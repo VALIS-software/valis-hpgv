@@ -18,7 +18,7 @@ export interface GenomeBrowserRenderProps {
 
 export default class GenomeBrowser {
 
-    protected trackViewer: TrackViewer; // @! temporarily public
+    protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
 
     constructor(configuration?: GenomeBrowserConfiguration){

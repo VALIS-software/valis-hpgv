@@ -6,11 +6,12 @@
   "types": "dist/GenomeBrowser.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=production"
+    "build": "webpack --mode=production && dts-generator --name genome-browser --project ./ --out dist/GenomeBrowser.d.ts"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
   "dependencies": {
+    "dts-generator": "^2.1.0",
     "engine": "git+https://github.com/VALIS-software/Engine.git",
     "react": "16.3.x",
     "react-dom": "16.3.x",

@@ -2,11 +2,11 @@
   "name": "genome-browser",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/GenomeBrowser.js",
-  "types": "dist/GenomeBrowser.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=production"
+    "build": "cti src && webpack --mode=production"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
@@ -18,6 +18,7 @@
     "valis": "github:VALIS-Software/valis-typescript-client"
   },
   "devDependencies": {
+    "create-ts-index": "^1.0.14",
     "file-loader": "2.0.x",
     "ts-loader": "4.2.x",
     "typescript": "3.0.x",

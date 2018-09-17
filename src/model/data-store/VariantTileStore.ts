@@ -33,7 +33,7 @@ type VariantInfo = {
     variant_affected_genes: Array<string>
 }
 
-export type TilePayload = Array<{
+type TilePayload = Array<{
     id: string,
     baseIndex: number,
     refSequence: string,

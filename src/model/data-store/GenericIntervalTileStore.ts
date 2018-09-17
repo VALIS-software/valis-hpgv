@@ -1,7 +1,7 @@
 import { Tile, TileStore } from "./TileStore";
 import { SiriusApi } from "valis";
 
-export type TilePayload = Float32Array;
+type TilePayload = Float32Array;
 
 /**
  * GenericIntervalTileStore makes it possible to transform a query result into tiles containing intervals

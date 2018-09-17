@@ -9,14 +9,14 @@ module.exports = (env) => {
     let releaseMode = !!(env.production || env.deploy);
 
     const config = {
-        context: path.resolve(__dirname, "src"),
-        entry: "./GenomeBrowser.tsx",
-
         mode: releaseMode ? "production" : "development",
 
+        context: path.resolve(__dirname, "src"),
+        
+        entry: "./index.ts",
         output: {
             path: outputDirectory,
-            filename: 'GenomeBrowser.js'
+            filename: 'index.js'
         },
 
         // Enable sourcemaps for debugging webpack's output.

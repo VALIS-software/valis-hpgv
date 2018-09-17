@@ -14,7 +14,7 @@ import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
 import TextClone from "./util/TextClone";
 import { EntityType } from "valis";
 
-export default class VariantTrack extends TrackObject<'variant'> {
+export class VariantTrack extends TrackObject<'variant'> {
 
     protected readonly macroLodBlendRange = 1;
     protected readonly macroLodThresholdLow = 8;
@@ -394,3 +394,5 @@ export default class VariantTrack extends TrackObject<'variant'> {
     }
 
 }
+
+export default VariantTrack;

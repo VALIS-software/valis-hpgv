@@ -12,7 +12,7 @@ type TilePayload = Float32Array;
  *
  * Macro tile have lod level `this.macroLodLevel` and store many more intervals but with lower precision (not enough to display with base-pair precision)
  */
-export default class GenericIntervalTileStore extends TileStore<TilePayload, void> {
+export class GenericIntervalTileStore extends TileStore<TilePayload, void> {
 
     microLodThreshold = 3;
     macroLodLevel = 10;
@@ -62,3 +62,5 @@ export default class GenericIntervalTileStore extends TileStore<TilePayload, voi
     }
 
 }
+
+export default GenericIntervalTileStore;

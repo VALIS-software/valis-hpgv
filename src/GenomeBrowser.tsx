@@ -16,7 +16,7 @@ export interface GenomeBrowserRenderProps {
     style?: React.CSSProperties,
 }
 
-export default class GenomeBrowser {
+export class GenomeBrowser {
 
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
@@ -99,3 +99,5 @@ export default class GenomeBrowser {
     }
 
 }
+
+export default GenomeBrowser;

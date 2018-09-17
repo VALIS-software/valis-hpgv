@@ -40,7 +40,7 @@ export interface TrackViewerConfiguration {
     tracks: Array<TrackConfiguration>,
 }
 
-export default class TrackViewer extends Object2D {
+export class TrackViewer extends Object2D {
 
     // layout settings
     readonly trackHeaderWidth: number = 180;
@@ -1046,3 +1046,5 @@ function AddPanelButton(props: {
         </div>
     </div>
 }
+
+export default TrackViewer;

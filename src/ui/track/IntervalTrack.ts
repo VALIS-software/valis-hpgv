@@ -10,7 +10,7 @@ import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
 
 type TilePayload = Float32Array;
 
-export default class IntervalTrack extends TrackObject<'interval'> {
+export class IntervalTrack extends TrackObject<'interval'> {
     
     blendEnabled: boolean = true;
 
@@ -133,3 +133,5 @@ export default class IntervalTrack extends TrackObject<'interval'> {
     }
 
 }
+
+export default IntervalTrack;

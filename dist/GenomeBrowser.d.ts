@@ -10,7 +10,7 @@ export interface GenomeBrowserRenderProps {
     pixelRatio?: number;
     style?: React.CSSProperties;
 }
-export default class GenomeBrowser {
+export declare class GenomeBrowser {
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
     constructor(configuration?: GenomeBrowserConfiguration);
@@ -26,3 +26,4 @@ export default class GenomeBrowser {
     protected stopFrameLoop(): void;
     protected frameLoop: () => void;
 }
+export default GenomeBrowser;

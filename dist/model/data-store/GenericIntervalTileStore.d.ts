@@ -9,7 +9,7 @@ declare type TilePayload = Float32Array;
  *
  * Macro tile have lod level `this.macroLodLevel` and store many more intervals but with lower precision (not enough to display with base-pair precision)
  */
-export default class GenericIntervalTileStore extends TileStore<TilePayload, void> {
+export declare class GenericIntervalTileStore extends TileStore<TilePayload, void> {
     protected contig: string;
     protected query: any;
     protected tileSize: number;
@@ -19,4 +19,4 @@ export default class GenericIntervalTileStore extends TileStore<TilePayload, voi
     protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }
-export {};
+export default GenericIntervalTileStore;

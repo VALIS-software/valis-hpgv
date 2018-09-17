@@ -17,7 +17,7 @@ export interface TrackViewerConfiguration {
     panels: Array<PanelConfiguration>;
     tracks: Array<TrackConfiguration>;
 }
-export default class TrackViewer extends Object2D {
+export declare class TrackViewer extends Object2D {
     readonly trackHeaderWidth: number;
     readonly panelHeaderHeight: number;
     readonly spacing: {
@@ -128,4 +128,4 @@ declare class RowObject {
     static readonly expandedTrackHeight: number;
     static readonly collapsedTrackHeight: number;
 }
-export {};
+export default TrackViewer;

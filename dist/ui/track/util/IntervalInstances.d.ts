@@ -9,7 +9,7 @@ export declare type IntervalInstance = {
     h: number;
     color: Array<number>;
 };
-export default class IntervalInstances extends Object2DInstances<IntervalInstance> {
+export declare class IntervalInstances extends Object2DInstances<IntervalInstance> {
     minWidth: number;
     blendFactor: number;
     borderStrength: number;
@@ -21,3 +21,4 @@ export default class IntervalInstances extends Object2DInstances<IntervalInstanc
     protected getVertexCode(): string;
     protected getFragmentCode(): string;
 }
+export default IntervalInstances;

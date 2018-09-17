@@ -6,7 +6,7 @@ import { Object2D } from "engine/ui/Object2D";
 import TrackObject from "./BaseTrack";
 import IntervalInstances from "./util/IntervalInstances";
 declare type TilePayload = Float32Array;
-export default class IntervalTrack extends TrackObject<'interval'> {
+export declare class IntervalTrack extends TrackObject<'interval'> {
     blendEnabled: boolean;
     protected tileStore: GenericIntervalTileStore;
     constructor(model: TrackModel<'interval'>);
@@ -20,4 +20,4 @@ export default class IntervalTrack extends TrackObject<'interval'> {
     protected createTileNode(tile: Tile<TilePayload>): IntervalInstances;
     protected removeTile: (tile: IntervalInstances) => void;
 }
-export {};
+export default IntervalTrack;

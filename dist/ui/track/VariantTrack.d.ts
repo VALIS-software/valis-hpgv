@@ -7,7 +7,7 @@ import { Text } from "engine/ui/Text";
 import TrackObject from "./BaseTrack";
 import IntervalInstances from "./util/IntervalInstances";
 import TextClone from "./util/TextClone";
-export default class VariantTrack extends TrackObject<'variant'> {
+export declare class VariantTrack extends TrackObject<'variant'> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;
@@ -38,3 +38,4 @@ export default class VariantTrack extends TrackObject<'variant'> {
         [key: string]: Text;
     };
 }
+export default VariantTrack;

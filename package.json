@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode=production"
   },
-  "author": "",
+  "author": "George Corney (haxiomic)",
   "license": "ISC",
   "dependencies": {
     "engine": "git+https://github.com/VALIS-software/Engine.git",

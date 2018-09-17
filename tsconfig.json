@@ -2,7 +2,7 @@
     "compilerOptions": {
         "outDir": "dist",
         "target": "es5",
-        "declaration": false,
+        "declaration": true,
         "downlevelIteration": true,
         "noImplicitAny": true,
         "strictNullChecks": false,

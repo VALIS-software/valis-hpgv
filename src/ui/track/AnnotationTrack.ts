@@ -1,6 +1,6 @@
-import { Strand } from "gff3/Strand";
-import { GeneClass, TranscriptClass } from "sirius/AnnotationTileset";
-import QueryBuilder from "sirius/QueryBuilder";
+import { Strand } from "valis";
+import { AnnotationTileset } from "valis";
+import { QueryBuilder } from "valis";
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
@@ -15,7 +15,7 @@ import Text from "engine/ui/Text";
 import { OpenSansRegular } from "../font/Fonts";
 import TrackObject from "./BaseTrack";
 import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
-import { SiriusApi } from "sirius/SiriusApi";
+import { SiriusApi } from "valis";
 
 /**
  * WIP Annotation tracks:
@@ -123,7 +123,7 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
                 for (let gene of tile.payload) {
                     if (gene.strand !== this.model.strand) continue;
 
-                    let color = gene.class === GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
+                    let color = gene.class === AnnotationTileset.GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
                     let height = gene.transcriptCount * 20 + (gene.transcriptCount - 1) * 10 + 60;
 
                     instanceData.push({
@@ -335,9 +335,9 @@ class TranscriptAnnotation extends Object2D {
         super();
 
         let transcriptColor = {
-            [TranscriptClass.Unspecified]: [0.5, 0.5, 0.5, 0.25],
-            [TranscriptClass.ProteinCoding]: [1, 0, 1, 0.25],
-            [TranscriptClass.NonProteinCoding]: [0, 1, 1, 0.25],
+            [AnnotationTileset.TranscriptClass.Unspecified]: [0.5, 0.5, 0.5, 0.25],
+            [AnnotationTileset.TranscriptClass.ProteinCoding]: [1, 0, 1, 0.25],
+            [AnnotationTileset.TranscriptClass.NonProteinCoding]: [0, 1, 1, 0.25],
         }
 
         let backgroundColor = [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17]; // rgba(107, 109, 136, 0.17)

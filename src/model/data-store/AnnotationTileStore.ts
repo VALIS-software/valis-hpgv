@@ -1,6 +1,12 @@
-import { GeneInfo, GenomeFeatureType, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "sirius/AnnotationTileset";
-import SiriusApi from "sirius/SiriusApi";
+import { SiriusApi } from "valis";
 import { Tile, TileStore } from "./TileStore";
+import { AnnotationTileset } from "valis";
+
+type GeneInfo = AnnotationTileset.GeneInfo;
+type TranscriptComponentInfo = AnnotationTileset.TranscriptComponentInfo;
+type TranscriptInfo = AnnotationTileset.TranscriptInfo;
+const TranscriptComponentClass = AnnotationTileset.TranscriptComponentClass;
+const GenomeFeatureType = AnnotationTileset.GenomeFeatureType;
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {

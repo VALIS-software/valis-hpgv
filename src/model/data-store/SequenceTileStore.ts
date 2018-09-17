@@ -1,4 +1,4 @@
-import SiriusApi from "sirius/SiriusApi";
+import { SiriusApi } from "valis";
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
 import TileStore, { Tile } from "./TileStore";
 

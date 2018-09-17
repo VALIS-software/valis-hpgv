@@ -1,6 +1,5 @@
 import { Tile, TileStore } from "./TileStore";
-import { SiriusApi } from "sirius/SiriusApi";
-import QueryBuilder from "sirius/QueryBuilder";
+import { SiriusApi } from "valis";
 
 export type TilePayload = Float32Array;
 

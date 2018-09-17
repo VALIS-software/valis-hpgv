@@ -1,8 +1,6 @@
-import QueryBuilder from "sirius/QueryBuilder";
-import SiriusApi from "sirius/SiriusApi";
+import { SiriusApi } from "valis";
 import { TrackModel } from "../TrackModel";
 import { Tile, TileStore } from "./TileStore";
-import { start } from "repl";
 
 // Tile payload is a list of genes extended with nesting
 type VariantGenomeNode = {

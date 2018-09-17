@@ -1,4 +1,4 @@
-import { Strand } from "gff3/Strand";
+import { Strand } from "valis";
 
 /**
  * Should be plain-old-data and easy to serialize

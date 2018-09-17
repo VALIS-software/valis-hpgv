@@ -2,7 +2,7 @@ import * as React from "react";
 import Animator from "engine/animation/Animator";
 import AppCanvas from "./ui/core/AppCanvas";
 import TrackViewer, { TrackViewerConfiguration, Track } from "./ui/TrackViewer";
-import { TrackModel } from "genome-browser/model/TrackModel";
+import { TrackModel } from "./model/TrackModel";
 
 export interface GenomeBrowserConfiguration extends TrackViewerConfiguration {
 

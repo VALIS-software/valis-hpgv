@@ -12,7 +12,7 @@ import { OpenSansRegular } from "../font/Fonts";
 import TrackObject from "./BaseTrack";
 import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
 import TextClone from "./util/TextClone";
-import { EntityType } from "sirius/EntityType";
+import { EntityType } from "valis";
 
 export default class VariantTrack extends TrackObject<'variant'> {
 

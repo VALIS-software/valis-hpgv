@@ -8,12 +8,12 @@ Dev notes:
 */
 
 import React = require("react");
-import IconButton from "material-ui/IconButton";
-import SvgAdd from "material-ui/svg-icons/content/add";
-import SvgClose from "material-ui/svg-icons/navigation/close";
-import SvgExpandLess from "material-ui/svg-icons/navigation/expand-less";
-import SvgExpandMore from "material-ui/svg-icons/navigation/expand-more";
-import { SiriusApi } from "sirius/SiriusApi";
+// import IconButton from "material-ui/IconButton";
+// import SvgAdd from "material-ui/svg-icons/content/add";
+// import SvgClose from "material-ui/svg-icons/navigation/close";
+// import SvgExpandLess from "material-ui/svg-icons/navigation/expand-less";
+// import SvgExpandMore from "material-ui/svg-icons/navigation/expand-more";
+import { SiriusApi } from "valis";
 import Animator from "engine/animation/Animator";
 import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../model/TrackModel";
@@ -962,9 +962,9 @@ function TrackCloseButton(props: {
             top: '50%',
             transform: 'translate(0, -50%)',
         }}>
-            <IconButton onClick={() => props.onClick(props.track)}>
-                <SvgClose color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)' />
-            </IconButton>
+            <span onClick={() => props.onClick(props.track)}>
+                X
+            </span>
         </div>
     </div>
 }
@@ -987,14 +987,9 @@ function TrackHeader(props: {
         justifyContent: 'flex-start'
     };
 
-    const ArrowElem = props.isExpanded ? SvgExpandLess : SvgExpandMore;
+    const ArrowElem = props.isExpanded ? <span>-</span> : <span>+</span>;
 
-    const expandArrow = (<ArrowElem
-        style={style}
-        viewBox={iconViewBoxSize}
-        color={iconColor}
-        hoverColor={iconHoverColor}
-    />);
+    const expandArrow = ArrowElem;
     return <div
         style={{
             position: 'relative',
@@ -1045,9 +1040,9 @@ function AddPanelButton(props: {
             top: '50%',
             transform: 'translate(0, -50%)',
         }}>
-            <IconButton onClick={props.onClick}>
-                <SvgAdd color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)' />
-            </IconButton>
+            <span onClick={props.onClick}>
+                +
+            </span>
         </div>
     </div>
 }

@@ -35,8 +35,12 @@ module.exports = (env) => {
                     exclude: [path.resolve(__dirname, "node_modules")],
                 },
                 {
-                    test: /\.bin$/,
-                    use: 'raw-loader'
+                    test: /\.bin/,
+                    type: 'javascript/auto',
+                    use: [{
+                        loader: 'file-loader',
+                        options: { name: 'assets/[name].[ext]' },
+                    }],
                 }
             ]
         },

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/GenomeBrowser.js",
+  "types": "dist/GenomeBrowser.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode=production"
@@ -17,10 +18,10 @@
     "valis": "github:VALIS-Software/valis-typescript-client"
   },
   "devDependencies": {
-    "raw-loader": "^0.5.1",
-    "webpack": "4.4.x",
-    "webpack-cli": "2.0.x",
+    "file-loader": "2.0.x",
+    "ts-loader": "4.2.x",
     "typescript": "3.0.x",
-    "ts-loader": "4.2.x"
+    "webpack": "4.4.x",
+    "webpack-cli": "2.0.x"
   }
 }

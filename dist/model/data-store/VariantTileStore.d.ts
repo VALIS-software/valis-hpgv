@@ -1,6 +1,6 @@
 import { TrackModel } from "../TrackModel";
 import { Tile, TileStore } from "./TileStore";
-export declare type TilePayload = Array<{
+declare type TilePayload = Array<{
     id: string;
     baseIndex: number;
     refSequence: string;

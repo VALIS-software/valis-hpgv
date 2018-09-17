@@ -1,5 +1,5 @@
 import { Tile, TileStore } from "./TileStore";
-export declare type TilePayload = Float32Array;
+declare type TilePayload = Float32Array;
 /**
  * GenericIntervalTileStore makes it possible to transform a query result into tiles containing intervals
  *
@@ -19,3 +19,4 @@ export default class GenericIntervalTileStore extends TileStore<TilePayload, voi
     protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }
+export {};

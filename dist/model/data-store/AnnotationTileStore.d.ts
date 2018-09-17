@@ -12,7 +12,7 @@ export declare type Transcript = TranscriptInfo & {
     utr: Array<TranscriptComponentInfo>;
     other: Array<TranscriptComponentInfo>;
 };
-export declare type TilePayload = Array<Gene>;
+declare type TilePayload = Array<Gene>;
 export declare class AnnotationTileStore extends TileStore<TilePayload, void> {
     protected contig: string;
     protected macro: boolean;

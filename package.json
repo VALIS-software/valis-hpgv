@@ -17,11 +17,11 @@
     "valis": "github:VALIS-Software/valis-typescript-client"
   },
   "devDependencies": {
-    "create-ts-index": "^1.0.14",
+    "create-ts-index": "1.0.x",
     "file-loader": "2.0.x",
     "ts-loader": "4.2.x",
-    "typescript": "^3.0.3",
-    "url-loader": "^1.1.1",
+    "typescript": "3.0.x",
+    "url-loader": "1.1.x",
     "webpack": "4.4.x",
     "webpack-cli": "2.0.x"
   }

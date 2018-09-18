@@ -18,7 +18,7 @@ module.exports = (env) => {
             path: outputDirectory,
             filename: '../index.js',
             library: '',
-            libraryTarget: 'commonjs',
+            libraryTarget: 'umd',
         },
 
         // Enable sourcemaps for debugging webpack's output.
@@ -50,8 +50,8 @@ module.exports = (env) => {
         ],
 
         externals: {
-            react: 'react',
-            reactDOM: 'reactDOM',
+            react: 'React',
+            reactDOM: 'ReactDOM',
         }
     }
 

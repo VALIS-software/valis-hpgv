@@ -2,8 +2,8 @@
   "name": "genome-browser",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cti src && webpack --mode=production"
@@ -14,14 +14,14 @@
     "engine": "git+https://github.com/VALIS-software/Engine.git",
     "react": "16.3.x",
     "react-dom": "16.3.x",
-    "react-virtualized": "9.20.x",
     "valis": "github:VALIS-Software/valis-typescript-client"
   },
   "devDependencies": {
     "create-ts-index": "^1.0.14",
     "file-loader": "2.0.x",
     "ts-loader": "4.2.x",
-    "typescript": "3.0.x",
+    "typescript": "^3.0.3",
+    "url-loader": "^1.1.1",
     "webpack": "4.4.x",
     "webpack-cli": "2.0.x"
   }

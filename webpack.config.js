@@ -13,10 +13,12 @@ module.exports = (env) => {
 
         context: path.resolve(__dirname, "src"),
         
-        entry: "./index.ts",
+        entry: "./index",
         output: {
             path: outputDirectory,
-            filename: 'index.js'
+            filename: '../index.js',
+            library: '',
+            libraryTarget: 'commonjs',
         },
 
         // Enable sourcemaps for debugging webpack's output.
@@ -34,13 +36,10 @@ module.exports = (env) => {
                     loader: "ts-loader",
                     exclude: [path.resolve(__dirname, "node_modules")],
                 },
+                // convert binary files into data-urls and embed into the output
                 {
                     test: /\.bin/,
-                    type: 'javascript/auto',
-                    use: [{
-                        loader: 'file-loader',
-                        options: { name: 'assets/[name].[ext]' },
-                    }],
+                    loader: 'url-loader'
                 }
             ]
         },
@@ -48,7 +47,12 @@ module.exports = (env) => {
         plugins: [
             // pass --env to javascript build via process.env
             new webpack.DefinePlugin({ "process.env": JSON.stringify(env) }),
-        ]
+        ],
+
+        externals: {
+            react: 'react',
+            reactDOM: 'reactDOM',
+        }
     }
 
     return config;

@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "outDir": "_built",
+        "target": "es5",
+        "declaration": false,
+        "noImplicitAny": true,
+        "strictNullChecks": false,
+        "lib": [
+            "es2015",
+            "DOM",
+            "ScriptHost"
+        ],
+        "typeRoots": [ // fix bug with parent node_modules
+            "./node_modules/@types"
+        ]
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}

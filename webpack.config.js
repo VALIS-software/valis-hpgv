@@ -1,8 +1,6 @@
 const path = require('path');
 const webpack = require("webpack");
 
-const outputDirectory = `${__dirname}/dist`;
-
 module.exports = (env) => {
     env = env || {};
 
@@ -15,7 +13,7 @@ module.exports = (env) => {
         
         entry: "./index",
         output: {
-            path: outputDirectory,
+            path: `${__dirname}/@types`, // hack to make sure the @types directory gets generated
             filename: '../index.js',
             library: '',
             libraryTarget: 'umd',

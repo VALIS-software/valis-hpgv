@@ -1,10 +1,10 @@
 const path = require('path');
 const webpack = require("webpack");
 
-module.exports = (env) => {
+module.exports = (env, argv) => {
     env = env || {};
 
-    let releaseMode = !!(env.production || env.deploy);
+    let releaseMode = argv.mode === 'production';
 
     const config = {
         mode: releaseMode ? "production" : "development",
@@ -45,11 +45,14 @@ module.exports = (env) => {
         plugins: [
             // pass --env to javascript build via process.env
             new webpack.DefinePlugin({ "process.env": JSON.stringify(env) }),
-        ],
+            
+        ].concat(
+            env.analyze ? [new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)] : []
+        ),
 
         externals: {
-            react: 'React',
-            reactDOM: 'ReactDOM',
+            'react': 'React',
+            'react-dom': 'ReactDOM',
         }
     }
 

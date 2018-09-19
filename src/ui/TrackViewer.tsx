@@ -8,11 +8,11 @@ Dev notes:
 */
 
 import React = require("react");
-// import IconButton from "material-ui/IconButton";
-// import SvgAdd from "material-ui/svg-icons/content/add";
-// import SvgClose from "material-ui/svg-icons/navigation/close";
-// import SvgExpandLess from "material-ui/svg-icons/navigation/expand-less";
-// import SvgExpandMore from "material-ui/svg-icons/navigation/expand-more";
+import IconButton from "@material-ui/core/IconButton";
+import AddIcon from "@material-ui/icons/Add";
+import CloseIcon from "@material-ui/icons/Close";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { SiriusApi } from "valis";
 import Animator from "engine/animation/Animator";
 import { GenomicLocation } from "../model/GenomicLocation";
@@ -246,7 +246,8 @@ export class TrackViewer extends Object2D {
         this.grid.add(panel);
 
         // set available contigs to navigate to from the API
-        SiriusApi.getContigsSorted().then((contigs) => panel.setAvailableContigs(contigs));
+        // SiriusApi.getContigsSorted().then((contigs) => panel.setAvailableContigs(contigs));
+        panel.setAvailableContigs(['chr1', 'chr2']); // @! temporary
 
         // initialize tracks for this panel
        for (let track of this.tracks) {
@@ -962,9 +963,9 @@ function TrackCloseButton(props: {
             top: '50%',
             transform: 'translate(0, -50%)',
         }}>
-            <span onClick={() => props.onClick(props.track)}>
-                X
-            </span>
+            <IconButton onClick={() => props.onClick(props.track)} color='inherit'>
+                <CloseIcon /*colorPrimary='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+            </IconButton>
         </div>
     </div>
 }
@@ -979,7 +980,8 @@ function TrackHeader(props: {
     const iconViewBoxSize = '0 0 32 32';
     const style = {
         marginTop: 8,
-        marginLeft: 16
+        marginLeft: 16,
+        color: 'inherit'
     }
     const headerContainerStyle: React.CSSProperties = {
         display: 'flex',
@@ -987,9 +989,14 @@ function TrackHeader(props: {
         justifyContent: 'flex-start'
     };
 
-    const ArrowElem = props.isExpanded ? <span>-</span> : <span>+</span>;
+    const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
 
-    const expandArrow = ArrowElem;
+    const expandArrow = (<ArrowElem
+        style={style}	
+        viewBox={iconViewBoxSize}	
+        // color={iconColor}	
+        // hoverColor={iconHoverColor}	
+    />);
     return <div
         style={{
             position: 'relative',
@@ -999,6 +1006,7 @@ function TrackHeader(props: {
             backgroundColor: '#171615',
             borderRadius: '8px 0px 0px 8px',
             fontSize: '15px',
+            fontFamily: 'sans-serif',
             overflow: 'hidden',
             userSelect: 'none',
         }}
@@ -1040,9 +1048,9 @@ function AddPanelButton(props: {
             top: '50%',
             transform: 'translate(0, -50%)',
         }}>
-            <span onClick={props.onClick}>
-                +
-            </span>
+            <IconButton onClick={props.onClick} color="inherit">
+                <AddIcon />
+            </IconButton>
         </div>
     </div>
 }

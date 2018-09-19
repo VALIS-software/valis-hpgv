@@ -6,11 +6,15 @@
   "types": "./@types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cti src && webpack --mode=production"
+    "build": "cti src && webpack --mode=production",
+    "dev": "cti src && webpack --watch --mode=production",
+    "analyze": "cti src && webpack --mode=production --env.analyze"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
   "dependencies": {
+    "@material-ui/core": "^3.1.0",
+    "@material-ui/icons": "^3.0.1",
     "engine": "git+https://github.com/VALIS-software/Engine.git",
     "react": "16.3.x",
     "react-dom": "16.3.x",
@@ -23,6 +27,7 @@
     "typescript": "3.0.x",
     "url-loader": "1.1.x",
     "webpack": "4.4.x",
-    "webpack-cli": "2.0.x"
+    "webpack-cli": "2.0.x",
+    "webpack-bundle-analyzer": "^3.0.2"
   }
 }

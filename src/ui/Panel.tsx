@@ -1,10 +1,10 @@
-// import IconButton from "material-ui/IconButton";
-// import SvgEdit from "material-ui/svg-icons/image/edit";
-// import SvgChevronLeft from "material-ui/svg-icons/navigation/chevron-left";
-// import SvgChevronRight from "material-ui/svg-icons/navigation/chevron-right";
-// import SvgCancel from "material-ui/svg-icons/navigation/cancel";
-// import SvgCheck from "material-ui/svg-icons/navigation/check";
-// import SvgClose from "material-ui/svg-icons/navigation/close";
+import IconButton from "@material-ui/core/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import CancelIcon from "@material-ui/icons/Cancel";
+import CheckIcon from "@material-ui/icons/Check";
+import CloseIcon from "@material-ui/icons/Close";
 import * as React from "react";
 import { InteractionEvent, WheelDeltaMode, WheelInteractionEvent } from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
@@ -669,9 +669,9 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 position: 'absolute',
                 right: 0
             }}>
-                <div onClick={() => this.props.onClose(this.props.panel)}>
-                    X
-                </div>
+                <IconButton onClick={() => this.props.onClose(this.props.panel)}>
+                    <CloseIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                </IconButton>
             </div>
         ) : null;
 
@@ -680,9 +680,9 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 position: 'absolute',
                 left: 0
             }}>
-                <div onClick={() => this.props.onPreviousContig(this.props.panel)}>
-                    &lt;
-                </div>
+                <IconButton onClick={() => this.props.onPreviousContig(this.props.panel)}>
+                    <ChevronLeftIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                </IconButton>
             </div>
         );
 
@@ -691,9 +691,9 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 position: 'absolute',
                 right: 0
             }}>
-                <div onClick={() => this.props.onNextContig(this.props.panel)}>
-                    &gt;
-                </div>
+                <IconButton onClick={() => this.props.onNextContig(this.props.panel)}>
+                    <ChevronRightIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                </IconButton>
             </div>
         );
 
@@ -709,19 +709,20 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                     type="text"
                     defaultValue={this.props.rangeSpecifier}></input></span>
                 <span style={headerStyle}>
-                    {/* <SvgCancel 
+                    <CancelIcon 
                         onClick={() => this.props.onEditCancel()} 
                         viewBox={iconViewBoxSize}
-                        color={iconColor}
-                        hoverColor={iconHoverColor} 
-                    /> */}
+                        // color={iconColor}
+                        // hoverColor={iconHoverColor} 
+                    />
                 </span>
                 <span style={headerStyle}>
-                    {/* <SvgCheck 
+                    <CheckIcon 
                         onClick={() => this.props.onEditSave(this.rangeSpecifier)} 
-                        viewBox={iconViewBoxSize}color={iconColor}
-                        hoverColor={iconHoverColor} 
-                    /> */}
+                        viewBox={iconViewBoxSize}
+                        // color={iconColor}
+                        // hoverColor={iconHoverColor} 
+                    />
                 </span>
                 {closeIcon}
             </div>);
@@ -730,11 +731,11 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 {this.props.enableContigNavigation ? previousIcon : null}
                 <span onClick={() => this.props.onEditStart()}><b>{this.props.contig}</b> {this.props.rangeString}</span>
                 <span style={headerStyle} onClick={() => this.props.onEditStart()}>
-                    {/* <SvgEdit 
+                    <EditIcon 
                         viewBox={iconViewBoxSize}
-                        color={iconColor}
-                        hoverColor={iconHoverColor} 
-                    /> */}
+                        // color={iconColor}
+                        // hoverColor={iconHoverColor} 
+                    />
                 </span>
                 {this.props.enableContigNavigation ? nextIcon : null}
             </div>);
@@ -750,6 +751,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 borderRadius: '8px',
                 fontSize: '12px',
                 fontWeight: 200,
+                fontFamily: 'sans-serif',
                 overflow: 'hidden',
                 userSelect: 'none',
             }}

@@ -1021,7 +1021,9 @@ function TrackHeader(props: {
             <div onClick={() => {
                 props.setExpanded(!props.isExpanded);
             }} style={headerContainerStyle}>
-                {expandArrow}
+                <IconButton color="inherit">
+                    {expandArrow}
+                </IconButton>
                 {props.title}
             </div>
         </div>

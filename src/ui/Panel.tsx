@@ -669,7 +669,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 position: 'absolute',
                 right: 0
             }}>
-                <IconButton onClick={() => this.props.onClose(this.props.panel)}>
+                <IconButton onClick={() => this.props.onClose(this.props.panel)} color="inherit">
                     <CloseIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
                 </IconButton>
             </div>
@@ -680,7 +680,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 position: 'absolute',
                 left: 0
             }}>
-                <IconButton onClick={() => this.props.onPreviousContig(this.props.panel)}>
+                <IconButton onClick={() => this.props.onPreviousContig(this.props.panel)} color="inherit">
                     <ChevronLeftIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
                 </IconButton>
             </div>
@@ -691,7 +691,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 position: 'absolute',
                 right: 0
             }}>
-                <IconButton onClick={() => this.props.onNextContig(this.props.panel)}>
+                <IconButton onClick={() => this.props.onNextContig(this.props.panel)} color="inherit">
                     <ChevronRightIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
                 </IconButton>
             </div>
@@ -709,7 +709,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                     type="text"
                     defaultValue={this.props.rangeSpecifier}></input></span>
                 <span style={headerStyle}>
-                    <CancelIcon 
+                    <CancelIcon
                         onClick={() => this.props.onEditCancel()} 
                         viewBox={iconViewBoxSize}
                         // color={iconColor}

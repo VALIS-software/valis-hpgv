@@ -1,1 +1,4 @@
 examples/
+webpack.config.js
+tsconfig.js
+.gitignore

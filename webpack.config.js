@@ -10,7 +10,7 @@ module.exports = (env, argv) => {
         mode: releaseMode ? "production" : "development",
 
         context: path.resolve(__dirname, "src"),
-        
+
         entry: "./index",
         output: {
             path: `${__dirname}/@types`, // hack to make sure the @types directory gets generated
@@ -45,14 +45,24 @@ module.exports = (env, argv) => {
         plugins: [
             // pass --env to javascript build via process.env
             new webpack.DefinePlugin({ "process.env": JSON.stringify(env) }),
-            
         ].concat(
             env.analyze ? [new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)] : []
         ),
 
         externals: {
-            'react': 'React',
-            'react-dom': 'ReactDOM',
+            // don't bundle react or react-dom
+            'react': {
+                commonjs: "react",
+                commonjs2: "react",
+                amd: "React",
+                root: "React"
+            },
+            "react-dom": {
+                commonjs: "react-dom",
+                commonjs2: "react-dom",
+                amd: "ReactDOM",
+                root: "ReactDOM"
+            }
         }
     }
 

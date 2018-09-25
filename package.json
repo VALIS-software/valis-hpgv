@@ -6,19 +6,15 @@
   "types": "./@types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cti src && webpack --mode=production",
-    "dev": "cti src && webpack --watch --mode=production",
+    "prod": "cti src && webpack --mode=production",
+    "dev": "cti src && webpack --watch --mode=development",
     "analyze": "cti src && webpack --mode=production --env.analyze"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
   "dependencies": {
     "@material-ui/core": "^3.1.0",
-    "@material-ui/icons": "^3.0.1",
-    "engine": "github:VALIS-software/Engine",
-    "react": "16.3.x",
-    "react-dom": "16.3.x",
-    "valis": "github:VALIS-Software/valis-typescript-client"
+    "@material-ui/icons": "^3.0.1"
   },
   "devDependencies": {
     "create-ts-index": "1.0.x",
@@ -28,6 +24,14 @@
     "url-loader": "1.1.x",
     "webpack": "4.4.x",
     "webpack-cli": "2.0.x",
-    "webpack-bundle-analyzer": "^3.0.2"
+    "webpack-bundle-analyzer": "^3.0.2",
+    "engine": "github:VALIS-software/Engine",
+    "valis": "github:VALIS-Software/valis-typescript-client"
+  },
+  "peerDependencies": {
+    "react": "16.x",
+    "react-dom": "16.x",
+    "engine": "github:VALIS-software/Engine",
+    "valis": "github:VALIS-Software/valis-typescript-client"
   }
 }

@@ -1006,7 +1006,6 @@ function TrackHeader(props: {
             backgroundColor: '#171615',
             borderRadius: '8px 0px 0px 8px',
             fontSize: '15px',
-            fontFamily: 'sans-serif',
             overflow: 'hidden',
             userSelect: 'none',
         }}

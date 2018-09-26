@@ -751,7 +751,6 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 borderRadius: '8px',
                 fontSize: '12px',
                 fontWeight: 200,
-                fontFamily: 'sans-serif',
                 overflow: 'hidden',
                 userSelect: 'none',
             }}

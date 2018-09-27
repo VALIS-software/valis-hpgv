@@ -30,8 +30,6 @@
   },
   "peerDependencies": {
     "react": "16.x",
-    "react-dom": "16.x",
-    "engine": "github:VALIS-software/Engine",
-    "valis": "github:VALIS-Software/valis-typescript-client"
+    "react-dom": "16.x"
   }
 }

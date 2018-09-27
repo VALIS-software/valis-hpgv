@@ -101,7 +101,6 @@ export class ShaderTrack<TilePayload, BlockPayload> extends TrackObject {
                             let fallbackNode = this._tileNodeCache.get(this.contig + ':' + fallbackTile.key, this.createTileNode);
                             this.updateTileNode(fallbackNode, fallbackTile, x0, span, displayLodLevel);
 
-                            // @! improve this
                             // z-position tile so that better lods are front-most
                             fallbackNode.z = (1.0 - fallbackTile.lodLevel / 50) - 0.1;
 

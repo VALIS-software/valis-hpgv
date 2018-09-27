@@ -103,7 +103,7 @@ export class XAxis extends Object2D {
         const tickRatio = tickSpacingPx / rangeWidthPx;
         const snap = this.snap;
 
-        // @! problem is we're dealing in absolute space too much
+        // we're dealing in absolute space too much
         // we should convert to absolute space only when displaying text
 
         // let t0x = tickRatio * range; // x-space location of first tick after 0

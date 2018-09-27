@@ -95,7 +95,7 @@ export class VariantTrack extends TrackObject<'variant'> {
                     let textOpacity = Math.min(Math.max((textSizePx - minTextSize) / (maxTextSize - minTextSize), 0.0), 1.0) * maxOpacity;
                     textOpacity = textOpacity * textOpacity;
 
-                    // @! very suboptimal: draw each character individually; should be using a batch text object
+                    // suboptimal: draw each character individually; would be faster be using a batch text object
                     // display text
                     if (textOpacity > 0 && textSizePx > 0) {
                         for (let variant of tile.payload) {

@@ -5,16 +5,17 @@
   "main": "./index.js",
   "types": "./@types/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prod": "cti src && webpack --mode=production",
-    "dev": "cti src && webpack --watch --mode=development",
-    "analyze": "cti src && webpack --mode=production --env.analyze"
+    "clean": "rimraf ./@types ./index.js ./index.js.map",
+    "prod": "npm run clean && cti src && webpack --mode=production",
+    "dev": "npm run clean && cti src && webpack --watch --mode=development",
+    "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
   "dependencies": {
     "@material-ui/core": "^3.1.0",
-    "@material-ui/icons": "^3.0.1"
+    "@material-ui/icons": "^3.0.1",
+    "genomics-formats": "github:VALIS-software/Genomics-Formats"
   },
   "devDependencies": {
     "create-ts-index": "1.0.x",
@@ -26,7 +27,8 @@
     "webpack-cli": "2.0.x",
     "webpack-bundle-analyzer": "^3.0.2",
     "engine": "github:VALIS-software/Engine",
-    "valis": "github:VALIS-Software/valis-typescript-client"
+    "valis": "github:VALIS-Software/valis-typescript-client",
+    "rimraf": "^2.6.2"
   },
   "peerDependencies": {
     "react": "16.x",

@@ -8,7 +8,8 @@
     "clean": "rimraf ./@types ./index.js ./index.js.map",
     "prod": "npm run clean && cti src && webpack --mode=production",
     "dev": "npm run clean && cti src && webpack --watch --mode=development",
-    "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze"
+    "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
+    "build": "npm run prod"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",

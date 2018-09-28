@@ -10,9 +10,10 @@
             "DOM",
             "ScriptHost"
         ],
-        "typeRoots": [ // fix bug with parent node_modules
-            "./node_modules/@types"
-        ]
+
+        // this is required to prevent TypeScript picking up types from parent directories
+        "types": [],
+        "typeRoots": [ "./node_modules/@types" ]
     },
     "include": [
         "./src/**/*"

@@ -1,7 +1,7 @@
 import { UsageCache } from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import { BlockPayload, TilePayload, SequenceTileStore } from "../../model/data-store/SequenceTileStore";
-import { Tile, TileState } from "../../model/data-store/TileStore";
+import { BlockPayload, TilePayload, SequenceTileStore } from "../../tile-store/SequenceTileStore";
+import { Tile, TileState } from "../../tile-store/TileStore";
 import { TrackModel } from "../../model/TrackModel";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext, DrawMode } from "engine/rendering/Renderer";

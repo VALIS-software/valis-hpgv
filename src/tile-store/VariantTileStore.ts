@@ -1,5 +1,5 @@
 import { SiriusApi } from "valis";
-import { TrackModel } from "../TrackModel";
+import { TrackModel } from "../model/TrackModel";
 import { Tile, TileStore } from "./TileStore";
 
 // Tile payload is a list of genes extended with nesting

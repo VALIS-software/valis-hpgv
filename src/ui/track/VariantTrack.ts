@@ -1,9 +1,9 @@
 import { Animator } from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
-import { SharedTileStore } from "../../model/data-store/SharedTileStores";
-import { TileState } from "../../model/data-store/TileStore";
-import { VariantTileStore } from "../../model/data-store/VariantTileStore";
+import { SharedTileStore } from "../../tile-store/SharedTileStores";
+import { TileState } from "../../tile-store/TileStore";
+import { VariantTileStore } from "../../tile-store/VariantTileStore";
 import { TrackModel } from "../../model/TrackModel";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";

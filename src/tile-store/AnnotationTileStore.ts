@@ -1,6 +1,6 @@
 import { SiriusApi } from "valis";
 import { Tile, TileStore } from "./TileStore";
-import { GeneInfo, TranscriptComponentInfo, TranscriptInfo, TranscriptComponentClass, GenomeFeatureType } from "../AnnotationTileset";
+import { GeneInfo, TranscriptComponentInfo, TranscriptInfo, TranscriptComponentClass, GenomeFeatureType } from "../model/AnnotationTileset";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {

@@ -4,9 +4,9 @@ import Scalar from "engine/math/Scalar";
 import TrackModel from "../../model/TrackModel";
 import { DEFAULT_SPRING } from "../UIConstants";
 import Object2D from "engine/ui/Object2D";
-import TileStore, { Tile, TileState } from "../../model/data-store/TileStore";
+import TileStore, { Tile, TileState } from "../../tile-store/TileStore";
 import { TrackObject } from "./BaseTrack";
-import SharedTileStore from "../../model/data-store/SharedTileStores";
+import SharedTileStore from "../../tile-store/SharedTileStores";
 
 /**
  * TileTrack provides a base class for Tracks that use TileStore

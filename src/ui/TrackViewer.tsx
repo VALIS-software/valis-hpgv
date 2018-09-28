@@ -13,7 +13,6 @@ import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import { SiriusApi } from "valis";
 import Animator from "engine/animation/Animator";
 import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../model/TrackModel";

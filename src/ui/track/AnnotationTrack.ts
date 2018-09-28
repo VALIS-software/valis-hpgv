@@ -1,5 +1,4 @@
-import { Strand } from "valis";
-import { AnnotationTileset } from "valis";
+import { Strand } from "genomics-formats/dist/gff3/Strand";
 import { QueryBuilder } from "valis";
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
@@ -8,6 +7,7 @@ import { AnnotationTileStore, Gene, MacroAnnotationTileStore, Transcript } from 
 import SharedTileStore from "../../model/data-store/SharedTileStores";
 import { TileState } from "../../model/data-store/TileStore";
 import TrackModel from "../../model/TrackModel";
+import { GeneClass, TranscriptClass } from "../../model/AnnotationTileset";
 import { BlendMode, DrawContext } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
@@ -123,7 +123,7 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
                 for (let gene of tile.payload) {
                     if (gene.strand !== this.model.strand) continue;
 
-                    let color = gene.class === AnnotationTileset.GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
+                    let color = gene.class === GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
                     let height = gene.transcriptCount * 20 + (gene.transcriptCount - 1) * 10 + 60;
 
                     instanceData.push({
@@ -335,9 +335,9 @@ class TranscriptAnnotation extends Object2D {
         super();
 
         let transcriptColor = {
-            [AnnotationTileset.TranscriptClass.Unspecified]: [0.5, 0.5, 0.5, 0.25],
-            [AnnotationTileset.TranscriptClass.ProteinCoding]: [1, 0, 1, 0.25],
-            [AnnotationTileset.TranscriptClass.NonProteinCoding]: [0, 1, 1, 0.25],
+            [TranscriptClass.Unspecified]: [0.5, 0.5, 0.5, 0.25],
+            [TranscriptClass.ProteinCoding]: [1, 0, 1, 0.25],
+            [TranscriptClass.NonProteinCoding]: [0, 1, 1, 0.25],
         }
 
         let backgroundColor = [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17]; // rgba(107, 109, 136, 0.17)

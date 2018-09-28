@@ -5,18 +5,7 @@ import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
 import Panel from "./Panel";
 import TrackObject from "./track/BaseTrack";
-export interface PanelConfiguration {
-    location: GenomicLocation;
-    width?: number;
-}
-export interface TrackConfiguration {
-    model: TrackModel;
-    heightPx?: number;
-}
-export interface TrackViewerConfiguration {
-    panels: Array<PanelConfiguration>;
-    tracks: Array<TrackConfiguration>;
-}
+import TrackViewerConfiguration from "./TrackViewerConfiguration";
 export declare class TrackViewer extends Object2D {
     readonly trackHeaderWidth: number;
     readonly panelHeaderHeight: number;

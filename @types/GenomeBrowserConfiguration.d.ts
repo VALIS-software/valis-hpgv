@@ -1,4 +1,4 @@
-import { TrackViewerConfiguration } from "./ui/TrackViewer";
+import TrackViewerConfiguration from "./ui/TrackViewerConfiguration";
 export interface GenomeBrowserConfiguration extends TrackViewerConfiguration {
 }
 export default GenomeBrowserConfiguration;

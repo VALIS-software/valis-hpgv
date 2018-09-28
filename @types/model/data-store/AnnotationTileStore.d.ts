@@ -1,8 +1,5 @@
 import { Tile, TileStore } from "./TileStore";
-import { AnnotationTileset } from "valis";
-declare type GeneInfo = AnnotationTileset.GeneInfo;
-declare type TranscriptComponentInfo = AnnotationTileset.TranscriptComponentInfo;
-declare type TranscriptInfo = AnnotationTileset.TranscriptInfo;
+import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "../AnnotationTileset";
 export declare type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
 };

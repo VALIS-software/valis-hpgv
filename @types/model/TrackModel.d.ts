@@ -1,4 +1,4 @@
-import { Strand } from "valis";
+import { Strand } from "genomics-formats/dist/gff3/Strand";
 /**
  * Should be plain-old-data and easy to serialize
  * - Should encapsulate complete state, excluding transitive UI state

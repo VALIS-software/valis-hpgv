@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepublish": "npm pack ../../",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && npx browserify _built/App.js -o bundle.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "genome-browser": "git+https://github.com/VALIS-software/Genome-Browser.git",
+    "genome-browser": "file:./genome-browser-1.0.0.tgz",
     "react": "16.3.x",
     "react-dom": "16.3.x"
   },

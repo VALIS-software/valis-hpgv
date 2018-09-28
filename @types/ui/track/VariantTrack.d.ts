@@ -1,5 +1,5 @@
 import UsageCache from "engine/ds/UsageCache";
-import { VariantTileStore } from "../../model/data-store/VariantTileStore";
+import { VariantTileStore } from "../../tile-store/VariantTileStore";
 import { TrackModel } from "../../model/TrackModel";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";

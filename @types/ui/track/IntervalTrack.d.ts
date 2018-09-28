@@ -1,6 +1,6 @@
 import UsageCache from "engine/ds/UsageCache";
-import GenericIntervalTileStore from "../../model/data-store/GenericIntervalTileStore";
-import { Tile } from "../../model/data-store/TileStore";
+import GenericIntervalTileStore from "../../tile-store/GenericIntervalTileStore";
+import { Tile } from "../../tile-store/TileStore";
 import { TrackModel } from "../../model/TrackModel";
 import { Object2D } from "engine/ui/Object2D";
 import TrackObject from "./BaseTrack";

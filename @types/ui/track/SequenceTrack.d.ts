@@ -1,5 +1,5 @@
-import { BlockPayload, TilePayload } from "../../model/data-store/SequenceTileStore";
-import { Tile } from "../../model/data-store/TileStore";
+import { BlockPayload, TilePayload } from "../../tile-store/SequenceTileStore";
+import { Tile } from "../../tile-store/TileStore";
 import { TrackModel } from "../../model/TrackModel";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext } from "engine/rendering/Renderer";

@@ -1,5 +1,5 @@
 import { Tile, TileStore } from "./TileStore";
-import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "../AnnotationTileset";
+import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "../model/AnnotationTileset";
 export declare type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
 };

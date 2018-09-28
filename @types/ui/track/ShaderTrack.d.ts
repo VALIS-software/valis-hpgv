@@ -1,7 +1,7 @@
 import UsageCache from "engine/ds/UsageCache";
 import TrackModel from "../../model/TrackModel";
 import Object2D from "engine/ui/Object2D";
-import TileStore, { Tile } from "../../model/data-store/TileStore";
+import TileStore, { Tile } from "../../tile-store/TileStore";
 import { TrackObject } from "./BaseTrack";
 /**
  * TileTrack provides a base class for Tracks that use TileStore

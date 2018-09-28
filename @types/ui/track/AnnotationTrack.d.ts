@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import UsageCache from "engine/ds/UsageCache";
-import { AnnotationTileStore } from "../../model/data-store/AnnotationTileStore";
+import { AnnotationTileStore } from "../../tile-store/AnnotationTileStore";
 import TrackModel from "../../model/TrackModel";
 import Object2D from "engine/ui/Object2D";
 import TrackObject from "./BaseTrack";

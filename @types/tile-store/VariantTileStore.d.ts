@@ -1,4 +1,4 @@
-import { TrackModel } from "../TrackModel";
+import { TrackModel } from "../model/TrackModel";
 import { Tile, TileStore } from "./TileStore";
 declare type TilePayload = Array<{
     id: string;

@@ -24,21 +24,7 @@ import Panel, { PanelInternal } from "./Panel";
 import ConstructTrack from "./track/ConstructTrack";
 import TrackObject from "./track/BaseTrack";
 import { DEFAULT_SPRING } from "./UIConstants";
-
-export interface PanelConfiguration {
-    location: GenomicLocation,
-    width?: number
-}
-
-export interface TrackConfiguration {
-    model: TrackModel,
-    heightPx?: number
-}
-
-export interface TrackViewerConfiguration {
-    panels: Array<PanelConfiguration>,
-    tracks: Array<TrackConfiguration>,
-}
+import TrackViewerConfiguration from "./TrackViewerConfiguration";
 
 export class TrackViewer extends Object2D {
 

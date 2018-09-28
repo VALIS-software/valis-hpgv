@@ -1,12 +1,11 @@
 import * as React from "react";
 import Animator from "engine/animation/Animator";
 import AppCanvas from "./ui/core/AppCanvas";
-import TrackViewer, { TrackViewerConfiguration, Track } from "./ui/TrackViewer";
-import { TrackModel } from "./model/TrackModel";
-
-export interface GenomeBrowserConfiguration extends TrackViewerConfiguration {
-
-}
+import TrackViewer, { Track } from "./ui/TrackViewer";
+import TrackModel from "./model/TrackModel";
+import DataSource from "./model/DataSource";
+import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
+import { ManifestDataSource } from "./data-source/ManifestDataSource";
 
 export interface GenomeBrowserRenderProps {
     width: number,
@@ -20,8 +19,16 @@ export class GenomeBrowser {
 
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
+    protected dataSource: DataSource; 
 
-    constructor(configuration?: GenomeBrowserConfiguration){
+    constructor(dataSource: DataSource, configuration?: GenomeBrowserConfiguration)
+    constructor(manifestPath: string, configuration?: GenomeBrowserConfiguration){
+        if (typeof manifestPath === 'string') {
+            this.dataSource = new ManifestDataSource(manifestPath);
+        } else {
+            this.dataSource = manifestPath;
+        }
+
         this.trackViewer = new TrackViewer();
 
         if (configuration != null) {

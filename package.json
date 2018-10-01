@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rimraf ./@types ./index.js ./index.js.map",
     "prod": "npm run clean && cti src && webpack --mode=production",
-    "dev": "npm run clean && cti src && webpack --watch --mode=development",
+    "dev": "npm run clean && cti src && webpack --watch --mode=development & live-server --ignorePattern=node_modules",
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
     "build": "npm run prod"
   },
@@ -16,7 +16,9 @@
   "dependencies": {
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
-    "genomics-formats": "github:VALIS-software/Genomics-Formats"
+    "genomics-formats": "github:VALIS-software/Genomics-Formats",
+    "engine": "github:VALIS-software/Engine",
+    "valis": "github:VALIS-Software/valis-typescript-client"
   },
   "devDependencies": {
     "create-ts-index": "1.0.x",
@@ -27,9 +29,8 @@
     "webpack": "4.4.x",
     "webpack-cli": "2.0.x",
     "webpack-bundle-analyzer": "^3.0.2",
-    "engine": "github:VALIS-software/Engine",
-    "valis": "github:VALIS-Software/valis-typescript-client",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "live-server": "^1.2.0"
   },
   "peerDependencies": {
     "react": "16.x",

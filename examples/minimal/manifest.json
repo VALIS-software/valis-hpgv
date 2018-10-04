@@ -1,6 +1,6 @@
 {
     "contigs": [{
-        "id": "test-contig",
+        "id": "chr1",
         "name": "Test Contig",
         "start": 10,
         "length": 100 

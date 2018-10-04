@@ -1,0 +1,8 @@
+{
+    "contigs": [{
+        "id": "test-contig",
+        "name": "Test Contig",
+        "start": 10,
+        "length": 100 
+    }]
+}

@@ -3,7 +3,7 @@ import Animator from "engine/animation/Animator";
 import AppCanvas from "./ui/core/AppCanvas";
 import TrackViewer, { Track } from "./ui/TrackViewer";
 import TrackModel from "./model/TrackModel";
-import DataSource from "./model/DataSource";
+import IDataSource from "./data-source/IDataSource";
 import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
 import { ManifestDataSource } from "./data-source/ManifestDataSource";
 
@@ -19,21 +19,34 @@ export class GenomeBrowser {
 
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
-    protected dataSource: DataSource; 
+    protected dataSource: IDataSource; 
 
-    constructor(dataSource: DataSource, configuration?: GenomeBrowserConfiguration)
-    constructor(manifestPath: string, configuration?: GenomeBrowserConfiguration){
-        if (typeof manifestPath === 'string') {
-            this.dataSource = new ManifestDataSource(manifestPath);
-        } else {
-            this.dataSource = manifestPath;
-        }
-
+    constructor(dataSource: IDataSource | string, configuration?: GenomeBrowserConfiguration){
         this.trackViewer = new TrackViewer();
+
+        if (dataSource != null) {
+            this.setDataSource(dataSource);
+        }
 
         if (configuration != null) {
             this.setConfiguration(configuration);
         }
+    }
+
+    setDataSource(dataSource: IDataSource | string) {
+        if (typeof dataSource === 'string') {
+            // if first argument is string, use a manifest data source
+            this.dataSource = new ManifestDataSource(dataSource);
+        } else {
+            this.dataSource = dataSource;
+        }
+
+        this.dataSource.getContigs().then((contigs) => {
+            console.log(`Contigs loaded!`, contigs);
+            // create internal data source
+            // new InternalDataSource(contigs, ...)
+            // onDataSourceChange()
+        });
     }
 
     setConfiguration(configuration: GenomeBrowserConfiguration) {

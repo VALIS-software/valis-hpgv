@@ -1,7 +1,7 @@
 import { TrackModel } from "../../model/TrackModel";
 import AnnotationTrack from "./AnnotationTrack";
 import SequenceTrack from "./SequenceTrack";
-import TrackObject from "./BaseTrack";
+import TrackObject from "./TrackObject";
 import VariantTrack from "./VariantTrack";
 import IntervalTrack from "./IntervalTrack";
 

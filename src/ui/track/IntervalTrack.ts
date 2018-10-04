@@ -5,7 +5,7 @@ import SharedTileStore from "../../tile-store/SharedTileStores";
 import { Tile, TileState } from "../../tile-store/TileStore";
 import { TrackModel } from "../../model/TrackModel";
 import { Object2D } from "engine/ui/Object2D";
-import TrackObject from "./BaseTrack";
+import TrackObject from "./TrackObject";
 import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
 
 type TilePayload = Float32Array;

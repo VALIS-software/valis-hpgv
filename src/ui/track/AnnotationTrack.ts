@@ -13,7 +13,7 @@ import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { OpenSansRegular } from "../font/Fonts";
-import TrackObject from "./BaseTrack";
+import TrackObject from "./TrackObject";
 import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
 import { SiriusApi } from "valis";
 

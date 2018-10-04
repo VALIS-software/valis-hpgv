@@ -57,7 +57,7 @@ export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeM
         this.add(this.focusRegionRectLeft);
         this.add(this.focusRegionRectRight);
         // disabled by default
-        this.disableFocusRegion();
+        this.clearFocusRegion();
     }
 
     setContig(contig: string) {
@@ -118,7 +118,7 @@ export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeM
         this.focusRegionRectRight.render = true;
     }
 
-    disableFocusRegion() {
+    clearFocusRegion() {
         this.focusRegionRectLeft.render = false;
         this.focusRegionRectRight.render = false;
     }

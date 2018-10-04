@@ -21,7 +21,7 @@ import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
 import Panel, { PanelInternal } from "./Panel";
 import ConstructTrack from "./track/ConstructTrack";
-import TrackObject from "./track/BaseTrack";
+import TrackObject from "./track/TrackObject";
 import { DEFAULT_SPRING } from "./UIConstants";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
 

@@ -5,7 +5,7 @@ import TrackModel from "../../model/TrackModel";
 import { DEFAULT_SPRING } from "../UIConstants";
 import Object2D from "engine/ui/Object2D";
 import TileStore, { Tile, TileState } from "../../tile-store/TileStore";
-import { TrackObject } from "./BaseTrack";
+import { TrackObject } from "./TrackObject";
 import SharedTileStore from "../../tile-store/SharedTileStores";
 
 /**

@@ -1,6 +1,15 @@
 import { EventEmitter } from "events";
 import Scalar from "engine/math/Scalar";
 
+/**
+ * Base class for requesting and managing tiled data
+ * 
+ * To use override the following methods in a subclass:
+ * - `getTilePayload`
+ * - `createBlockPayload`
+ * - `releaseBlockPayload`
+ * - `mapLodLevel`
+ */
 export class TileStore<TilePayload, BlockPayload> {
 
     protected lods = new Array<Blocks<TilePayload, BlockPayload>>();

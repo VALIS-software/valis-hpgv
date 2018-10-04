@@ -1,9 +1,9 @@
-import { TrackModel } from "../../model/TrackModel";
-import AnnotationTrack from "./AnnotationTrack";
-import SequenceTrack from "./SequenceTrack";
+import { TrackModel } from "../model/TrackModel";
+import AnnotationTrack from "./annotation/AnnotationTrack";
+import SequenceTrack from "./sequence/SequenceTrack";
 import TrackObject from "./TrackObject";
-import VariantTrack from "./VariantTrack";
-import IntervalTrack from "./IntervalTrack";
+import VariantTrack from "./variant/VariantTrack";
+import IntervalTrack from "./interval/IntervalTrack";
 
 export function ConstructTrack(model: TrackModel) {
     switch (model.type) {

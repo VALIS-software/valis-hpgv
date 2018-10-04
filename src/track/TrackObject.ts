@@ -1,10 +1,10 @@
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
-import { Tile } from "../../tile-store/TileStore";
-import { TrackModel, TrackTypeMap } from "../../model/TrackModel";
+import { Tile } from "./TileCache";
+import { TrackModel, TrackTypeMap } from "../model/TrackModel";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { OpenSansRegular } from "../font/Fonts";
+import { OpenSansRegular } from "../ui/font/Fonts";
 
 export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeMap> extends Rect {
 

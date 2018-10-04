@@ -11,7 +11,7 @@ import Object2D from "engine/ui/Object2D";
 import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
 import { OpenSansRegular } from "./font/Fonts";
-import TrackObject, { AxisPointerStyle } from "./track/TrackObject";
+import TrackObject, { AxisPointerStyle } from "../track/TrackObject";
 import XAxis from "./XAxis";
 import Animator from "engine/animation/Animator";
 

@@ -10,7 +10,7 @@ import Scalar from "engine/math/Scalar";
  * - `releaseBlockPayload`
  * - `mapLodLevel`
  */
-export class TileStore<TilePayload, BlockPayload> {
+export class TileCache<TilePayload, BlockPayload> {
 
     protected lods = new Array<Blocks<TilePayload, BlockPayload>>();
     protected readonly blockSize: number;
@@ -140,7 +140,7 @@ export class TileStore<TilePayload, BlockPayload> {
     }
 
     protected releaseBlockPayload(block: BlockPayload): void {
-        
+
     }
 
     protected mapLodLevel(selectedLodLevel: number): number {
@@ -342,4 +342,4 @@ export class Tile<Payload> {
 
 }
 
-export default TileStore;
+export default TileCache;

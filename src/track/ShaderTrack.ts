@@ -1,15 +1,15 @@
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
-import TrackModel from "../../model/TrackModel";
-import { DEFAULT_SPRING } from "../UIConstants";
+import TrackModel from "../model/TrackModel";
+import { DEFAULT_SPRING } from "../ui/UIConstants";
 import Object2D from "engine/ui/Object2D";
-import TileStore, { Tile, TileState } from "../../tile-store/TileStore";
+import TileCache, { Tile, TileState } from "./TileCache";
 import { TrackObject } from "./TrackObject";
-import SharedTileStore from "../../tile-store/SharedTileStores";
+import SharedTileCache from "../tile-store/SharedTileCaches";
 
 /**
- * TileTrack provides a base class for Tracks that use TileStore
+ * TileTrack provides a base class for Tracks that use TileCache
  */
 export class ShaderTrack<TilePayload, BlockPayload> extends TrackObject {
 
@@ -21,22 +21,22 @@ export class ShaderTrack<TilePayload, BlockPayload> extends TrackObject {
     }
 
     protected densityMultiplier = 1.0;
-    protected tileStore: TileStore<TilePayload, BlockPayload>;
+    protected tileCache: TileCache<TilePayload, BlockPayload>;
     protected _pixelRatio: number = window.devicePixelRatio || 1;
 
     constructor(
         model: TrackModel,
-        protected tileStoreType: string,
-        protected tileStoreConstructor: (contig: string) => TileStore<TilePayload, BlockPayload>,
+        protected tileCacheType: string,
+        protected tileCacheConstructor: (contig: string) => TileCache<TilePayload, BlockPayload>,
     ) {
         super(model);
     }
 
     setContig(contig: string) {
-        this.tileStore = SharedTileStore.getTileStore(
-            this.tileStoreType,
+        this.tileCache = SharedTileCache.getTileCache(
+            this.tileCacheType,
             contig,
-            this.tileStoreConstructor
+            this.tileCacheConstructor
         );
         super.setContig(contig);
     }
@@ -61,7 +61,7 @@ export class ShaderTrack<TilePayload, BlockPayload> extends TrackObject {
             let displayLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
             let lodLevel = Math.floor(displayLodLevel);
 
-            this.tileStore.getTiles(x0, x1, samplingDensity, true, (tile) => {
+            this.tileCache.getTiles(x0, x1, samplingDensity, true, (tile) => {
                 let tileNode = this._tileNodeCache.get(this.contig + ':' + tile.key, this.createTileNode);
                 this.updateTileNode(tileNode, tile, x0, span, displayLodLevel);
 
@@ -82,9 +82,9 @@ export class ShaderTrack<TilePayload, BlockPayload> extends TrackObject {
                         let fallbackDensity = samplingDensity * densityMultiplier;
 
                         // exhausted all available lods
-                        if (!this.tileStore.isWithinInitializedLodRange(fallbackDensity)) break;
+                        if (!this.tileCache.isWithinInitializedLodRange(fallbackDensity)) break;
 
-                        let fallbackTile = this.tileStore.getTile(gapCenterX, fallbackDensity, false);
+                        let fallbackTile = this.tileCache.getTile(gapCenterX, fallbackDensity, false);
 
                         // it's possible we end up with the same lod we already have, if so, skip it
                         if (fallbackTile.lodLevel === tile.lodLevel) continue;

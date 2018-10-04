@@ -2,7 +2,7 @@
 
 export * from './core';
 export * from './font';
-export * from './track';
+export * from './util';
 export * from './Panel';
 export * from './TrackViewer';
 export * from './TrackViewerConfiguration';

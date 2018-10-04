@@ -1,12 +1,12 @@
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import GenericIntervalTileStore from "../../tile-store/GenericIntervalTileStore";
-import SharedTileStore from "../../tile-store/SharedTileStores";
-import { Tile, TileState } from "../../tile-store/TileStore";
+import IntervalTileCache from "./IntervalTileCache";
+import SharedTileCache from "../../tile-store/SharedTileCaches";
+import { Tile, TileState } from "../TileCache";
 import { TrackModel } from "../../model/TrackModel";
 import { Object2D } from "engine/ui/Object2D";
-import TrackObject from "./TrackObject";
-import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
+import TrackObject from "../TrackObject";
+import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 
 type TilePayload = Float32Array;
 
@@ -14,7 +14,7 @@ export class IntervalTrack extends TrackObject<'interval'> {
     
     blendEnabled: boolean = true;
 
-    protected tileStore: GenericIntervalTileStore;
+    protected tileCache: IntervalTileCache;
 
     constructor(model: TrackModel<'interval'>) {
         super(model);
@@ -22,11 +22,11 @@ export class IntervalTrack extends TrackObject<'interval'> {
     }
 
     setContig(contig: string) {
-        let typeKey = this.model.tileStoreType + ':' + JSON.stringify(this.model.query);
-        this.tileStore = SharedTileStore.getTileStore(
+        let typeKey = this.model.tileCacheType + ':' + JSON.stringify(this.model.query);
+        this.tileCache = SharedTileCache.getTileCache(
             typeKey,
             contig,
-            (contig) => new GenericIntervalTileStore(contig, this.model.query)
+            (contig) => new IntervalTileCache(contig, this.model.query)
         );
         super.setContig(contig);
     }
@@ -51,7 +51,7 @@ export class IntervalTrack extends TrackObject<'interval'> {
             let basePairsPerDOMPixel = (span / widthPx);
             let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
 
-            this.tileStore.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+            this.tileCache.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                 if (tile.state === TileState.Complete) {
                     this.displayTileNode(tile, 0.9, x0, span, continuousLodLevel);
                 } else {
@@ -60,7 +60,7 @@ export class IntervalTrack extends TrackObject<'interval'> {
 
                     // display a fallback tile if one is loaded at this location
                     let gapCenterX = tile.x + tile.span * 0.5;
-                    let fallbackTile = this.tileStore.getTile(gapCenterX, 1 << this.tileStore.macroLodLevel, false);
+                    let fallbackTile = this.tileCache.getTile(gapCenterX, 1 << this.tileCache.macroLodLevel, false);
 
                     if (fallbackTile.state === TileState.Complete) {
                         // display fallback tile behind other tiles

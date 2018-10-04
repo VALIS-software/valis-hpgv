@@ -23,7 +23,7 @@ export interface TrackTypeMap {
     },
     'interval': {
         query: any,
-        tileStoreType: string,
+        tileCacheType: string,
         blendEnabled: boolean,
     },
 }

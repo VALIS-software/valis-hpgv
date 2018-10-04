@@ -1,6 +1,6 @@
 import { SiriusApi } from "valis";
-import { TrackModel } from "../model/TrackModel";
-import { Tile, TileStore } from "./TileStore";
+import { TrackModel } from "../../model/TrackModel";
+import { Tile, TileCache } from "../TileCache";
 
 // Tile payload is a list of genes extended with nesting
 type VariantGenomeNode = {
@@ -40,7 +40,7 @@ type TilePayload = Array<{
     alts: string[]
 }>;
 
-export class VariantTileStore extends TileStore<TilePayload, void> {
+export class VariantTileCache extends TileCache<TilePayload, void> {
 
     constructor(protected model: TrackModel<'variant'>, protected contig: string) {
         super(
@@ -85,4 +85,4 @@ export class VariantTileStore extends TileStore<TilePayload, void> {
     }
 
 }
-export default VariantTileStore;
+export default VariantTileCache;

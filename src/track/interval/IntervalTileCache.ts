@@ -1,10 +1,10 @@
-import { Tile, TileStore } from "./TileStore";
+import { Tile, TileCache } from "../TileCache";
 import { SiriusApi } from "valis";
 
 type TilePayload = Float32Array;
 
 /**
- * GenericIntervalTileStore makes it possible to transform a query result into tiles containing intervals
+ * GenericIntervalTileCache makes it possible to transform a query result into tiles containing intervals
  *
  * It has two tile levels, micro and macro
  *
@@ -12,7 +12,7 @@ type TilePayload = Float32Array;
  *
  * Macro tile have lod level `this.macroLodLevel` and store many more intervals but with lower precision (not enough to display with base-pair precision)
  */
-export class GenericIntervalTileStore extends TileStore<TilePayload, void> {
+export class IntervalTileCache extends TileCache<TilePayload, void> {
 
     readonly microLodThreshold = 3;
     readonly macroLodLevel = 10;
@@ -63,4 +63,4 @@ export class GenericIntervalTileStore extends TileStore<TilePayload, void> {
 
 }
 
-export default GenericIntervalTileStore;
+export default IntervalTileCache;

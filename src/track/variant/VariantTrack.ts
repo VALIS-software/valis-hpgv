@@ -1,17 +1,17 @@
 import { Animator } from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
-import { SharedTileStore } from "../../tile-store/SharedTileStores";
-import { TileState } from "../../tile-store/TileStore";
-import { VariantTileStore } from "../../tile-store/VariantTileStore";
+import { SharedTileCache } from "../../tile-store/SharedTileCaches";
+import { TileState } from "../TileCache";
+import { VariantTileCache } from "./VariantTileCache";
 import { TrackModel } from "../../model/TrackModel";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
-import { OpenSansRegular } from "../font/Fonts";
-import TrackObject from "./TrackObject";
-import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
-import TextClone from "./util/TextClone";
+import { OpenSansRegular } from "../../ui/font/Fonts";
+import TrackObject from "../TrackObject";
+import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
+import TextClone from "../../ui/util/TextClone";
 import { EntityType } from "valis";
 
 export class VariantTrack extends TrackObject<'variant'> {
@@ -20,7 +20,7 @@ export class VariantTrack extends TrackObject<'variant'> {
     protected readonly macroLodThresholdLow = 8;
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
-    protected tileStore: VariantTileStore;
+    protected tileCache: VariantTileCache;
     protected pointerOverTrack = false;
 
     constructor(model: TrackModel<'variant'>) {
@@ -37,10 +37,10 @@ export class VariantTrack extends TrackObject<'variant'> {
 
     setContig(contig: string) {
         let typeKey = this.model.type + ':' + JSON.stringify(this.model.query);
-        this.tileStore = SharedTileStore.getTileStore(
+        this.tileCache = SharedTileCache.getTileCache(
             typeKey,
             contig,
-            (c) => new VariantTileStore(this.model, contig)
+            (c) => new VariantTileCache(this.model, contig)
         )
         super.setContig(contig);
     }
@@ -75,7 +75,7 @@ export class VariantTrack extends TrackObject<'variant'> {
 
             // micro-scale details
             if (microOpacity > 0) {
-                this.tileStore.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+                this.tileCache.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                     if (tile.state !== TileState.Complete) {
                         this._pendingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
                         return;

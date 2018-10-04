@@ -1,6 +1,6 @@
 import { SiriusApi } from "valis";
-import { Tile, TileStore } from "./TileStore";
-import { GeneInfo, TranscriptComponentInfo, TranscriptInfo, TranscriptComponentClass, GenomeFeatureType } from "../model/AnnotationTileset";
+import { Tile, TileCache } from "../TileCache";
+import { Strand, GeneInfo, TranscriptComponentInfo, TranscriptInfo, TranscriptComponentClass, GenomeFeatureType } from "../../model/AnnotationTileset";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
@@ -16,7 +16,7 @@ export type Transcript = TranscriptInfo & {
 
 type TilePayload = Array<Gene>;
 
-export class AnnotationTileStore extends TileStore<TilePayload, void> {
+export class AnnotationTileCache extends TileCache<TilePayload, void> {
 
     constructor(protected contig: string, tileSize: number = 1 << 20, protected macro: boolean = false) {
         super(tileSize, 1);
@@ -50,6 +50,16 @@ export class AnnotationTileStore extends TileStore<TilePayload, void> {
 
                 if (feature.type === GenomeFeatureType.Gene) {
                     let geneInfo = feature as GeneInfo;
+                    // convert strand from old format to new
+                    if (typeof geneInfo.strand === 'number') {
+                        switch (geneInfo.strand) {
+                            case 0: geneInfo.strand = Strand.None; break;
+                            case 1: geneInfo.strand = Strand.Unknown; break;
+                            case 2: geneInfo.strand = Strand.Positive; break;
+                            case 3: geneInfo.strand = Strand.Negative; break;
+                            default: geneInfo.strand = Strand.Unknown; break;
+                        }
+                    }
                     activeGene = {
                         ...geneInfo,
                         transcripts: [],
@@ -114,7 +124,7 @@ export class AnnotationTileStore extends TileStore<TilePayload, void> {
 
 }
 
-export class MacroAnnotationTileStore extends AnnotationTileStore {
+export class MacroAnnotationTileCache extends AnnotationTileCache {
 
     constructor(sourceId: string) {
         super(sourceId, 1 << 25, true);
@@ -122,4 +132,4 @@ export class MacroAnnotationTileStore extends AnnotationTileStore {
 
 }
 
-export default AnnotationTileStore;
+export default AnnotationTileCache;

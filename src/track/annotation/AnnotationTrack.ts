@@ -3,18 +3,18 @@ import { QueryBuilder } from "valis";
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import { AnnotationTileStore, Gene, MacroAnnotationTileStore, Transcript } from "../../tile-store/AnnotationTileStore";
-import SharedTileStore from "../../tile-store/SharedTileStores";
-import { TileState } from "../../tile-store/TileStore";
+import { AnnotationTileCache, Gene, MacroAnnotationTileCache, Transcript } from "./AnnotationTileCache";
+import SharedTileCache from "../../tile-store/SharedTileCaches";
+import { TileState } from "../TileCache";
 import TrackModel from "../../model/TrackModel";
 import { GeneClass, TranscriptClass } from "../../model/AnnotationTileset";
 import { BlendMode, DrawContext } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { OpenSansRegular } from "../font/Fonts";
-import TrackObject from "./TrackObject";
-import IntervalInstances, { IntervalInstance } from "./util/IntervalInstances";
+import { OpenSansRegular } from "../../ui/font/Fonts";
+import TrackObject from "../TrackObject";
+import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { SiriusApi } from "valis";
 
 /**
@@ -34,8 +34,8 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
     protected readonly namesLodThresholdLow = 9;
     protected readonly namesLodThresholdHigh = this.namesLodThresholdLow + this.namesLodBlendRange;
 
-    protected annotationStore: AnnotationTileStore;
-    protected macroAnnotationStore: AnnotationTileStore;
+    protected annotationStore: AnnotationTileCache;
+    protected macroAnnotationStore: AnnotationTileCache;
 
     protected pointerState: TrackPointerState = {
         pointerOver: false,
@@ -56,15 +56,15 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
     }
 
     setContig(contig: string) {
-        this.annotationStore = SharedTileStore.getTileStore(
+        this.annotationStore = SharedTileCache.getTileCache(
             'annotation',
             contig,
-            (c) => { return new AnnotationTileStore(c); }
+            (c) => { return new AnnotationTileCache(c); }
         );
-        this.macroAnnotationStore = SharedTileStore.getTileStore(
+        this.macroAnnotationStore = SharedTileCache.getTileCache(
             'macroAnnotation',
             contig,
-            (c) => { return new MacroAnnotationTileStore(c); }
+            (c) => { return new MacroAnnotationTileCache(c); }
         );
         super.setContig(contig);
     }

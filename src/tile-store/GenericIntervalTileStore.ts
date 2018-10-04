@@ -14,8 +14,8 @@ type TilePayload = Float32Array;
  */
 export class GenericIntervalTileStore extends TileStore<TilePayload, void> {
 
-    microLodThreshold = 3;
-    macroLodLevel = 10;
+    readonly microLodThreshold = 3;
+    readonly macroLodLevel = 10;
 
     constructor(
         protected contig: string,

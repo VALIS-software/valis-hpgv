@@ -2,7 +2,7 @@ import * as React from "react";
 import AppCanvas from "./ui/core/AppCanvas";
 import TrackViewer, { Track } from "./ui/TrackViewer";
 import TrackModel from "./model/TrackModel";
-import DataSource from "./model/DataSource";
+import IDataSource from "./data-source/IDataSource";
 import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
 export interface GenomeBrowserRenderProps {
     width: number;
@@ -13,8 +13,9 @@ export interface GenomeBrowserRenderProps {
 export declare class GenomeBrowser {
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
-    protected dataSource: DataSource;
-    constructor(dataSource: DataSource, configuration?: GenomeBrowserConfiguration);
+    protected dataSource: IDataSource;
+    constructor(dataSource: IDataSource | string, configuration?: GenomeBrowserConfiguration);
+    setDataSource(dataSource: IDataSource | string): void;
     setConfiguration(configuration: GenomeBrowserConfiguration): void;
     getConfiguration(): import("./ui/TrackViewerConfiguration").TrackViewerConfiguration;
     addTrack(model: TrackModel, heightPx?: number, animateIn?: boolean): Track;

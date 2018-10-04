@@ -72,7 +72,7 @@ export class VariantTileStore extends TileStore<TilePayload, void> {
         } else {
             ApiPromise = SiriusApi.getVariantTrackData(this.contig, startBase, endBase, snpQuery);
         }
-        // use general API to laod other variants, the number of results should be no more than 10M.
+        // use general API to load other variants, the number of results should be no more than 10M.
         return ApiPromise.then((data) => {
             let variants: Array<VariantGenomeNode> = data.data;
             return variants.map((v) => { return {

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import UsageCache from "engine/ds/UsageCache";
 import Object2D from "engine/ui/Object2D";
 import IntervalInstances from "../../ui/util/IntervalInstances";
@@ -32,7 +31,7 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     protected removeAnnotation: (annotation: Object2D) => void;
     protected deleteAnnotation: (annotation: Object2D) => void;
     protected annotationKey: (feature: {
-        soClass: import("react").ReactText;
+        soClass: string | number;
         name?: string;
         startIndex: number;
         length: number;

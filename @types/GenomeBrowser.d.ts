@@ -24,6 +24,7 @@ export declare class GenomeBrowser {
     closeTrack(track: Track, animateOut: boolean, onComplete: () => void): void;
     getTracks(): Track[];
     getPanels(): Set<import("./ui/Panel").Panel>;
+    clearCaches(): void;
     render(props: GenomeBrowserRenderProps): JSX.Element;
     private _frameLoopHandle;
     protected startFrameLoop(): void;

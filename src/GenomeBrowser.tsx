@@ -78,6 +78,12 @@ export class GenomeBrowser {
         return this.trackViewer.getPanels();
     }
 
+    clearCaches() {
+        if (this.internalDataSource != null) {
+            this.internalDataSource.clearTileCaches();
+        }
+    }
+
     render(props: GenomeBrowserRenderProps) {
         return (
             <AppCanvas

@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 import Scalar from "engine/math/Scalar";
+import TrackModel from "./TrackModel";
 
 /**
  * Base class for requesting and managing tiled data
@@ -9,6 +10,8 @@ import Scalar from "engine/math/Scalar";
  * - `createBlockPayload`
  * - `releaseBlockPayload`
  * - `mapLodLevel`
+ * 
+ * Tiles are organized into blocks for data storage efficiency (example, we may want to store many tiles into a single GPU texture 'block')
  */
 export class TileCache<TilePayload, BlockPayload> {
 

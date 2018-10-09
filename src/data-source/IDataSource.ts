@@ -1,5 +1,5 @@
 import { Contig } from "../model/Contig";
-import { TileContent } from "../track/annotation/AnnotationTypes";
+import { GenomeFeature } from "../track";
 
 export interface IDataSource {
 
@@ -24,7 +24,7 @@ export interface IDataSource {
         startBaseIndex: number,
         span: number,
         macro: boolean,
-    ): Promise<TileContent>;
+    ): Promise<Array<GenomeFeature>>;
 
 }
 

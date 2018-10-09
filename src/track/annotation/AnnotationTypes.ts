@@ -16,8 +16,6 @@ export interface GenomeFeature {
 	type: GenomeFeatureType,
 }
 
-export type TileContent = Array<GenomeFeature>;
-
 export enum GeneClass {
 	// this is a small, simplified subset of types specified in the Sequence Ontology
 	Unspecified,

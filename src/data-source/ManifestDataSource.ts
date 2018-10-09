@@ -1,5 +1,6 @@
 import { Contig } from "../model/Contig";
 import { IDataSource } from "./IDataSource";
+import { TileContent } from "../track/annotation/AnnotationTypes";
 
 type Manifest = {
     contigs: Array<Contig>
@@ -47,7 +48,17 @@ export class ManifestDataSource implements IDataSource {
         },
         indicesPerBase: number,
     }> {
-        console.error(`TODO, support ACGT sequence loading`);
+        console.error(`@! TODO: support loadACGTSequence`);
+        return null;
+    }
+
+    loadAnnotations(
+        contig: string,
+        startBaseIndex: number,
+        span: number,
+        macro: boolean,
+    ): Promise<TileContent> {
+        console.error(`@! TODO: support loadAnnotations`);
         return null;
     }
 

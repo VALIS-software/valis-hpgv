@@ -1,4 +1,5 @@
 import { Contig } from "../model/Contig";
+import { TileContent } from "../track/annotation/AnnotationTypes";
 
 export interface IDataSource {
 
@@ -17,6 +18,13 @@ export interface IDataSource {
         },
         indicesPerBase: number,
     }>;
+
+    loadAnnotations(
+        contig: string,
+        startBaseIndex: number,
+        span: number,
+        macro: boolean,
+    ): Promise<TileContent>;
 
 }
 

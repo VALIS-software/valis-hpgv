@@ -1,7 +1,6 @@
-import { SiriusApi } from "valis";
+import { IDataSource } from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
-import { IDataSource } from "../../data-source/IDataSource";
 
 // Tile payload is a list of genes extended with nesting
 type VariantGenomeNode = {
@@ -63,6 +62,7 @@ export class VariantTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
+        /*
         const startBase = tile.x + 1;
         const endBase = startBase + tile.span;
         const snpQuery = this.model.query;
@@ -83,6 +83,9 @@ export class VariantTileLoader extends TileLoader<TilePayload, void> {
                 alts: v.info.variant_alt ? v.info.variant_alt.split(','): [],
             } });
         });
+        */
+        console.warn('@! todo: load variants');
+        return [];
     }
 
 }

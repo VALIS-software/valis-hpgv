@@ -17,8 +17,7 @@
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
     "engine": "github:VALIS-software/Engine",
-    "genomics-formats": "github:VALIS-software/Genomics-Formats",
-    "valis": "github:VALIS-Software/valis-typescript-client"
+    "genomics-formats": "github:VALIS-software/Genomics-Formats"
   },
   "devDependencies": {
     "create-ts-index": "1.0.x",

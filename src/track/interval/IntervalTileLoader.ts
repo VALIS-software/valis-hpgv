@@ -1,7 +1,6 @@
-import { Tile, TileLoader } from "../TileLoader";
-import { SiriusApi } from "valis";
-import { IntervalTrackModel } from "./IntervalTrackModel";
 import IDataSource from "../../data-source/IDataSource";
+import { Tile, TileLoader } from "../TileLoader";
+import { IntervalTrackModel } from "./IntervalTrackModel";
 
 type TilePayload = Float32Array;
 
@@ -43,6 +42,7 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
         // @! quality improvement; reduce perception of shivering when zooming in
         // if lod level = 0 and a macro track exists that covers this tile then we can filter that tile to get the lod 0 tile (so no network request or promise)
 
+        /*
         let startBase = tile.x + 1;
         let endBase = startBase + tile.span;
 
@@ -57,7 +57,9 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
             }
             return intervals;
         });
-
+        */
+       console.warn('@! todo: load intervals');
+       return new Float32Array(0);
     }
 
 }

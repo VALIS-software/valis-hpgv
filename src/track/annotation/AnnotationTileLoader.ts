@@ -1,8 +1,7 @@
-import { SiriusApi } from "valis";
+import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
-import IDataSource from "../../data-source/IDataSource";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
@@ -127,7 +126,7 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
-        return SiriusApi.loadAnnotations(this.contig, false, tile.x, tile.span).then(transformAnnotations);
+        return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, false).then(transformAnnotations);
     }
 
 }
@@ -150,7 +149,7 @@ export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
-        return SiriusApi.loadAnnotations(this.contig, true, tile.x, tile.span).then(transformAnnotations);
+        return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, true).then(transformAnnotations);
     }
 
 }

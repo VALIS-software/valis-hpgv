@@ -5,9 +5,9 @@ import { Text } from "engine/ui/Text";
 import IntervalInstances from "../../ui/util/IntervalInstances";
 import TextClone from "../../ui/util/TextClone";
 import TrackObject from "../TrackObject";
-import { VariantTileCache } from "./VariantTileCache";
+import { VariantTileLoader } from "./VariantTileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
-export declare class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCache> {
+export declare class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoader> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;

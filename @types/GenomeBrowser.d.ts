@@ -2,7 +2,7 @@ import * as React from "react";
 import IDataSource from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
 import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
-import { TileCache, TrackObject } from "./track";
+import { TileLoader, TrackObject } from "./track";
 import TrackModel from "./track/TrackModel";
 import AppCanvas from "./ui/core/AppCanvas";
 import TrackViewer, { Track } from "./ui/TrackViewer";
@@ -30,14 +30,14 @@ export declare class GenomeBrowser {
     protected startFrameLoop(): void;
     protected stopFrameLoop(): void;
     protected frameLoop: () => void;
-    static registerTrackType<ModelType extends TrackModel>(type: ModelType['type'], tileCacheClass: {
-        new (model: ModelType, contig: string, ...args: Array<any>): TileCache<any, any>;
+    static registerTrackType<ModelType extends TrackModel>(type: ModelType['type'], tileLoaderClass: {
+        new (model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
     }, trackObjectClass: {
         new (model: TrackModel): TrackObject<TrackModel, any>;
     }): void;
     static getTrackType(type: string): {
-        trackObjectClass: new (model: TrackModel) => TrackObject<TrackModel, TileCache<any, any>>;
-        tileCacheClass: new (model: TrackModel, contig: string, ...args: any[]) => TileCache<any, any>;
+        trackObjectClass: new (model: TrackModel) => TrackObject<TrackModel, TileLoader<any, any>>;
+        tileCacheClass: new (model: TrackModel, contig: string, ...args: any[]) => TileLoader<any, any>;
     };
     private static trackTypes;
 }

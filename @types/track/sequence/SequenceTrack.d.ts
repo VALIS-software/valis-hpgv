@@ -1,5 +1,5 @@
-import { SequenceTilePayload } from "./SequenceTileCache";
-import { Tile } from "../TileCache";
+import { SequenceTilePayload } from "./SequenceTileLoader";
+import { Tile } from "../TileLoader";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";

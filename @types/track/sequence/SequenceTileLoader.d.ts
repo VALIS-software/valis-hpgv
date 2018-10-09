@@ -1,5 +1,5 @@
 import GPUDevice, { GPUTexture } from "engine/rendering/GPUDevice";
-import TileCache, { Tile } from "../TileCache";
+import TileLoader, { Tile } from "../TileLoader";
 import { SequenceTrackModel } from "./SequenceTrackModel";
 declare type TilePayload = {
     array: Uint8Array;
@@ -15,7 +15,7 @@ declare type BlockPayload = {
     getTexture(device: GPUDevice): GPUTexture;
 };
 export declare type SequenceTilePayload = TilePayload;
-export declare class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
+export declare class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
     protected model: SequenceTrackModel;
     protected contig: string;
     constructor(model: SequenceTrackModel, contig: string);
@@ -33,4 +33,4 @@ export declare class SequenceTileCache extends TileCache<TilePayload, BlockPaylo
     protected createBlockPayload(lodLevel: number, lodX: number, tileWidth: number, rows: number): BlockPayload;
     protected releaseBlockPayload(payload: BlockPayload): void;
 }
-export default SequenceTileCache;
+export default SequenceTileLoader;

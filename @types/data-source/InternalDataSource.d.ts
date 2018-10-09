@@ -1,16 +1,16 @@
-import TileCache from '../track/TileCache';
+import TileLoader from '../track/TileLoader';
 import TrackModel from '../track/TrackModel';
 import { IDataSource } from './IDataSource';
 export declare class InternalDataSource implements IDataSource {
     protected readonly dataSource: IDataSource;
     protected tileCaches: {
         [type: string]: {
-            [key: string]: TileCache<any, any>;
+            [key: string]: TileLoader<any, any>;
         };
     };
     constructor(dataSource: IDataSource);
     getContigs(): Promise<import("../model/Contig").Contig[]>;
-    getTileCache(model: TrackModel, contig: string, differentiatingKey?: string): TileCache<any, any>;
+    getTileLoader(model: TrackModel, contig: string, differentiatingKey?: string): TileLoader<any, any>;
     clearTileCache(type: string): void;
     clearTileCaches(): void;
 }

@@ -29,7 +29,7 @@ export declare class Panel extends Object2D {
     readonly header: ReactObject;
     readonly xAxis: XAxis;
     readonly resizeHandle: Rect;
-    readonly trackViews: Set<TrackObject<import("../track/TrackModel").TrackModel, import("../track/TileCache").TileCache<any, any>>>;
+    readonly trackViews: Set<TrackObject<import("../track/TrackModel").TrackModel, import("../track/TileLoader").TileLoader<any, any>>>;
     closable: boolean;
     closing: boolean;
     protected _closable: boolean;

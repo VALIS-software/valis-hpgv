@@ -1,12 +1,12 @@
 import UsageCache from "engine/ds/UsageCache";
 import Object2D from "engine/ui/Object2D";
-import { Tile, TileCache } from "./TileCache";
+import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { TrackObject } from "./TrackObject";
 /**
  * - to use, override constructTileNode()
  */
-export declare class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileCache<P, any>> {
+export declare class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoader<P, any>> {
     pixelRatio: number;
     protected densityMultiplier: number;
     protected _pixelRatio: number;

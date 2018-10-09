@@ -96,7 +96,7 @@ declare class RowObject {
     readonly header: ReactObject;
     readonly closeButton: ReactObject;
     readonly resizeHandle: Rect;
-    readonly trackViews: Set<TrackObject<TrackModel, import("../track/TileCache").TileCache<any, any>>>;
+    readonly trackViews: Set<TrackObject<TrackModel, import("../track/TileLoader").TileLoader<any, any>>>;
     y: number;
     h: number;
     title: string;

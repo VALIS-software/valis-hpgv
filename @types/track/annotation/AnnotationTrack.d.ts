@@ -2,7 +2,7 @@ import UsageCache from "engine/ds/UsageCache";
 import Object2D from "engine/ui/Object2D";
 import IntervalInstances from "../../ui/util/IntervalInstances";
 import TrackObject from "../TrackObject";
-import { AnnotationTileCache } from "./AnnotationTileCache";
+import { AnnotationTileLoader } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 /**
  * WIP Annotation tracks:
@@ -11,7 +11,7 @@ import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTra
  * - Convert micro-scale annotations to use instancing (and text batching)
  * - Merge shaders where possible and clean up
  */
-export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileCache> {
+export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;

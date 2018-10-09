@@ -1,4 +1,4 @@
-import { Tile, TileCache } from "../TileCache";
+import { Tile, TileLoader } from "../TileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 export declare type Gene = GeneInfo & {
@@ -11,7 +11,7 @@ export declare type Transcript = TranscriptInfo & {
     other: Array<TranscriptComponentInfo>;
 };
 declare type TilePayload = Array<Gene>;
-export declare class AnnotationTileCache extends TileCache<TilePayload, void> {
+export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly model: AnnotationTrackModel;
     protected readonly contig: string;
     protected macro: boolean;
@@ -19,12 +19,12 @@ export declare class AnnotationTileCache extends TileCache<TilePayload, void> {
     protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }
-export declare class MacroAnnotationTileCache extends TileCache<TilePayload, void> {
+export declare class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly model: MacroAnnotationTrackModel;
     protected readonly contig: string;
-    protected annotationCache: AnnotationTileCache;
+    protected annotationCache: AnnotationTileLoader;
     constructor(model: MacroAnnotationTrackModel, contig: string, tileSize?: number);
     protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }
-export default AnnotationTileCache;
+export default AnnotationTileLoader;

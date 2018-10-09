@@ -2,9 +2,9 @@ import UsageCache from "engine/ds/UsageCache";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
-import { Tile, TileCache } from "./TileCache";
+import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
-export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileCacheType extends TileCache<any, any> = TileCache<any, any>> extends Rect {
+export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>> extends Rect {
     protected readonly model: ModelType;
     protected readonly tileDataKey?: string;
     protected dataSource: InternalDataSource;
@@ -31,7 +31,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     clearFocusRegion(): void;
     private _lastComputedWidth;
     applyTransformToSubNodes(root?: boolean): void;
-    protected getTileCache(): TileCacheType;
+    protected getTileLoader(): TileLoaderType;
     protected _pendingTiles: UsageCache<Tile<any>>;
     protected updateDisplay(): void;
     /**

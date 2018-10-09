@@ -60,7 +60,7 @@ export declare class Panel extends Object2D {
     setContig(contig: string): void;
     setRange(x0: number, x1: number, animate?: boolean): void;
     protected setAvailableContigs(contigs: Array<Contig>): void;
-    protected getFormattedContig(contig: string): string;
+    protected getFormattedContig(contigId: string): string;
     protected setSecondaryAxisPointers(secondaryAxisPointers: {
         [pointerId: string]: number;
     }): void;

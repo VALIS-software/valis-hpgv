@@ -1,7 +1,7 @@
 export declare type Contig = {
     id: string;
     name?: string;
-    start: number;
-    length: number;
+    startIndex: number;
+    span: number;
 };
 export default Contig;

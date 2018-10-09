@@ -283,8 +283,10 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCach
         let cacheKey = this.contig + ':' + startIndex + ',' + altIndex + ',' + charIndex;
         let label = this._sequenceLabelCache.get(cacheKey, () => {
             return this.createBaseLabel(baseCharacter, color, () => {
-                const entity = {id: variantId, type: EntityType.SNP}
+                const userFileID = this.model.query ? this.model.query.userFileID : null;
+                const entity = { id: variantId, type: EntityType.SNP, userFileID: userFileID };
                 console.log('@! todo: variant label clicked', entity);
+                // App.displayEntityDetails(entity);
             });
         });
 

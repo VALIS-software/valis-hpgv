@@ -1,10 +1,10 @@
 import { Animator } from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
+import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
-import { EntityType } from "valis";
 import GenomeBrowser from "../../GenomeBrowser";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
@@ -282,12 +282,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
 
         let cacheKey = this.contig + ':' + startIndex + ',' + altIndex + ',' + charIndex;
         let label = this._sequenceLabelCache.get(cacheKey, () => {
-            return this.createBaseLabel(baseCharacter, color, () => {
-                const userFileID = this.model.query ? this.model.query.userFileID : null;
-                const entity = { id: variantId, type: EntityType.SNP, userFileID: userFileID };
-                console.log('@! todo: variant label clicked', entity);
-                // App.displayEntityDetails(entity);
-            });
+            return this.createBaseLabel(baseCharacter, color, (e) => this.onVariantClicked(e, variantId));
         });
 
         label.root.layoutParentX = layoutParentX;
@@ -302,7 +297,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
         }
     }
 
-    protected createBaseLabel = (baseCharacter: string, color: ArrayLike<number>, onClick: () => void) => {
+    protected createBaseLabel = (baseCharacter: string, color: ArrayLike<number>, onClick: (e: InteractionEvent) => void) => {
         let root = new Rect(0, 0, color);
         root.blendFactor = 0;
         root.mask = this;
@@ -330,7 +325,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
             if (this.pointerOverTrack && e.isPrimary) {
                 e.preventDefault();
                 e.stopPropagation();
-                onClick();
+                onClick(e);
             }
         });
 
@@ -373,6 +368,8 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
         }
         this.remove(label.root);
     }
+
+    protected onVariantClicked = (e: InteractionEvent, variantId: string) => {}
 
     // we only need 1 text instance of each letter which we can render multiple times
     // this saves reallocating new vertex buffers for each letter

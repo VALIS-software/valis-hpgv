@@ -1,7 +1,7 @@
 import TileLoader from '../track/TileLoader';
 import TrackModel from '../track/TrackModel';
 import { IDataSource } from './IDataSource';
-export declare class InternalDataSource implements IDataSource {
+export declare class InternalDataSource {
     protected readonly dataSource: IDataSource;
     protected tileCaches: {
         [type: string]: {

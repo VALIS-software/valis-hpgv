@@ -1,3 +1,4 @@
+import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
 declare type TilePayload = Float32Array;
@@ -11,11 +12,12 @@ declare type TilePayload = Float32Array;
  * Macro tile have lod level `this.macroLodLevel` and store many more intervals but with lower precision (not enough to display with base-pair precision)
  */
 export declare class IntervalTileLoader extends TileLoader<TilePayload, void> {
+    protected readonly dataSource: IDataSource;
     protected readonly model: IntervalTrackModel;
     protected readonly contig: string;
     readonly microLodThreshold: number;
     readonly macroLodLevel: number;
-    constructor(model: IntervalTrackModel, contig: string, tileSize?: number);
+    constructor(dataSource: IDataSource, model: IntervalTrackModel, contig: string, tileSize?: number);
     protected mapLodLevel(l: number): 0 | 10;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }

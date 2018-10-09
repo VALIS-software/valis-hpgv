@@ -12,6 +12,12 @@ export interface GenomeBrowserRenderProps {
     pixelRatio?: number;
     style?: React.CSSProperties;
 }
+interface CustomTileLoader<ModelType> {
+    new (dataSource: IDataSource, model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
+}
+interface CustomTrackObject {
+    new (model: TrackModel): TrackObject<TrackModel, any>;
+}
 export declare class GenomeBrowser {
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
@@ -30,14 +36,10 @@ export declare class GenomeBrowser {
     protected startFrameLoop(): void;
     protected stopFrameLoop(): void;
     protected frameLoop: () => void;
-    static registerTrackType<ModelType extends TrackModel>(type: ModelType['type'], tileLoaderClass: {
-        new (model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
-    }, trackObjectClass: {
-        new (model: TrackModel): TrackObject<TrackModel, any>;
-    }): void;
+    static registerTrackType<ModelType extends TrackModel>(type: ModelType['type'], tileLoaderClass: CustomTileLoader<ModelType>, trackObjectClass: CustomTrackObject): void;
     static getTrackType(type: string): {
-        trackObjectClass: new (model: TrackModel) => TrackObject<TrackModel, TileLoader<any, any>>;
-        tileCacheClass: new (model: TrackModel, contig: string, ...args: any[]) => TileLoader<any, any>;
+        tileLoaderClass: CustomTileLoader<TrackModel>;
+        trackObjectClass: CustomTrackObject;
     };
     private static trackTypes;
 }

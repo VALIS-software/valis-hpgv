@@ -2,11 +2,11 @@ import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
 import { BlendMode, DrawContext } from "engine/rendering/Renderer";
+import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { Strand } from "genomics-formats/dist/gff3/Strand";
-import { QueryBuilder, SiriusApi } from "valis";
 import GenomeBrowser from "../../GenomeBrowser";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
@@ -14,7 +14,7 @@ import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
-import { GeneClass, TranscriptClass } from "./AnnotationTypes";
+import { GeneClass, GenomeFeature, TranscriptClass } from "./AnnotationTypes";
 
 /**
  * WIP Annotation tracks:
@@ -165,7 +165,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create
-                    let object = new GeneAnnotation(gene, this.pointerState);
+                    let object = new GeneAnnotation(gene, this.pointerState, this.onAnnotationClicked);
                     object.y = 40;
                     object.layoutH = 0;
                     object.z = 1 / 4;
@@ -212,6 +212,10 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         return feature.soClass + '\x1F' + feature.name + '\x1F' + feature.startIndex + '\x1F' + feature.length;
     }
 
+    protected onAnnotationClicked = (e: InteractionEvent, feature: GenomeFeature) => {
+        // override this to handle annotation interactions
+    }
+
 }
 
 GenomeBrowser.registerTrackType('annotation', AnnotationTileLoader, AnnotationTrack);
@@ -246,7 +250,11 @@ class GeneAnnotation extends Object2D {
     protected name: Text;
     protected _opacity: number = 1;
 
-    constructor(protected readonly gene: Gene, trackPointerState: TrackPointerState) {
+    constructor(
+        protected readonly gene: Gene,
+        trackPointerState: TrackPointerState,
+        onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void
+    ) {
         super();
 
         /**
@@ -271,7 +279,7 @@ class GeneAnnotation extends Object2D {
         for (let i = 0; i < gene.transcripts.length; i++) {
             let transcript = gene.transcripts[i];
 
-            let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, this.onTranscriptClick, trackPointerState);
+            let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, onAnnotationClicked, trackPointerState);
             transcriptAnnotation.h = transcriptHeight;
             transcriptAnnotation.y = i * (transcriptHeight + transcriptSpacing) + transcriptOffset;
 
@@ -280,31 +288,6 @@ class GeneAnnotation extends Object2D {
 
             this.add(transcriptAnnotation);
         }
-    }
-
-    onTranscriptClick = (transcript: Transcript) => {
-        if (this.gene.name == null) {
-            console.warn(`Cannot search for a gene with no name`, this.gene);
-            return;
-        }
-        // we want to directly open the details view of the entity here
-        // @to-do After we switch to use the /reference API
-        // 1. Directly use id of the entity data (no query needed), similar to VariantTrack
-        // 2. Open gene details when clicking on gene, transcript details when clicking transcript, exon details when clicking exon
-        const builder = new QueryBuilder();
-        builder.newGenomeQuery();
-        builder.filterName(this.gene.name.toUpperCase());
-        builder.setLimit(1);
-        const geneQuery = builder.build();
-        SiriusApi.getQueryResults(geneQuery, false).then(results => {
-            if (results.data.length > 0) {
-                const entity = results.data[0];
-                console.log('@! todo: transcript clicked', entity);
-            } else {
-                // this is a temporary solution
-                alert("Data not found");
-            }
-        });
     }
 
 }
@@ -323,7 +306,11 @@ class TranscriptAnnotation extends Object2D {
 
     protected _opacity: number = 1;
 
-    constructor(protected readonly transcript: Transcript, strand: Strand, onClick: (transcript: Transcript) => void, trackPointerState: TrackPointerState) {
+    constructor(
+        protected readonly transcript: Transcript, strand: Strand,
+        onClick: (e: InteractionEvent, feature: GenomeFeature) => void,
+        trackPointerState: TrackPointerState
+    ) {
         super();
 
         let transcriptColor = {
@@ -366,7 +353,7 @@ class TranscriptAnnotation extends Object2D {
             if (trackPointerState.pointerOver && e.isPrimary) {
                 e.preventDefault();
                 e.stopPropagation();
-                onClick(transcript);
+                onClick(e, transcript);
             }
         });
 

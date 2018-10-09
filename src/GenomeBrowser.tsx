@@ -4,7 +4,7 @@ import IDataSource from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
 import { ManifestDataSource } from "./data-source/ManifestDataSource";
 import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
-import { TileCache, TrackObject } from "./track";
+import { TileLoader, TrackObject } from "./track";
 import TrackModel from "./track/TrackModel";
 import AppCanvas from "./ui/core/AppCanvas";
 import TrackViewer, { Track } from "./ui/TrackViewer";
@@ -131,12 +131,12 @@ export class GenomeBrowser {
 
     static registerTrackType<ModelType extends TrackModel>(
         type: ModelType['type'],
-        tileCacheClass: { new(model: ModelType, contig: string, ...args: Array<any>): TileCache<any, any> },
+        tileLoaderClass: { new(model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any> },
         trackObjectClass: { new(model: TrackModel): TrackObject<TrackModel, any> },
     ) {
         this.trackTypes[type] = {
             trackObjectClass: trackObjectClass,
-            tileCacheClass: tileCacheClass,
+            tileCacheClass: tileLoaderClass,
         }
     }
 
@@ -147,7 +147,7 @@ export class GenomeBrowser {
     private static trackTypes: {
         [ type: string ]: {
             trackObjectClass: { new(model: TrackModel): TrackObject }
-            tileCacheClass: { new(model: TrackModel, contig: string, ...args: Array<any>): TileCache<any, any> }
+            tileCacheClass: { new(model: TrackModel, contig: string, ...args: Array<any>): TileLoader<any, any> }
         }
     } = {};
 

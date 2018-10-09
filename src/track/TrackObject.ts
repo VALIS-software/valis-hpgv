@@ -4,12 +4,12 @@ import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
 import { OpenSansRegular } from "../ui/font/Fonts";
-import { Tile, TileCache } from "./TileCache";
+import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 
 export class TrackObject<
     ModelType extends TrackModel = TrackModel,
-    TileCacheType extends TileCache<any, any> = TileCache<any, any>
+    TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>
 > extends Rect {
 
     protected dataSource: InternalDataSource;
@@ -144,8 +144,8 @@ export class TrackObject<
         super.applyTransformToSubNodes(root);
     }
 
-    protected getTileCache(): TileCacheType {
-        return this.dataSource.getTileCache(this.model, this.contig, this.tileDataKey) as any;
+    protected getTileLoader(): TileLoaderType {
+        return this.dataSource.getTileLoader(this.model, this.contig, this.tileDataKey) as any;
     }
 
     protected _pendingTiles = new UsageCache<Tile<any>>();

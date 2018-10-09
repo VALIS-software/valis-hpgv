@@ -1,5 +1,5 @@
 import { SiriusApi } from "valis";
-import { Tile, TileCache } from "../TileCache";
+import { Tile, TileLoader } from "../TileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 
@@ -107,7 +107,7 @@ function transformAnnotations(flatFeatures: Array<GenomeFeature<GenomeFeatureTyp
     return payload;
 }
 
-export class AnnotationTileCache extends TileCache<TilePayload, void> {
+export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected macro: boolean = false;
 
@@ -129,9 +129,9 @@ export class AnnotationTileCache extends TileCache<TilePayload, void> {
 
 }
 
-export class MacroAnnotationTileCache extends TileCache<TilePayload, void> {
+export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
 
-    protected annotationCache: AnnotationTileCache;
+    protected annotationCache: AnnotationTileLoader;
 
     constructor(
         protected readonly model: MacroAnnotationTrackModel,
@@ -151,4 +151,4 @@ export class MacroAnnotationTileCache extends TileCache<TilePayload, void> {
 
 }
 
-export default AnnotationTileCache;
+export default AnnotationTileLoader;

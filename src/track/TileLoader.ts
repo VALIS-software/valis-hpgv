@@ -12,8 +12,9 @@ import { EventEmitter } from "events";
  * 
  * Tiles are organized into blocks for data storage efficiency (example, we may want to store many tiles into a single GPU texture 'block')
  */
-export class TileCache<TilePayload, BlockPayload> {
+export class TileLoader<TilePayload, BlockPayload> {
 
+    // cached tile data
     protected lods = new Array<Blocks<TilePayload, BlockPayload>>();
     protected readonly blockSize: number;
 
@@ -344,4 +345,4 @@ export class Tile<Payload> {
 
 }
 
-export default TileCache;
+export default TileLoader;

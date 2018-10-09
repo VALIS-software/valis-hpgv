@@ -1,5 +1,5 @@
 import { SiriusApi } from "valis";
-import { Tile, TileCache } from "../TileCache";
+import { Tile, TileLoader } from "../TileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
 
 // Tile payload is a list of genes extended with nesting
@@ -40,7 +40,7 @@ type TilePayload = Array<{
     alts: string[]
 }>;
 
-export class VariantTileCache extends TileCache<TilePayload, void> {
+export class VariantTileLoader extends TileLoader<TilePayload, void> {
 
     constructor(protected model: VariantTrackModel, protected contig: string) {
         super(
@@ -81,4 +81,4 @@ export class VariantTileCache extends TileCache<TilePayload, void> {
     }
 
 }
-export default VariantTileCache;
+export default VariantTileLoader;

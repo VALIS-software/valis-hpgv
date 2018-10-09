@@ -1,7 +1,7 @@
 import { UsageCache } from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import SequenceTileCache, { SequenceTilePayload } from "./SequenceTileCache";
-import { Tile, TileState } from "../TileCache";
+import SequenceTileLoader, { SequenceTilePayload } from "./SequenceTileLoader";
+import { Tile, TileState } from "../TileLoader";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext, DrawMode } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
@@ -32,7 +32,7 @@ export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileP
 
 }
 
-GenomeBrowser.registerTrackType('sequence', SequenceTileCache, SequenceTrack);
+GenomeBrowser.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
 
 /**
  * - A TileNode render field should only be set to true if it's TileEntry is in the Complete state

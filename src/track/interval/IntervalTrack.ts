@@ -3,14 +3,14 @@ import { Scalar } from "engine/math/Scalar";
 import { Object2D } from "engine/ui/Object2D";
 import GenomeBrowser from "../../GenomeBrowser";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
-import { Tile, TileState } from "../TileCache";
+import { Tile, TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
-import IntervalTileCache from "./IntervalTileCache";
+import IntervalTileLoader from "./IntervalTileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
 
 type TilePayload = Float32Array;
 
-export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileCache> {
+export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileLoader> {
     
     blendEnabled: boolean = true;
 
@@ -39,9 +39,9 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileC
             let basePairsPerDOMPixel = (span / widthPx);
             let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
 
-            let tileCache = this.getTileCache();
+            let tileLoader = this.getTileLoader();
 
-            tileCache.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+            tileLoader.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                 if (tile.state === TileState.Complete) {
                     this.displayTileNode(tile, 0.9, x0, span, continuousLodLevel);
                 } else {
@@ -50,7 +50,7 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileC
 
                     // display a fallback tile if one is loaded at this location
                     let gapCenterX = tile.x + tile.span * 0.5;
-                    let fallbackTile = tileCache.getTile(gapCenterX, 1 << tileCache.macroLodLevel, false);
+                    let fallbackTile = tileLoader.getTile(gapCenterX, 1 << tileLoader.macroLodLevel, false);
 
                     if (fallbackTile.state === TileState.Complete) {
                         // display fallback tile behind other tiles
@@ -124,6 +124,6 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileC
 
 }
 
-GenomeBrowser.registerTrackType('interval', IntervalTileCache, IntervalTrack);
+GenomeBrowser.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
 
 export default IntervalTrack;

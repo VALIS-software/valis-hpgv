@@ -3,14 +3,14 @@ import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
 import Object2D from "engine/ui/Object2D";
 import { DEFAULT_SPRING } from "../ui/UIConstants";
-import { Tile, TileCache, TileState } from "./TileCache";
+import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { TrackObject } from "./TrackObject";
 
 /**
  * - to use, override constructTileNode()
  */
-export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileCache<P, any>> {
+export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoader<P, any>> {
 
     get pixelRatio() { return this._pixelRatio; }
 
@@ -39,14 +39,14 @@ export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileCac
         this._tileNodeCache.markAllUnused();
 
         if (widthPx > 0) {
-            let tileCache = this.getTileCache();
+            let tileLoader = this.getTileLoader();
 
             let basePairsPerDOMPixel = (span / widthPx);
             let samplingDensity = this.densityMultiplier * basePairsPerDOMPixel / this.pixelRatio;
             let displayLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
             let lodLevel = Math.floor(displayLodLevel);
 
-            tileCache.getTiles(x0, x1, samplingDensity, true, (tile) => {
+            tileLoader.getTiles(x0, x1, samplingDensity, true, (tile) => {
                 let tileNode = this._tileNodeCache.get(this.contig + ':' + tile.key, this.createTileNode);
                 this.updateTileNode(tileNode, tile, x0, span, displayLodLevel);
 
@@ -67,9 +67,9 @@ export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileCac
                         let fallbackDensity = samplingDensity * densityMultiplier;
 
                         // exhausted all available lods
-                        if (!tileCache.isWithinInitializedLodRange(fallbackDensity)) break;
+                        if (!tileLoader.isWithinInitializedLodRange(fallbackDensity)) break;
 
-                        let fallbackTile = tileCache.getTile(gapCenterX, fallbackDensity, false);
+                        let fallbackTile = tileLoader.getTile(gapCenterX, fallbackDensity, false);
 
                         // it's possible we end up with the same lod we already have, if so, skip it
                         if (fallbackTile.lodLevel === tile.lodLevel) continue;

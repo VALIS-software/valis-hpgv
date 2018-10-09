@@ -1,6 +1,6 @@
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
 import { SiriusApi } from "valis";
-import TileCache, { Tile } from "../TileCache";
+import TileLoader, { Tile } from "../TileLoader";
 import { SequenceTrackModel } from "./SequenceTrackModel";
 
 type TilePayload = {
@@ -20,7 +20,7 @@ type BlockPayload = {
 
 export type SequenceTilePayload = TilePayload;
 
-export class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
+export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
 
     constructor(protected model: SequenceTrackModel, protected contig: string) {
         super(1024, 8);
@@ -32,7 +32,7 @@ export class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>) {
-        let tileCache = this;
+        let tileLoader = this;
         return SiriusApi.loadACGTSubSequence(this.contig, tile.lodLevel, tile.lodX, tile.lodSpan)
             .then((sequenceData) => {
                 return {
@@ -41,7 +41,7 @@ export class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
                     getTexture(device: GPUDevice): GPUTexture {
                         let payload: TilePayload = this;
 
-                        let blockPayload = tileCache.getBlockPayload(tile);
+                        let blockPayload = tileLoader.getBlockPayload(tile);
                         let gpuTexture: GPUTexture = blockPayload.getTexture(device);
 
                         // upload this tile's row to the block if not already uploaded
@@ -123,4 +123,4 @@ export class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
     
 }
 
-export default SequenceTileCache;
+export default SequenceTileLoader;

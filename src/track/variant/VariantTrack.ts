@@ -9,12 +9,12 @@ import GenomeBrowser from "../../GenomeBrowser";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import TextClone from "../../ui/util/TextClone";
-import { TileState } from "../TileCache";
+import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
-import { VariantTileCache } from "./VariantTileCache";
+import { VariantTileLoader } from "./VariantTileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
 
-export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCache> {
+export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoader> {
 
     protected readonly macroLodBlendRange = 1;
     protected readonly macroLodThresholdLow = 8;
@@ -49,7 +49,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCach
         const span = x1 - x0;
         const widthPx = this.getComputedWidth();
         if (widthPx > 0) {
-            let tileCache = this.getTileCache();
+            let tileLoader = this.getTileLoader();
 
             let basePairsPerDOMPixel = (span / widthPx);
             let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
@@ -65,7 +65,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCach
 
             // micro-scale details
             if (microOpacity > 0) {
-                tileCache.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+                tileLoader.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                     if (tile.state !== TileState.Complete) {
                         this._pendingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
                         return;
@@ -387,6 +387,6 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCach
 
 }
 
-GenomeBrowser.registerTrackType('variant', VariantTileCache, VariantTrack);
+GenomeBrowser.registerTrackType('variant', VariantTileLoader, VariantTrack);
 
 export default VariantTrack;

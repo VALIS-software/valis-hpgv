@@ -1,11 +1,12 @@
 import { GenomicLocation } from "../model/GenomicLocation";
-import TrackModel from "../model/TrackModel";
+import TrackModel from "../track/TrackModel";
 import Object2D from "engine/ui/Object2D";
 import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
 import Panel from "./Panel";
-import TrackObject from "./track/BaseTrack";
+import TrackObject from "../track/TrackObject";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
+import { InternalDataSource } from "../data-source/InternalDataSource";
 export declare class TrackViewer extends Object2D {
     readonly trackHeaderWidth: number;
     readonly panelHeaderHeight: number;
@@ -23,11 +24,13 @@ export declare class TrackViewer extends Object2D {
     /** used to collectively position panels and track tiles */
     protected grid: Object2D;
     protected addPanelButton: ReactObject;
+    protected dataSource: InternalDataSource;
     constructor();
     addTrack(model: TrackModel, heightPx?: number, animate?: boolean): Track;
     closeTrack(track: Track, animate?: boolean, onComplete?: () => void): void;
     addPanel(location: GenomicLocation, animate?: boolean): void;
     closePanel(panel: Panel, animate?: boolean, onComplete?: () => void): void;
+    setDataSource(dataSource: InternalDataSource): void;
     getConfiguration(): TrackViewerConfiguration;
     setConfiguration(state: TrackViewerConfiguration): void;
     getTracks(): Track[];
@@ -93,7 +96,7 @@ declare class RowObject {
     readonly header: ReactObject;
     readonly closeButton: ReactObject;
     readonly resizeHandle: Rect;
-    readonly trackViews: Set<TrackObject<"empty" | "sequence" | "annotation" | "variant" | "interval">>;
+    readonly trackViews: Set<TrackObject<TrackModel, import("../track/TileCache").TileCache<any, any>>>;
     y: number;
     h: number;
     title: string;

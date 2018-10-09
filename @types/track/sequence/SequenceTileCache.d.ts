@@ -1,6 +1,7 @@
 import GPUDevice, { GPUTexture } from "engine/rendering/GPUDevice";
-import TileStore, { Tile } from "./TileStore";
-export declare type TilePayload = {
+import TileCache, { Tile } from "../TileCache";
+import { SequenceTrackModel } from "./SequenceTrackModel";
+declare type TilePayload = {
     array: Uint8Array;
     sequenceMinMax: {
         min: number;
@@ -9,13 +10,15 @@ export declare type TilePayload = {
     dataUploaded: boolean;
     getTexture(device: GPUDevice): GPUTexture;
 };
-export declare type BlockPayload = {
+declare type BlockPayload = {
     _gpuTexture: GPUTexture;
     getTexture(device: GPUDevice): GPUTexture;
 };
-export declare class SequenceTileStore extends TileStore<TilePayload, BlockPayload> {
-    protected sourceId: string;
-    constructor(sourceId: string);
+export declare type SequenceTilePayload = TilePayload;
+export declare class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
+    protected model: SequenceTrackModel;
+    protected contig: string;
+    constructor(model: SequenceTrackModel, contig: string);
     protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<{
         dataUploaded: boolean;
@@ -30,4 +33,4 @@ export declare class SequenceTileStore extends TileStore<TilePayload, BlockPaylo
     protected createBlockPayload(lodLevel: number, lodX: number, tileWidth: number, rows: number): BlockPayload;
     protected releaseBlockPayload(payload: BlockPayload): void;
 }
-export default SequenceTileStore;
+export default SequenceTileCache;

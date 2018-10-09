@@ -1,10 +1,9 @@
-/// <reference types="react" />
 import UsageCache from "engine/ds/UsageCache";
-import { AnnotationTileStore } from "../../tile-store/AnnotationTileStore";
-import TrackModel from "../../model/TrackModel";
+import { AnnotationTileCache } from "./AnnotationTileCache";
 import Object2D from "engine/ui/Object2D";
-import TrackObject from "./BaseTrack";
-import IntervalInstances from "./util/IntervalInstances";
+import TrackObject from "../TrackObject";
+import IntervalInstances from "../../ui/util/IntervalInstances";
+import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 /**
  * WIP Annotation tracks:
  *
@@ -12,18 +11,16 @@ import IntervalInstances from "./util/IntervalInstances";
  * - Convert micro-scale annotations to use instancing (and text batching)
  * - Merge shaders where possible and clean up
  */
-export declare class AnnotationTrack extends TrackObject<'annotation'> {
+export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileCache> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;
     protected readonly namesLodBlendRange: number;
     protected readonly namesLodThresholdLow: number;
     protected readonly namesLodThresholdHigh: number;
-    protected annotationStore: AnnotationTileStore;
-    protected macroAnnotationStore: AnnotationTileStore;
+    protected macroModel: MacroAnnotationTrackModel;
     protected pointerState: TrackPointerState;
-    constructor(model: TrackModel<'annotation'>);
-    setContig(contig: string): void;
+    constructor(model: AnnotationTrackModel);
     protected _macroTileCache: UsageCache<IntervalInstances>;
     protected _annotationCache: UsageCache<Object2D>;
     protected _onStageAnnotations: UsageCache<Object2D>;
@@ -34,7 +31,7 @@ export declare class AnnotationTrack extends TrackObject<'annotation'> {
     protected removeAnnotation: (annotation: Object2D) => void;
     protected deleteAnnotation: (annotation: Object2D) => void;
     protected annotationKey: (feature: {
-        soClass: import("react").ReactText;
+        soClass: string | number;
         name?: string;
         startIndex: number;
         length: number;

@@ -1,22 +1,23 @@
-import { BlockPayload, TilePayload } from "../../tile-store/SequenceTileStore";
-import { Tile } from "../../tile-store/TileStore";
-import { TrackModel } from "../../model/TrackModel";
+import { SequenceTilePayload } from "./SequenceTileCache";
+import { Tile } from "../TileCache";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
 import { Text } from "engine/ui/Text";
-import { ShaderTrack, TileNode } from "./ShaderTrack";
-import { TextClone } from "./util/TextClone";
-export declare class SequenceTrack extends ShaderTrack<TilePayload, BlockPayload> {
+import { ShaderTrack, TileNode } from "../ShaderTrack";
+import { TextClone } from "../../ui/util/TextClone";
+import { SequenceTrackModel } from './SequenceTrackModel';
+export declare class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTilePayload> {
     protected densityMultiplier: number;
-    constructor(model: TrackModel);
+    constructor(model: SequenceTrackModel);
     protected constructTileNode(): SequenceTile;
+    static thing(): number;
 }
-declare class SequenceTile extends TileNode<TilePayload> {
+declare class SequenceTile extends TileNode<SequenceTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
     constructor();
-    setTile(tile: Tile<TilePayload>): void;
+    setTile(tile: Tile<SequenceTilePayload>): void;
     private _lastComputedWidth;
     private _lastComputedX;
     applyTransformToSubNodes(root?: boolean): void;

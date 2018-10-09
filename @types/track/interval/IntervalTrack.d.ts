@@ -1,16 +1,14 @@
 import UsageCache from "engine/ds/UsageCache";
-import GenericIntervalTileStore from "../../tile-store/GenericIntervalTileStore";
-import { Tile } from "../../tile-store/TileStore";
-import { TrackModel } from "../../model/TrackModel";
+import IntervalTileCache from "./IntervalTileCache";
+import { Tile } from "../TileCache";
 import { Object2D } from "engine/ui/Object2D";
-import TrackObject from "./BaseTrack";
-import IntervalInstances from "./util/IntervalInstances";
+import TrackObject from "../TrackObject";
+import IntervalInstances from "../../ui/util/IntervalInstances";
+import { IntervalTrackModel } from "./IntervalTrackModel";
 declare type TilePayload = Float32Array;
-export declare class IntervalTrack extends TrackObject<'interval'> {
+export declare class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileCache> {
     blendEnabled: boolean;
-    protected tileStore: GenericIntervalTileStore;
-    constructor(model: TrackModel<'interval'>);
-    setContig(contig: string): void;
+    constructor(model: IntervalTrackModel);
     setBlendMode(enabled: boolean): void;
     protected _pendingTiles: UsageCache<Tile<any>>;
     protected _intervalTileCache: UsageCache<IntervalInstances>;

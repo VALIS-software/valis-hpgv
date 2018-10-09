@@ -1,20 +1,18 @@
 import UsageCache from "engine/ds/UsageCache";
-import { VariantTileStore } from "../../tile-store/VariantTileStore";
-import { TrackModel } from "../../model/TrackModel";
+import { VariantTileCache } from "./VariantTileCache";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
-import TrackObject from "./BaseTrack";
-import IntervalInstances from "./util/IntervalInstances";
-import TextClone from "./util/TextClone";
-export declare class VariantTrack extends TrackObject<'variant'> {
+import TrackObject from "../TrackObject";
+import IntervalInstances from "../../ui/util/IntervalInstances";
+import TextClone from "../../ui/util/TextClone";
+import { VariantTrackModel } from "./VariantTrackModel";
+export declare class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCache> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;
-    protected tileStore: VariantTileStore;
     protected pointerOverTrack: boolean;
-    constructor(model: TrackModel<'variant'>);
-    setContig(contig: string): void;
+    constructor(model: VariantTrackModel);
     protected _microTileCache: UsageCache<IntervalInstances>;
     protected _onStageAnnotations: UsageCache<Object2D>;
     protected _sequenceLabelCache: UsageCache<{

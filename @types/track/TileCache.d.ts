@@ -1,6 +1,17 @@
 /// <reference types="node" />
 import { EventEmitter } from "events";
-export declare class TileStore<TilePayload, BlockPayload> {
+/**
+ * Base class for requesting and managing tiled data
+ *
+ * To use override the following methods in a subclass:
+ * - `getTilePayload`
+ * - `createBlockPayload`
+ * - `releaseBlockPayload`
+ * - `mapLodLevel`
+ *
+ * Tiles are organized into blocks for data storage efficiency (example, we may want to store many tiles into a single GPU texture 'block')
+ */
+export declare class TileCache<TilePayload, BlockPayload> {
     readonly tileWidth: number;
     readonly tilesPerBlock: number;
     maximumX: number;
@@ -64,4 +75,4 @@ export declare class Tile<Payload> {
     protected emitComplete(): void;
     protected emitLoadFailed(reason: string): void;
 }
-export default TileStore;
+export default TileCache;

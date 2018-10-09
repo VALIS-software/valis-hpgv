@@ -1,10 +1,13 @@
 import UsageCache from "engine/ds/UsageCache";
-import { Tile } from "../../tile-store/TileStore";
-import { TrackModel, TrackTypeMap } from "../../model/TrackModel";
+import { Tile, TileCache } from "./TileCache";
+import { TrackModel } from "./TrackModel";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-export declare class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeMap> extends Rect {
-    protected model: TrackModel<ModelType>;
+import { InternalDataSource } from "../data-source/InternalDataSource";
+export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileCacheType extends TileCache<any, any> = TileCache<any, any>> extends Rect {
+    protected readonly model: ModelType;
+    protected readonly tileDataKey?: string;
+    protected dataSource: InternalDataSource;
     protected contig: string | undefined;
     protected x0: number;
     protected x1: number;
@@ -18,15 +21,17 @@ export declare class TrackObject<ModelType extends keyof TrackTypeMap = keyof Tr
     protected focusRegionRectRight: Rect;
     protected loadingIndicator: LoadingIndicator;
     protected displayNeedUpdate: boolean;
-    constructor(model: TrackModel<ModelType>);
+    constructor(model: ModelType, tileDataKey?: string);
+    setDataSource(dataSource: InternalDataSource): void;
     setContig(contig: string): void;
     setRange(x0: number, x1: number): void;
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle): void;
     removeAxisPointer(id: string): void;
     setFocusRegion(x0_fractional: number, x1_fractional: number): void;
-    disableFocusRegion(): void;
+    clearFocusRegion(): void;
     private _lastComputedWidth;
     applyTransformToSubNodes(root?: boolean): void;
+    protected getTileCache(): TileCacheType;
     protected _pendingTiles: UsageCache<Tile<any>>;
     protected updateDisplay(): void;
     /**

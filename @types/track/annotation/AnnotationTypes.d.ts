@@ -1,5 +1,9 @@
-import { Strand } from "genomics-formats/dist/gff3/Strand";
-import { Feature } from "genomics-formats/dist/gff3/Feature";
+export declare enum Strand {
+    None = ".",
+    Unknown = "?",
+    Positive = "+",
+    Negative = "-"
+}
 export declare enum GenomeFeatureType {
     Gene = 0,
     Transcript = 1,
@@ -86,22 +90,3 @@ export declare class SoTranscriptComponentClass {
     readonly 'three_prime_UTR': TranscriptComponentClass;
     static readonly instance: SoTranscriptComponentClass;
 }
-declare type Tile = {
-    startIndex: number;
-    span: number;
-    content: TileContent;
-};
-export declare class Tileset {
-    protected tileSize: number;
-    protected topLevelOnly: boolean;
-    protected onUnknownFeature: (feature: Feature) => void;
-    protected onError: (reason: string) => void;
-    readonly sequences: {
-        [sequenceId: string]: Array<Tile>;
-    };
-    constructor(tileSize: number, topLevelOnly: boolean, onUnknownFeature: (feature: Feature) => void, onError: (reason: string) => void);
-    addTopLevelFeature: (feature: Feature) => void;
-    protected addFeature(tile: Tile, feature: Feature): void;
-    protected getTile(sequenceId: string, index: number): Tile;
-}
-export {};

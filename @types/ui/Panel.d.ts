@@ -2,8 +2,10 @@ import { InteractionEvent, WheelInteractionEvent } from "engine/ui/InteractionEv
 import Object2D from "engine/ui/Object2D";
 import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
-import TrackObject from "./track/BaseTrack";
+import TrackObject from "../track/TrackObject";
 import XAxis from "./XAxis";
+import { Contig } from "../model";
+import { InternalDataSource } from "../data-source/InternalDataSource";
 declare enum DragMode {
     Move = 0,
     SelectRegion = 1
@@ -27,11 +29,12 @@ export declare class Panel extends Object2D {
     readonly header: ReactObject;
     readonly xAxis: XAxis;
     readonly resizeHandle: Rect;
-    readonly trackViews: Set<TrackObject<"empty" | "sequence" | "annotation" | "variant" | "interval">>;
+    readonly trackViews: Set<TrackObject<import("../track/TrackModel").TrackModel, import("../track/TileCache").TileCache<any, any>>>;
     closable: boolean;
     closing: boolean;
     protected _closable: boolean;
     protected _closing: boolean;
+    protected dataSource: InternalDataSource;
     readonly contig: string;
     readonly x0: number;
     readonly x1: number;
@@ -43,19 +46,21 @@ export declare class Panel extends Object2D {
     };
     protected tileDragging: boolean;
     protected tileHovering: boolean;
-    protected formattedContig: string;
     protected isEditing: boolean;
-    protected availableContigs: Array<string>;
+    protected availableContigs: ReadonlyArray<Contig>;
     constructor(onClose: (t: Panel) => void, spacing: {
         x: number;
         y: number;
-    }, panelHeaderHeight: number, xAxisHeight: number);
+    }, panelHeaderHeight: number, xAxisHeight: number, dataSource: InternalDataSource);
     setResizable(v: boolean): void;
     addTrackView(trackView: TrackObject): void;
     removeTrackView(trackView: TrackObject): void;
+    private _dataSourceId;
+    setDataSource(dataSource: InternalDataSource): void;
     setContig(contig: string): void;
     setRange(x0: number, x1: number, animate?: boolean): void;
-    setAvailableContigs(contigs: Array<string>): void;
+    protected setAvailableContigs(contigs: Array<Contig>): void;
+    protected getFormattedContig(contig: string): string;
     protected setSecondaryAxisPointers(secondaryAxisPointers: {
         [pointerId: string]: number;
     }): void;

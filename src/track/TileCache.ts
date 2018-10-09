@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 import Scalar from "engine/math/Scalar";
-import TrackModel from "./TrackModel";
 
 /**
  * Base class for requesting and managing tiled data

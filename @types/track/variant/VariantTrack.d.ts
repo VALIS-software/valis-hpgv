@@ -1,4 +1,5 @@
 import UsageCache from "engine/ds/UsageCache";
+import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
@@ -22,7 +23,7 @@ export declare class VariantTrack extends TrackObject<VariantTrackModel, Variant
     }>;
     protected updateDisplay(): void;
     protected displayLabel(variantId: string, baseCharacter: string, color: ArrayLike<number>, startIndex: number, altIndex: number, charIndex: number, layoutParentX: number, baseLayoutW: number, altHeightPx: number, textSizePx: number, textOpacity: number, tileY: number): void;
-    protected createBaseLabel: (baseCharacter: string, color: ArrayLike<number>, onClick: () => void) => {
+    protected createBaseLabel: (baseCharacter: string, color: ArrayLike<number>, onClick: (e: InteractionEvent) => void) => {
         root: Rect;
         textParent: Object2D;
         text: TextClone;
@@ -32,6 +33,7 @@ export declare class VariantTrack extends TrackObject<VariantTrackModel, Variant
         textParent: Object2D;
         text: TextClone;
     }) => void;
+    protected onVariantClicked: (e: InteractionEvent, variantId: string) => void;
     protected static baseTextInstances: {
         [key: string]: Text;
     };

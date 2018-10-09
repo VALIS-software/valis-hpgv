@@ -1,8 +1,8 @@
 import UsageCache from "engine/ds/UsageCache";
 import Object2D from "engine/ui/Object2D";
 import { Tile, TileCache } from "./TileCache";
-import { TrackObject } from "./TrackObject";
 import { TrackModel } from "./TrackModel";
+import { TrackObject } from "./TrackObject";
 /**
  * - to use, override constructTileNode()
  */

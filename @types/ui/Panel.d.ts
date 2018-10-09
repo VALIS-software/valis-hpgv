@@ -1,11 +1,11 @@
 import { InteractionEvent, WheelInteractionEvent } from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
-import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
-import TrackObject from "../track/TrackObject";
-import XAxis from "./XAxis";
-import { Contig } from "../model";
 import { InternalDataSource } from "../data-source/InternalDataSource";
+import { Contig } from "../model";
+import TrackObject from "../track/TrackObject";
+import ReactObject from "./core/ReactObject";
+import XAxis from "./XAxis";
 declare enum DragMode {
     Move = 0,
     SelectRegion = 1

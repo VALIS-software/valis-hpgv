@@ -1,12 +1,12 @@
+import Object2D from "engine/ui/Object2D";
+import Rect from "engine/ui/Rect";
+import { InternalDataSource } from "../data-source/InternalDataSource";
 import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../track/TrackModel";
-import Object2D from "engine/ui/Object2D";
-import ReactObject from "./core/ReactObject";
-import Rect from "engine/ui/Rect";
-import Panel from "./Panel";
 import TrackObject from "../track/TrackObject";
+import ReactObject from "./core/ReactObject";
+import Panel from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
-import { InternalDataSource } from "../data-source/InternalDataSource";
 export declare class TrackViewer extends Object2D {
     readonly trackHeaderWidth: number;
     readonly panelHeaderHeight: number;

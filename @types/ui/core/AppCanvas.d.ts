@@ -1,10 +1,10 @@
-import * as React from "react";
 import GPUDevice from 'engine/rendering/GPUDevice';
-import RenderPass from 'engine/rendering/RenderPass';
 import Renderer from 'engine/rendering/Renderer';
+import RenderPass from 'engine/rendering/RenderPass';
+import { InteractionEventInit, InteractionEventMap } from "engine/ui/InteractionEvent";
 import { Object2D } from 'engine/ui/Object2D';
+import * as React from "react";
 import { ReactObject } from "./ReactObject";
-import { InteractionEventMap, InteractionEventInit } from "engine/ui/InteractionEvent";
 interface Props {
     width: number;
     height: number;

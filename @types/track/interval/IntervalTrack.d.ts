@@ -1,9 +1,9 @@
 import UsageCache from "engine/ds/UsageCache";
-import IntervalTileCache from "./IntervalTileCache";
-import { Tile } from "../TileCache";
 import { Object2D } from "engine/ui/Object2D";
-import TrackObject from "../TrackObject";
 import IntervalInstances from "../../ui/util/IntervalInstances";
+import { Tile } from "../TileCache";
+import TrackObject from "../TrackObject";
+import IntervalTileCache from "./IntervalTileCache";
 import { IntervalTrackModel } from "./IntervalTrackModel";
 declare type TilePayload = Float32Array;
 export declare class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileCache> {

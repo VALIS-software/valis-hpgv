@@ -1,6 +1,6 @@
 import TileCache from '../track/TileCache';
-import { IDataSource } from './IDataSource';
 import TrackModel from '../track/TrackModel';
+import { IDataSource } from './IDataSource';
 export declare class InternalDataSource implements IDataSource {
     protected readonly dataSource: IDataSource;
     protected tileCaches: {

@@ -1,11 +1,11 @@
 import UsageCache from "engine/ds/UsageCache";
-import { VariantTileCache } from "./VariantTileCache";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
-import TrackObject from "../TrackObject";
 import IntervalInstances from "../../ui/util/IntervalInstances";
 import TextClone from "../../ui/util/TextClone";
+import TrackObject from "../TrackObject";
+import { VariantTileCache } from "./VariantTileCache";
 import { VariantTrackModel } from "./VariantTrackModel";
 export declare class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCache> {
     protected readonly macroLodBlendRange: number;

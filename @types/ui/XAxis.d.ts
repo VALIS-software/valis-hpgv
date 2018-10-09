@@ -1,8 +1,8 @@
+import { UsageCache } from "engine/ds/UsageCache";
+import { Renderable } from "engine/rendering/Renderable";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { Renderable } from "engine/rendering/Renderable";
-import { UsageCache } from "engine/ds/UsageCache";
 export declare class XAxis extends Object2D {
     protected fontPath: string;
     protected offset: number;

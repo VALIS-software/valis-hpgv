@@ -1,9 +1,9 @@
 import UsageCache from "engine/ds/UsageCache";
-import { Tile, TileCache } from "./TileCache";
-import { TrackModel } from "./TrackModel";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
+import { Tile, TileCache } from "./TileCache";
+import { TrackModel } from "./TrackModel";
 export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileCacheType extends TileCache<any, any> = TileCache<any, any>> extends Rect {
     protected readonly model: ModelType;
     protected readonly tileDataKey?: string;

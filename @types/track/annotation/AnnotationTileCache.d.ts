@@ -1,6 +1,6 @@
 import { Tile, TileCache } from "../TileCache";
-import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
+import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 export declare type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
 };

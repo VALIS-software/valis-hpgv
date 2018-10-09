@@ -4,8 +4,9 @@
  * - Applying a TrackModel state should restore state exactly
  */
 export type TrackModel = {
-    type: string;
-    name: string;
+    type: string,
+    name: string,
+    [field: string]: any,
 };
 
 export default TrackModel;

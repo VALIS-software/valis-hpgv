@@ -42,12 +42,12 @@ export class InternalDataSource {
                 let matchingContigInfo = contigInfoArray.find((c) => c.id === key);
 
                 if (matchingContigInfo != null) {
-                    tileLoader.maximumX = matchingContigInfo.length - 1;
+                    tileLoader.maximumX = matchingContigInfo.span - 1;
 
                     // preload low-resolution data
                     // @! needs to be validated and tested that this works as expected
-                    let minLength = 512;
-                    tileLoader.getTiles(0, tileLoader.maximumX, matchingContigInfo.length / minLength, true, () => { });
+                    let minSpan = 512;
+                    tileLoader.getTiles(0, tileLoader.maximumX, matchingContigInfo.span / minSpan, true, () => { });
                 }
             });
         }

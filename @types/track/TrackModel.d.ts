@@ -6,5 +6,6 @@
 export declare type TrackModel = {
     type: string;
     name: string;
+    [field: string]: any;
 };
 export default TrackModel;

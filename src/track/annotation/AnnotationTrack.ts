@@ -212,7 +212,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         return feature.soClass + '\x1F' + feature.name + '\x1F' + feature.startIndex + '\x1F' + feature.length;
     }
 
-    protected onAnnotationClicked = (e: InteractionEvent, feature: GenomeFeature) => {
+    protected onAnnotationClicked = (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => {
         // override this to handle annotation interactions
     }
 
@@ -250,10 +250,10 @@ class GeneAnnotation extends Object2D {
     protected name: Text;
     protected _opacity: number = 1;
 
-    constructor(
+        constructor(
         protected readonly gene: Gene,
         trackPointerState: TrackPointerState,
-        onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void
+        onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void
     ) {
         super();
 
@@ -279,7 +279,7 @@ class GeneAnnotation extends Object2D {
         for (let i = 0; i < gene.transcripts.length; i++) {
             let transcript = gene.transcripts[i];
 
-            let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, onAnnotationClicked, trackPointerState);
+            let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
             transcriptAnnotation.h = transcriptHeight;
             transcriptAnnotation.y = i * (transcriptHeight + transcriptSpacing) + transcriptOffset;
 
@@ -308,8 +308,8 @@ class TranscriptAnnotation extends Object2D {
 
     constructor(
         protected readonly transcript: Transcript, strand: Strand,
+        trackPointerState: TrackPointerState,
         onClick: (e: InteractionEvent, feature: GenomeFeature) => void,
-        trackPointerState: TrackPointerState
     ) {
         super();
 

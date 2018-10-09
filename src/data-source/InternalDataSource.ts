@@ -43,6 +43,11 @@ export class InternalDataSource implements IDataSource {
 
                 if (matchingContigInfo != null) {
                     tileCache.maximumX = matchingContigInfo.length - 1;
+
+                    // preload low-resolution data
+                    // @! needs to be validated and tested that this works as expected
+                    let minLength = 512;
+                    tileCache.getTiles(0, tileCache.maximumX, matchingContigInfo.length / minLength, true, () => { });
                 }
             });
         }

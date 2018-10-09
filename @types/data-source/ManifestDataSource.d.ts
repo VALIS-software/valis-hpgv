@@ -1,6 +1,6 @@
 import { Contig } from "../model/Contig";
 import { IDataSource } from "./IDataSource";
-import { TileContent } from "../track/annotation/AnnotationTypes";
+import { GenomeFeature } from "../track/annotation/AnnotationTypes";
 declare type Manifest = {
     contigs: Array<Contig>;
 };
@@ -17,6 +17,6 @@ export declare class ManifestDataSource implements IDataSource {
         };
         indicesPerBase: number;
     }>;
-    loadAnnotations(contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<TileContent>;
+    loadAnnotations(contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<Array<GenomeFeature>>;
 }
 export default ManifestDataSource;

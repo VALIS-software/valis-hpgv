@@ -1,5 +1,5 @@
 import { Contig } from "../model/Contig";
-import { TileContent } from "../track/annotation/AnnotationTypes";
+import { GenomeFeature } from "../track";
 export interface IDataSource {
     getContigs(): Promise<Array<Contig>>;
     loadACGTSequence(contig: string, startBaseIndex: number, span: number, lodLevel: number): Promise<{
@@ -10,6 +10,6 @@ export interface IDataSource {
         };
         indicesPerBase: number;
     }>;
-    loadAnnotations(contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<TileContent>;
+    loadAnnotations(contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<Array<GenomeFeature>>;
 }
 export default IDataSource;

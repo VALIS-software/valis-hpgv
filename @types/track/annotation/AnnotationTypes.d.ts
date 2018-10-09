@@ -12,7 +12,6 @@ export declare enum GenomeFeatureType {
 export interface GenomeFeature {
     type: GenomeFeatureType;
 }
-export declare type TileContent = Array<GenomeFeature>;
 export declare enum GeneClass {
     Unspecified = 0,
     ProteinCoding = 1,

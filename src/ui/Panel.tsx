@@ -174,7 +174,7 @@ export class Panel extends Object2D {
         let currentDataSourceId = this._dataSourceId;
         this.dataSource.getContigs().then((contigs) => {
             if (this._dataSourceId !== currentDataSourceId) return;
-            this.setAvailableContigs(contigs)
+            this.setAvailableContigs(contigs);
         });
     }
 
@@ -226,21 +226,15 @@ export class Panel extends Object2D {
         this.updatePanelHeader();
     }
 
-    protected getFormattedContig(contig: string) {
+    protected getFormattedContig(contigId: string) {
         // determine a human-friendly name for the contig
-        let availableContig = this.availableContigs.find(c => c.id === contig);
+        let availableContig = this.availableContigs.find(c => c.id === contigId);
         if (availableContig != null) {
             if (availableContig.name != null) {
                 // use user-supplied name
                 return availableContig.name;
             } else {
-                // contigs of the format 'chr**' become 'Chromosome **'
-                let chromosomeContigMatch = /^chr(\d\d?\w\w?)$/.exec(contig);
-                if (chromosomeContigMatch) {
-                    return `Chromosome ${chromosomeContigMatch[1]}`;
-                } else {
-                    return contig;
-                }
+                return contigId;
             }
         } else {
             return `<Unknown contig> ${this.contig}`;

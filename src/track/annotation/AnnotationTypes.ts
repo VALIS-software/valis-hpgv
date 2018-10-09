@@ -12,17 +12,11 @@ export enum GenomeFeatureType {
 	TranscriptComponent,
 }
 
-export interface GenomeFeatureTypeMap {
-	[GenomeFeatureType.Gene]: GeneInfo,
-	[GenomeFeatureType.Transcript]: TranscriptInfo,
-	[GenomeFeatureType.TranscriptComponent]: TranscriptComponentInfo,
+export interface GenomeFeature {
+	type: GenomeFeatureType,
 }
 
-export type GenomeFeature<E extends keyof GenomeFeatureTypeMap> = GenomeFeatureTypeMap[E] & {
-	type: E,
-}
-
-export type TileContent = Array<GenomeFeature<keyof GenomeFeatureTypeMap>>;
+export type TileContent = Array<GenomeFeature>;
 
 export enum GeneClass {
 	// this is a small, simplified subset of types specified in the Sequence Ontology
@@ -32,7 +26,8 @@ export enum GeneClass {
 	Pseudo, // non-functional imperfect copy
 }
 
-export type GeneInfo = {
+export interface GeneInfo extends GenomeFeature {
+	type: GenomeFeatureType.Gene,
 	name?: string,
 	startIndex: number,
 	length: number,
@@ -58,7 +53,8 @@ export enum TranscriptClass {
 /**
  * Mature transcript – transcript after processing
  */
-export type TranscriptInfo = {
+export interface TranscriptInfo extends GenomeFeature {
+	type: GenomeFeatureType.Transcript,
 	name?: string,
 	startIndex: number,
 	length: number,
@@ -72,7 +68,8 @@ export enum TranscriptComponentClass {
 	ProteinCodingSequence,
 }
 
-export type TranscriptComponentInfo = {
+export interface TranscriptComponentInfo extends GenomeFeature {
+	type: GenomeFeatureType.TranscriptComponent,
 	name?: string,
 	startIndex: number,
 	length: number,

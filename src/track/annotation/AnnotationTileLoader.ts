@@ -17,7 +17,7 @@ export type Transcript = TranscriptInfo & {
 
 type TilePayload = Array<Gene>;
 
-function transformAnnotations(flatFeatures: Array<GenomeFeature<GenomeFeatureType>>) {
+function transformAnnotations(flatFeatures: Array<GenomeFeature>) {
     // convert flat list of features into a nested structure which is easier to work with for rendering
     let payload: TilePayload = new Array();
     let activeGene: TilePayload[0];
@@ -36,6 +36,7 @@ function transformAnnotations(flatFeatures: Array<GenomeFeature<GenomeFeatureTyp
 
         if (feature.type === GenomeFeatureType.Gene) {
             let geneInfo = feature as GeneInfo;
+
             // convert strand from old format to new
             if (typeof geneInfo.strand === 'number') {
                 switch (geneInfo.strand) {

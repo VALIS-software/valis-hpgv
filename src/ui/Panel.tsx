@@ -14,6 +14,8 @@ import { OpenSansRegular } from "./font/Fonts";
 import TrackObject, { AxisPointerStyle } from "../track/TrackObject";
 import XAxis from "./XAxis";
 import Animator from "engine/animation/Animator";
+import { Contig } from "../model";
+import { InternalDataSource } from "../data-source/InternalDataSource";
 
 enum DragMode {
     Move,
@@ -51,6 +53,8 @@ export class Panel extends Object2D {
     protected _closable = false;
     protected _closing = false;
 
+    protected dataSource: InternalDataSource;
+
     // view-state is defined by genomic location
     // viewport is designed to weight high precision to relatively small values (~millions) and lose precision for high values (~billions+)
     // these should only be changed by setContig() and setRange()
@@ -64,18 +68,19 @@ export class Panel extends Object2D {
     protected tileDragging = false;
     protected tileHovering = false;
 
-    protected formattedContig: string;
     protected isEditing: boolean = false;
 
-    protected availableContigs: Array<string>;
+    protected availableContigs: ReadonlyArray<Contig>;
 
     constructor(
         protected onClose: (t: Panel) => void,
         protected readonly spacing: { x: number, y: number },
         protected readonly panelHeaderHeight: number,
         protected readonly xAxisHeight: number,
+        dataSource: InternalDataSource,
     ) {
         super();
+        
         // a panel has nothing to render on its own
         this.render = false;
 
@@ -111,6 +116,8 @@ export class Panel extends Object2D {
         this.resizeHandle.z = 1;
         this.resizeHandle.render = false;
         this.setResizable(false);
+
+        this.setDataSource(dataSource);
     }
 
     setResizable(v: boolean) {
@@ -129,6 +136,7 @@ export class Panel extends Object2D {
         trackView.addInteractionListener('wheel', this.onTileWheel);
         trackView.addInteractionListener('pointermove', this.onTilePointerMove);
         trackView.addInteractionListener('pointerleave', this.onTileLeave);
+        trackView.setDataSource(this.dataSource);
         trackView.setContig(this.contig);
         trackView.setRange(this.x0, this.x1);
 
@@ -152,19 +160,29 @@ export class Panel extends Object2D {
         this.trackViews.delete(trackView);
     }
 
+    private _dataSourceId = 0;
+    setDataSource(dataSource: InternalDataSource) {
+        this.dataSource = dataSource;
+        this._dataSourceId++;
+
+        for (let trackView of this.trackViews) {
+            trackView.setDataSource(dataSource);
+        }
+
+        this.setAvailableContigs([]);
+
+        let currentDataSourceId = this._dataSourceId;
+        this.dataSource.getContigs().then((contigs) => {
+            if (this._dataSourceId !== currentDataSourceId) return;
+            this.setAvailableContigs(contigs)
+        });
+    }
+
     setContig(contig: string) {
-        (this.contig as any) = contig;
+        (this.contig as any) = contig; // override readonly
 
         for (let track of this.trackViews) {
             track.setContig(contig);
-        }
-
-        // parse contig and create a formatted contig
-        let chromosomeContigMatch = /chr(.*)$/.exec(contig);
-        if (chromosomeContigMatch) {
-            this.formattedContig = `Chromosome ${chromosomeContigMatch[1]}`;
-        } else {
-            this.formattedContig = `<Invalid contig> ${this.contig}`;
         }
 
         this.updatePanelHeader();
@@ -203,17 +221,38 @@ export class Panel extends Object2D {
         }
     }
 
-    setAvailableContigs(contigs: Array<string>) {
+    protected setAvailableContigs(contigs: Array<Contig>) {
         this.availableContigs = contigs;
         this.updatePanelHeader();
+    }
+
+    protected getFormattedContig(contig: string) {
+        // determine a human-friendly name for the contig
+        let availableContig = this.availableContigs.find(c => c.id === contig);
+        if (availableContig != null) {
+            if (availableContig.name != null) {
+                // use user-supplied name
+                return availableContig.name;
+            } else {
+                // contigs of the format 'chr**' become 'Chromosome **'
+                let chromosomeContigMatch = /^chr(\d\d?\w\w?)$/.exec(contig);
+                if (chromosomeContigMatch) {
+                    return `Chromosome ${chromosomeContigMatch[1]}`;
+                } else {
+                    return contig;
+                }
+            }
+        } else {
+            return `<Unknown contig> ${this.contig}`;
+        }
     }
 
     protected setSecondaryAxisPointers(secondaryAxisPointers: { [ pointerId: string ]: number }) {
         // remove any old and unused axis pointers
         for (let pointerId in this.secondaryAxisPointers) {
             if (secondaryAxisPointers[pointerId] === undefined && this.activeAxisPointers[pointerId] === undefined) {
-                for (let tile of this.trackViews) {
-                    tile.removeAxisPointer(pointerId);
+                for (let trackView of this.trackViews) {
+                    trackView.removeAxisPointer(pointerId);
                 }
             }
         }
@@ -232,8 +271,8 @@ export class Panel extends Object2D {
 
             this.secondaryAxisPointers[pointerId] = absX;
 
-            for (let tile of this.trackViews) {
-                tile.setAxisPointer(pointerId, fractionX, AxisPointerStyle.Secondary);
+            for (let trackView of this.trackViews) {
+                trackView.setAxisPointer(pointerId, fractionX, AxisPointerStyle.Secondary);
             }
         }
     }
@@ -546,8 +585,8 @@ export class Panel extends Object2D {
 
         delete this.activeAxisPointers[e.pointerId];
 
-        for (let tile of this.trackViews) {
-            tile.removeAxisPointer(e.pointerId.toString());
+        for (let trackView of this.trackViews) {
+            trackView.removeAxisPointer(e.pointerId.toString());
         }
 
         this.eventEmitter.emit('axisPointerUpdate', this.activeAxisPointers);
@@ -561,13 +600,13 @@ export class Panel extends Object2D {
         obj.w = -this.spacing.x;
     }
 
-    protected availableContigAtOffset = (contig: string, offset: number) => {
+    protected availableContigAtOffset = (contig: string, offset: number): string => {
         if (this.availableContigs != null) {
-            const idx = this.availableContigs.indexOf(contig);
-            if (idx < 0) return this.availableContigs[0];
+            const idx = this.availableContigs.findIndex(c => c.id === contig);
+            if (idx < 0) return this.availableContigs[0].id;
             let newIdx = (idx + offset) % this.availableContigs.length;
             if (newIdx < 0) newIdx += this.availableContigs.length;
-            return this.availableContigs[newIdx];
+            return this.availableContigs[newIdx].id;
         } else {
             return this.contig;
         }
@@ -581,7 +620,7 @@ export class Panel extends Object2D {
 
         this.header.content = <PanelHeader 
             panel={ this }
-            contig={ this.formattedContig }
+            contig={ this.getFormattedContig(this.contig) }
             rangeString={ rangeString }
             rangeSpecifier={ rangeSpecifier }
             enableClose = { this._closable && !this.closing } 

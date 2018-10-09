@@ -15,15 +15,16 @@ import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Animator from "engine/animation/Animator";
 import { GenomicLocation } from "../model/GenomicLocation";
-import TrackModel from "../model/TrackModel";
+import TrackModel from "../track/TrackModel";
 import Object2D from "engine/ui/Object2D";
 import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
 import Panel, { PanelInternal } from "./Panel";
-import ConstructTrack from "../track/ConstructTrack";
 import TrackObject from "../track/TrackObject";
 import { DEFAULT_SPRING } from "./UIConstants";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
+import GenomeBrowser from "../GenomeBrowser";
+import { InternalDataSource } from "../data-source/InternalDataSource";
 
 export class TrackViewer extends Object2D {
 
@@ -49,8 +50,11 @@ export class TrackViewer extends Object2D {
     protected grid: Object2D;
     protected addPanelButton: ReactObject;
 
+    protected dataSource: InternalDataSource;
+
     constructor() {
         super();
+
         this.render = false;
 
         // fill parent dimensions
@@ -134,7 +138,7 @@ export class TrackViewer extends Object2D {
 
         // add track tile to all panels
         for (let panel of this.panels) {
-            var trackView = ConstructTrack(model);
+            var trackView = new (GenomeBrowser.getTrackType(model.type).trackObjectClass)(model);
             panel.addTrackView(trackView);
             rowObject.addTrackView(trackView);
         }
@@ -223,20 +227,16 @@ export class TrackViewer extends Object2D {
         edges.push(newEdge);
 
         // create panel object and add header to the scene graph
-        let panel = new Panel((p) => this.closePanel(p, true), this.spacing, this.panelHeaderHeight, this.xAxisHeight);
+        let panel = new Panel((p) => this.closePanel(p, true), this.spacing, this.panelHeaderHeight, this.xAxisHeight, this.dataSource);
         panel.setContig(location.contig);
         panel.setRange(location.x0, location.x1);
         panel.column = newColumnIndex; // @! should use array of panels instead of column field
         panel.layoutH = 1; // fill the full grid height
         this.grid.add(panel);
 
-        // set available contigs to navigate to from the API
-        // SiriusApi.getContigsSorted().then((contigs) => panel.setAvailableContigs(contigs));
-        panel.setAvailableContigs(['chr1', 'chr2']); // @! temporary
-
         // initialize tracks for this panel
        for (let track of this.tracks) {
-           let trackView = ConstructTrack(track.model);
+           var trackView = new (GenomeBrowser.getTrackType(track.model.type).trackObjectClass)(track.model);
            panel.addTrackView(trackView);
            (track as any as TrackInternal).rowObject.addTrackView(trackView);
        }
@@ -315,6 +315,13 @@ export class TrackViewer extends Object2D {
         // clear edges if there's less then 2, this allows edges to be re-initialized
         if (edges.length < 2) {
             edges.length = 0;
+        }
+    }
+
+    setDataSource(dataSource: InternalDataSource) {
+        this.dataSource = dataSource;
+        for (let panel of this.panels) {
+            panel.setDataSource(dataSource);
         }
     }
 

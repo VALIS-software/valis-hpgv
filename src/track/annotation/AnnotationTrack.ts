@@ -4,10 +4,8 @@ import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
 import { AnnotationTileCache, Gene, MacroAnnotationTileCache, Transcript } from "./AnnotationTileCache";
-import SharedTileCache from "../../tile-store/SharedTileCaches";
 import { TileState } from "../TileCache";
-import TrackModel from "../../model/TrackModel";
-import { GeneClass, TranscriptClass } from "../../model/AnnotationTileset";
+import { GeneClass, TranscriptClass } from "./AnnotationTypes";
 import { BlendMode, DrawContext } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
@@ -16,6 +14,8 @@ import { OpenSansRegular } from "../../ui/font/Fonts";
 import TrackObject from "../TrackObject";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { SiriusApi } from "valis";
+import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
+import GenomeBrowser from "../../GenomeBrowser";
 
 /**
  * WIP Annotation tracks:
@@ -24,7 +24,7 @@ import { SiriusApi } from "valis";
  * - Convert micro-scale annotations to use instancing (and text batching)
  * - Merge shaders where possible and clean up
  */
-export class AnnotationTrack extends TrackObject<'annotation'> {
+export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileCache> {
 
     protected readonly macroLodBlendRange = 2;
     protected readonly macroLodThresholdLow = 10;
@@ -34,15 +34,19 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
     protected readonly namesLodThresholdLow = 9;
     protected readonly namesLodThresholdHigh = this.namesLodThresholdLow + this.namesLodBlendRange;
 
-    protected annotationStore: AnnotationTileCache;
-    protected macroAnnotationStore: AnnotationTileCache;
+    protected macroModel: MacroAnnotationTrackModel;
 
     protected pointerState: TrackPointerState = {
         pointerOver: false,
     }
 
-    constructor(model: TrackModel<'annotation'>) {
+    constructor(model: AnnotationTrackModel) {
         super(model);
+
+        this.macroModel = {
+            ...model,
+            type: 'macro-annotation'
+        };
 
         this.color.set([0.1, 0.1, 0.1, 1]);
 
@@ -53,20 +57,6 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
         this.addInteractionListener('pointerleave', (e) => {
             this.pointerState.pointerOver = false;
         });
-    }
-
-    setContig(contig: string) {
-        this.annotationStore = SharedTileCache.getTileCache(
-            'annotation',
-            contig,
-            (c) => { return new AnnotationTileCache(c); }
-        );
-        this.macroAnnotationStore = SharedTileCache.getTileCache(
-            'macroAnnotation',
-            contig,
-            (c) => { return new MacroAnnotationTileCache(c); }
-        );
-        super.setContig(contig);
     }
 
     protected _macroTileCache = new UsageCache<IntervalInstances>();
@@ -105,7 +95,7 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
     }
 
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
-        this.macroAnnotationStore.getTiles(x0, x1, samplingDensity, true, (tile) => {
+        this.dataSource.getTileCache(this.macroModel, this.contig).getTiles(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 // if the tile is incomplete then wait until complete and call updateAnnotations() again
                 this._pendingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
@@ -157,7 +147,7 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
     protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number,  opacity: number) {
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
-        this.annotationStore.getTiles(x0, x1, samplingDensity, true, (tile) => {
+        this.getTileCache().getTiles(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 // if the tile is incomplete then wait until complete and call updateAnnotations() again
                 this._pendingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
@@ -224,6 +214,9 @@ export class AnnotationTrack extends TrackObject<'annotation'> {
     }
 
 }
+
+GenomeBrowser.registerTrackType('annotation', AnnotationTileCache, AnnotationTrack);
+GenomeBrowser.registerTrackType('macro-annotation', MacroAnnotationTileCache, AnnotationTrack);
 
 type TrackPointerState = {
     pointerOver: boolean,

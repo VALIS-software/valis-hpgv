@@ -1,13 +1,18 @@
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
-import { Tile } from "./TileCache";
-import { TrackModel, TrackTypeMap } from "../model/TrackModel";
+import { Tile, TileCache } from "./TileCache";
+import { TrackModel } from "./TrackModel";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { OpenSansRegular } from "../ui/font/Fonts";
+import { InternalDataSource } from "../data-source/InternalDataSource";
 
-export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeMap> extends Rect {
+export class TrackObject<
+    ModelType extends TrackModel = TrackModel,
+    TileCacheType extends TileCache<any, any> = TileCache<any, any>
+> extends Rect {
 
+    protected dataSource: InternalDataSource;
     protected contig: string | undefined;
     protected x0: number;
     protected x1: number;
@@ -25,7 +30,7 @@ export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeM
 
     protected displayNeedUpdate = true;
 
-    constructor(protected model: TrackModel<ModelType>) {
+    constructor(protected readonly model: ModelType, protected readonly tileDataKey?: string) {
         super(0, 0, [0.1, 0.1, 0.1, 1]);
 
         this.cursorStyle = this.defaultCursor;
@@ -58,6 +63,11 @@ export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeM
         this.add(this.focusRegionRectRight);
         // disabled by default
         this.clearFocusRegion();
+    }
+
+    setDataSource(dataSource: InternalDataSource) {
+        this.dataSource = dataSource;
+        this.displayNeedUpdate = true;
     }
 
     setContig(contig: string) {
@@ -132,6 +142,10 @@ export class TrackObject<ModelType extends keyof TrackTypeMap = keyof TrackTypeM
         }
 
         super.applyTransformToSubNodes(root);
+    }
+
+    protected getTileCache(): TileCacheType {
+        return this.dataSource.getTileCache(this.model, this.contig, this.tileDataKey) as any;
     }
 
     protected _pendingTiles = new UsageCache<Tile<any>>();

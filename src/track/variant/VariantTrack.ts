@@ -1,10 +1,9 @@
 import { Animator } from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
-import { SharedTileCache } from "../../tile-store/SharedTileCaches";
 import { TileState } from "../TileCache";
 import { VariantTileCache } from "./VariantTileCache";
-import { TrackModel } from "../../model/TrackModel";
+import { TrackModel } from "../TrackModel";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
@@ -13,18 +12,19 @@ import TrackObject from "../TrackObject";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import TextClone from "../../ui/util/TextClone";
 import { EntityType } from "valis";
+import { VariantTrackModel } from "./VariantTrackModel";
+import GenomeBrowser from "../../GenomeBrowser";
 
-export class VariantTrack extends TrackObject<'variant'> {
+export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileCache> {
 
     protected readonly macroLodBlendRange = 1;
     protected readonly macroLodThresholdLow = 8;
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
-    protected tileCache: VariantTileCache;
     protected pointerOverTrack = false;
 
-    constructor(model: TrackModel<'variant'>) {
-        super(model);
+    constructor(model: VariantTrackModel) {
+        super(model, JSON.stringify(model.query));
 
         this.addInteractionListener('pointerenter', (e) => {
             this.pointerOverTrack = true;
@@ -33,16 +33,6 @@ export class VariantTrack extends TrackObject<'variant'> {
         this.addInteractionListener('pointerleave', (e) => {
             this.pointerOverTrack = false;
         });
-    }
-
-    setContig(contig: string) {
-        let typeKey = this.model.type + ':' + JSON.stringify(this.model.query);
-        this.tileCache = SharedTileCache.getTileCache(
-            typeKey,
-            contig,
-            (c) => new VariantTileCache(this.model, contig)
-        )
-        super.setContig(contig);
     }
 
     protected _microTileCache = new UsageCache<IntervalInstances>();
@@ -60,6 +50,7 @@ export class VariantTrack extends TrackObject<'variant'> {
         const span = x1 - x0;
         const widthPx = this.getComputedWidth();
         if (widthPx > 0) {
+            let tileCache = this.getTileCache();
 
             let basePairsPerDOMPixel = (span / widthPx);
             let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
@@ -75,7 +66,7 @@ export class VariantTrack extends TrackObject<'variant'> {
 
             // micro-scale details
             if (microOpacity > 0) {
-                this.tileCache.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+                tileCache.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                     if (tile.state !== TileState.Complete) {
                         this._pendingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
                         return;
@@ -394,5 +385,7 @@ export class VariantTrack extends TrackObject<'variant'> {
     }
 
 }
+
+GenomeBrowser.registerTrackType('variant', VariantTileCache, VariantTrack);
 
 export default VariantTrack;

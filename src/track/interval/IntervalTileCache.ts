@@ -1,5 +1,6 @@
 import { Tile, TileCache } from "../TileCache";
 import { SiriusApi } from "valis";
+import { IntervalTrackModel } from "./IntervalTrackModel";
 
 type TilePayload = Float32Array;
 
@@ -18,18 +19,14 @@ export class IntervalTileCache extends TileCache<TilePayload, void> {
     readonly macroLodLevel = 10;
 
     constructor(
-        protected contig: string,
-        protected query: any,
-        protected tileSize = 1 << 15
+        protected readonly model: IntervalTrackModel,
+        protected readonly contig: string,
+        tileSize = 1 << 15
     ) {
         super(
             tileSize, // tile size
             1
         );
-
-        SiriusApi.getContigInfo(contig).then((info) => {
-            this.maximumX = info.length - 1;
-        });
     }
 
     protected mapLodLevel(l: number) {
@@ -47,7 +44,7 @@ export class IntervalTileCache extends TileCache<TilePayload, void> {
         let startBase = tile.x + 1;
         let endBase = startBase + tile.span;
 
-        return SiriusApi.getIntervalTrackData(this.contig, startBase, endBase, this.query).then((r) => {
+        return SiriusApi.getIntervalTrackData(this.contig, startBase, endBase, this.model.query).then((r) => {
             // allocate interval buffer
             let intervals = new Float32Array(r.data.length * 2);
 

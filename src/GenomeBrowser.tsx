@@ -2,10 +2,12 @@ import * as React from "react";
 import Animator from "engine/animation/Animator";
 import AppCanvas from "./ui/core/AppCanvas";
 import TrackViewer, { Track } from "./ui/TrackViewer";
-import TrackModel from "./model/TrackModel";
+import TrackModel from "./track/TrackModel";
 import IDataSource from "./data-source/IDataSource";
 import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
 import { ManifestDataSource } from "./data-source/ManifestDataSource";
+import { InternalDataSource } from "./data-source/InternalDataSource";
+import { TrackObject, TileCache } from "./track";
 
 export interface GenomeBrowserRenderProps {
     width: number,
@@ -19,7 +21,7 @@ export class GenomeBrowser {
 
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
-    protected dataSource: IDataSource; 
+    protected internalDataSource: InternalDataSource;
 
     constructor(dataSource: IDataSource | string, configuration?: GenomeBrowserConfiguration){
         this.trackViewer = new TrackViewer();
@@ -33,20 +35,23 @@ export class GenomeBrowser {
         }
     }
 
-    setDataSource(dataSource: IDataSource | string) {
-        if (typeof dataSource === 'string') {
+    setDataSource(dataSourceArg: IDataSource | string) {
+        let dataSource: IDataSource;
+        if (typeof dataSourceArg === 'string') {
             // if first argument is string, use a manifest data source
-            this.dataSource = new ManifestDataSource(dataSource);
+            dataSource = new ManifestDataSource(dataSourceArg);
         } else {
-            this.dataSource = dataSource;
+            dataSource = dataSourceArg;
         }
 
-        this.dataSource.getContigs().then((contigs) => {
-            console.log(`Contigs loaded!`, contigs);
-            // create internal data source
-            // new InternalDataSource(contigs, ...)
-            // onDataSourceChange()
-        });
+        if (this.internalDataSource != null) {
+            this.internalDataSource.clearTileCaches();
+            this.internalDataSource = null;
+        }
+
+        this.internalDataSource = new InternalDataSource(dataSource);
+
+        this.trackViewer.setDataSource(this.internalDataSource);
     }
 
     setConfiguration(configuration: GenomeBrowserConfiguration) {
@@ -117,6 +122,28 @@ export class GenomeBrowser {
 
         this.appCanvasRef.renderCanvas();
     }
+
+    static registerTrackType<ModelType extends TrackModel>(
+        type: ModelType['type'],
+        tileCacheClass: { new(model: ModelType, contig: string, ...args: Array<any>): TileCache<any, any> },
+        trackObjectClass: { new(model: TrackModel): TrackObject<TrackModel, any> },
+    ) {
+        this.trackTypes[type] = {
+            trackObjectClass: trackObjectClass,
+            tileCacheClass: tileCacheClass,
+        }
+    }
+
+    static getTrackType(type: string) {
+        return this.trackTypes[type];
+    }
+
+    private static trackTypes: {
+        [ type: string ]: {
+            trackObjectClass: { new(model: TrackModel): TrackObject }
+            tileCacheClass: { new(model: TrackModel, contig: string, ...args: Array<any>): TileCache<any, any> }
+        }
+    } = {};
 
 }
 

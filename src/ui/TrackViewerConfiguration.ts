@@ -1,5 +1,5 @@
 import GenomicLocation from "../model/GenomicLocation";
-import TrackModel from "../model/TrackModel";
+import TrackModel from "../track/TrackModel";
 
 export interface PanelConfiguration {
     location: GenomicLocation,

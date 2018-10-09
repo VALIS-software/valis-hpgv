@@ -31,7 +31,7 @@ export class ManifestDataSource implements IDataSource {
     }
 
     getContigs(): Promise<Array<Contig>> {
-        return this.manifestPromise.then((manifest) => manifest.contigs.slice());
+        return this.manifestPromise.then((manifest) => manifest.contigs);
     }
 
 }

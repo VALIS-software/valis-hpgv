@@ -1,8 +1,7 @@
 import { UsageCache } from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import { BlockPayload, TilePayload, SequenceTileCache } from "./SequenceTileCache";
+import SequenceTileCache, { SequenceTilePayload } from "./SequenceTileCache";
 import { Tile, TileState } from "../TileCache";
-import { TrackModel } from "../../model/TrackModel";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext, DrawMode } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
@@ -11,13 +10,17 @@ import { Text } from "engine/ui/Text";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import { ShaderTrack, TileNode } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
+import { SequenceTrackModel } from './SequenceTrackModel';
+import GenomeBrowser from "../../GenomeBrowser";
+import { TrackModel } from "../TrackModel";
+import TrackObject from "../TrackObject";
 
-export class SequenceTrack extends ShaderTrack<TilePayload, BlockPayload> {
+export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTilePayload> {
 
     protected densityMultiplier = 2.0;
  
-    constructor(model: TrackModel) {
-        super(model, 'sequence', (c) => new SequenceTileCache(c));
+    constructor(model: SequenceTrackModel) {
+        super(model);
         this.color.set([0, 0, 0, 1]);
     }
 
@@ -25,7 +28,13 @@ export class SequenceTrack extends ShaderTrack<TilePayload, BlockPayload> {
         return new SequenceTile();
     }
 
+    public static thing() {
+        return 1;
+    }
+
 }
+
+GenomeBrowser.registerTrackType('sequence', SequenceTileCache, SequenceTrack);
 
 /**
  * - A TileNode render field should only be set to true if it's TileEntry is in the Complete state
@@ -35,7 +44,7 @@ const NUCLEOBASE_T_COLOR = new Float32Array([0.200, 0.200, 0.404, 1.0]); // #333
 const NUCLEOBASE_C_COLOR = new Float32Array([0.043, 0.561, 0.608, 1.0]); // #0B8F9B;
 const NUCLEOBASE_G_COLOR = new Float32Array([0.071, 0.725, 0.541, 1.0]); // #12B98A;
 
-class SequenceTile extends TileNode<TilePayload> {
+class SequenceTile extends TileNode<SequenceTilePayload> {
 
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
@@ -44,7 +53,7 @@ class SequenceTile extends TileNode<TilePayload> {
         super();
     }
 
-    setTile(tile: Tile<TilePayload>) {
+    setTile(tile: Tile<SequenceTilePayload>) {
         super.setTile(tile);
 
         if (this.tile != null) {

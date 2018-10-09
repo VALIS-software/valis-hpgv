@@ -1,8 +1,9 @@
 import { SiriusApi } from "valis";
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
 import TileCache, { Tile } from "../TileCache";
+import { SequenceTrackModel } from "./SequenceTrackModel";
 
-export type TilePayload = {
+type TilePayload = {
     array: Uint8Array,
     sequenceMinMax: {
         min: number,
@@ -12,25 +13,17 @@ export type TilePayload = {
     getTexture(device: GPUDevice): GPUTexture;
 }
 
-export type BlockPayload = {
+type BlockPayload = {
     _gpuTexture: GPUTexture,
     getTexture(device: GPUDevice): GPUTexture;
 }
 
+export type SequenceTilePayload = TilePayload;
+
 export class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
 
-    constructor(protected sourceId: string) {
+    constructor(protected model: SequenceTrackModel, protected contig: string) {
         super(1024, 8);
-
-        SiriusApi.getContigInfo(sourceId).then((info) => {
-            this.maximumX = info.length - 1;
-
-            // pre-load the sequence at a high lod level to avoid displaying nothing when zooming out
-            let minLength = 512;
-            this.getTiles(0, this.maximumX, info.length / minLength, true, () => {});
-        }).catch(() => {
-            console.warn(`Could not determine sequence length`);
-        });
     }
 
     // skip odd lod levels to trade visual fidelity for improved load time and performance
@@ -40,7 +33,7 @@ export class SequenceTileCache extends TileCache<TilePayload, BlockPayload> {
 
     protected getTilePayload(tile: Tile<TilePayload>) {
         let tileCache = this;
-        return SiriusApi.loadACGTSubSequence(this.sourceId, tile.lodLevel, tile.lodX, tile.lodSpan)
+        return SiriusApi.loadACGTSubSequence(this.contig, tile.lodLevel, tile.lodX, tile.lodSpan)
             .then((sequenceData) => {
                 return {
                     ...sequenceData,

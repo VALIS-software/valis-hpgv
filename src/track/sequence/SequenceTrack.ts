@@ -12,8 +12,6 @@ import { ShaderTrack, TileNode } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
 import GenomeBrowser from "../../GenomeBrowser";
-import { TrackModel } from "../TrackModel";
-import TrackObject from "../TrackObject";
 
 export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTilePayload> {
 

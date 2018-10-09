@@ -1,7 +1,7 @@
-import TileCache from '../track/TileCache';
-import { IDataSource } from './IDataSource';
 import { GenomeBrowser } from '../GenomeBrowser';
+import TileCache from '../track/TileCache';
 import TrackModel from '../track/TrackModel';
+import { IDataSource } from './IDataSource';
 
 export class InternalDataSource implements IDataSource {
 

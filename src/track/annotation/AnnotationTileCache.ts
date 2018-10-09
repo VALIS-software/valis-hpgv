@@ -1,7 +1,7 @@
 import { SiriusApi } from "valis";
 import { Tile, TileCache } from "../TileCache";
-import { Strand, GeneInfo, TranscriptComponentInfo, TranscriptInfo, TranscriptComponentClass, GenomeFeatureType, GenomeFeature } from "./AnnotationTypes";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
+import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {

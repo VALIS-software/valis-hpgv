@@ -1,7 +1,7 @@
 import GPUDevice, { AttributeLayout, AttributeType, VertexAttributeBuffer } from "engine/rendering/GPUDevice";
 import { DrawContext, DrawMode } from "engine/rendering/Renderer";
-import Object2DInstances from "engine/ui/Object2DInstances";
 import SharedResources from "engine/SharedResources";
+import Object2DInstances from "engine/ui/Object2DInstances";
 
 export type IntervalInstance = {
     xFractional: number, y: number, z: number,

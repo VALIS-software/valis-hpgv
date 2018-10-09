@@ -1,9 +1,9 @@
+import { UsageCache } from "engine/ds/UsageCache";
+import { Scalar } from "engine/math/Scalar";
+import { Renderable } from "engine/rendering/Renderable";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { Renderable } from "engine/rendering/Renderable";
-import { Scalar } from "engine/math/Scalar";
-import { UsageCache } from "engine/ds/UsageCache";
 
 export class XAxis extends Object2D {
 

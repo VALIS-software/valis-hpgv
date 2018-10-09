@@ -1,21 +1,21 @@
 import IconButton from "@material-ui/core/IconButton";
-import EditIcon from "@material-ui/icons/Edit";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import CancelIcon from "@material-ui/icons/Cancel";
 import CheckIcon from "@material-ui/icons/Check";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import CloseIcon from "@material-ui/icons/Close";
-import * as React from "react";
+import EditIcon from "@material-ui/icons/Edit";
+import Animator from "engine/animation/Animator";
 import { InteractionEvent, WheelDeltaMode, WheelInteractionEvent } from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
-import ReactObject from "./core/ReactObject";
 import Rect from "engine/ui/Rect";
-import { OpenSansRegular } from "./font/Fonts";
-import TrackObject, { AxisPointerStyle } from "../track/TrackObject";
-import XAxis from "./XAxis";
-import Animator from "engine/animation/Animator";
-import { Contig } from "../model";
+import * as React from "react";
 import { InternalDataSource } from "../data-source/InternalDataSource";
+import { Contig } from "../model";
+import TrackObject, { AxisPointerStyle } from "../track/TrackObject";
+import ReactObject from "./core/ReactObject";
+import { OpenSansRegular } from "./font/Fonts";
+import XAxis from "./XAxis";
 
 enum DragMode {
     Move,

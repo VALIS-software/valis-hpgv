@@ -14,17 +14,17 @@ import CloseIcon from "@material-ui/icons/Close";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Animator from "engine/animation/Animator";
+import Object2D from "engine/ui/Object2D";
+import Rect from "engine/ui/Rect";
+import { InternalDataSource } from "../data-source/InternalDataSource";
+import GenomeBrowser from "../GenomeBrowser";
 import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../track/TrackModel";
-import Object2D from "engine/ui/Object2D";
-import ReactObject from "./core/ReactObject";
-import Rect from "engine/ui/Rect";
-import Panel, { PanelInternal } from "./Panel";
 import TrackObject from "../track/TrackObject";
-import { DEFAULT_SPRING } from "./UIConstants";
+import ReactObject from "./core/ReactObject";
+import Panel, { PanelInternal } from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
-import GenomeBrowser from "../GenomeBrowser";
-import { InternalDataSource } from "../data-source/InternalDataSource";
+import { DEFAULT_SPRING } from "./UIConstants";
 
 export class TrackViewer extends Object2D {
 

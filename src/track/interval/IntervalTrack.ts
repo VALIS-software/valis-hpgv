@@ -1,12 +1,12 @@
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import IntervalTileCache from "./IntervalTileCache";
-import { Tile, TileState } from "../TileCache";
 import { Object2D } from "engine/ui/Object2D";
-import TrackObject from "../TrackObject";
-import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
-import { IntervalTrackModel } from "./IntervalTrackModel";
 import GenomeBrowser from "../../GenomeBrowser";
+import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
+import { Tile, TileState } from "../TileCache";
+import TrackObject from "../TrackObject";
+import IntervalTileCache from "./IntervalTileCache";
+import { IntervalTrackModel } from "./IntervalTrackModel";
 
 type TilePayload = Float32Array;
 

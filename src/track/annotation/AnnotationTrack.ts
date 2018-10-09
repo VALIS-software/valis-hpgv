@@ -1,21 +1,20 @@
-import { Strand } from "genomics-formats/dist/gff3/Strand";
-import { QueryBuilder } from "valis";
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import { AnnotationTileCache, Gene, MacroAnnotationTileCache, Transcript } from "./AnnotationTileCache";
-import { TileState } from "../TileCache";
-import { GeneClass, TranscriptClass } from "./AnnotationTypes";
 import { BlendMode, DrawContext } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { OpenSansRegular } from "../../ui/font/Fonts";
-import TrackObject from "../TrackObject";
-import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
-import { SiriusApi } from "valis";
-import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
+import { Strand } from "genomics-formats/dist/gff3/Strand";
+import { QueryBuilder, SiriusApi } from "valis";
 import GenomeBrowser from "../../GenomeBrowser";
+import { OpenSansRegular } from "../../ui/font/Fonts";
+import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
+import { TileState } from "../TileCache";
+import TrackObject from "../TrackObject";
+import { AnnotationTileCache, Gene, MacroAnnotationTileCache, Transcript } from "./AnnotationTileCache";
+import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
+import { GeneClass, TranscriptClass } from "./AnnotationTypes";
 
 /**
  * WIP Annotation tracks:

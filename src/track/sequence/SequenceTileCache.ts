@@ -1,5 +1,5 @@
-import { SiriusApi } from "valis";
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
+import { SiriusApi } from "valis";
 import TileCache, { Tile } from "../TileCache";
 import { SequenceTrackModel } from "./SequenceTrackModel";
 

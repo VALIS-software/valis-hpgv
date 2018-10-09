@@ -1,5 +1,5 @@
-import { EventEmitter } from "events";
 import Scalar from "engine/math/Scalar";
+import { EventEmitter } from "events";
 
 /**
  * Base class for requesting and managing tiled data

@@ -1,7 +1,7 @@
+import GPUDevice from "engine/rendering/GPUDevice";
+import { DrawContext } from "engine/rendering/Renderer";
 import Object2D, { Object2DInternal } from "engine/ui/Object2D";
 import { Text } from "engine/ui/Text";
-import { DrawContext } from "engine/rendering/Renderer";
-import GPUDevice from "engine/rendering/GPUDevice";
 
 /**
  * If we're repeating the same text a lot we can improve performance by having a single text instance and re-rendering it at different locations

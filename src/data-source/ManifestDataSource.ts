@@ -1,5 +1,5 @@
-import { IDataSource } from "./IDataSource";
 import { Contig } from "../model/Contig";
+import { IDataSource } from "./IDataSource";
 
 type Manifest = {
     contigs: Array<Contig>

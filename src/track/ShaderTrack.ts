@@ -1,11 +1,11 @@
 import Animator from "engine/animation/Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
-import { DEFAULT_SPRING } from "../ui/UIConstants";
 import Object2D from "engine/ui/Object2D";
-import { Tile, TileState, TileCache } from "./TileCache";
-import { TrackObject } from "./TrackObject";
+import { DEFAULT_SPRING } from "../ui/UIConstants";
+import { Tile, TileCache, TileState } from "./TileCache";
 import { TrackModel } from "./TrackModel";
+import { TrackObject } from "./TrackObject";
 
 /**
  * - to use, override constructTileNode()

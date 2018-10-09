@@ -8,15 +8,15 @@
     - Should split up and move core parts to engine
 */
 
-import * as React from "react";
 import GPUDevice from 'engine/rendering/GPUDevice';
-import RenderPass from 'engine/rendering/RenderPass';
-import Renderer from 'engine/rendering/Renderer';
 import Renderable from 'engine/rendering/Renderable';
+import Renderer from 'engine/rendering/Renderer';
+import RenderPass from 'engine/rendering/RenderPass';
 import SharedResources from 'engine/SharedResources';
+import InteractionEvent, { InteractionEventInit, InteractionEventInternal, InteractionEventMap, WheelInteractionEvent } from "engine/ui/InteractionEvent";
 import { Object2D, Object2DInternal } from 'engine/ui/Object2D';
+import * as React from "react";
 import { ReactObject, ReactObjectContainer } from "./ReactObject";
-import InteractionEvent, { InteractionEventInternal, InteractionEventMap, WheelInteractionEvent, InteractionEventInit } from "engine/ui/InteractionEvent";
 
 interface Props {
     width: number;

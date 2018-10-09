@@ -1,9 +1,11 @@
 import UsageCache from "engine/ds/UsageCache";
+import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import IntervalInstances from "../../ui/util/IntervalInstances";
 import TrackObject from "../TrackObject";
 import { AnnotationTileLoader } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
+import { GenomeFeature } from "./AnnotationTypes";
 /**
  * WIP Annotation tracks:
  *
@@ -36,6 +38,7 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
         startIndex: number;
         length: number;
     }) => string;
+    protected onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void;
 }
 declare type TrackPointerState = {
     pointerOver: boolean;

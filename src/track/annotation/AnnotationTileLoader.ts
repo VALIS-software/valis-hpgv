@@ -2,6 +2,7 @@ import { SiriusApi } from "valis";
 import { Tile, TileLoader } from "../TileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
+import IDataSource from "../../data-source/IDataSource";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
@@ -113,6 +114,7 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected macro: boolean = false;
 
     constructor(
+        protected readonly dataSource: IDataSource,
         protected readonly model: AnnotationTrackModel,
         protected readonly contig: string,
         tileSize: number = 1 << 20,
@@ -135,6 +137,7 @@ export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected annotationCache: AnnotationTileLoader;
 
     constructor(
+        protected readonly dataSource: IDataSource,
         protected readonly model: MacroAnnotationTrackModel,
         protected readonly contig: string,
         tileSize: number = 1 << 25,

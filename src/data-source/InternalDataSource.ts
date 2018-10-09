@@ -3,7 +3,7 @@ import TileLoader from '../track/TileLoader';
 import TrackModel from '../track/TrackModel';
 import { IDataSource } from './IDataSource';
 
-export class InternalDataSource implements IDataSource {
+export class InternalDataSource {
 
     protected tileCaches: {
         [type: string]: {
@@ -35,7 +35,7 @@ export class InternalDataSource implements IDataSource {
         if (tileLoader === undefined) {
 
             let trackDescriptor = GenomeBrowser.getTrackType(type);
-            tileCaches[key] = tileLoader = new trackDescriptor.tileCacheClass(model, contig);
+            tileCaches[key] = tileLoader = new trackDescriptor.tileLoaderClass(this.dataSource, model, contig);
 
             // set maximumX when we have access to contig info
             this.dataSource.getContigs().then((contigInfoArray) => {

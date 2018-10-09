@@ -1,6 +1,7 @@
 import { SiriusApi } from "valis";
 import { Tile, TileLoader } from "../TileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
+import { IDataSource } from "../../data-source/IDataSource";
 
 // Tile payload is a list of genes extended with nesting
 type VariantGenomeNode = {
@@ -42,7 +43,11 @@ type TilePayload = Array<{
 
 export class VariantTileLoader extends TileLoader<TilePayload, void> {
 
-    constructor(protected model: VariantTrackModel, protected contig: string) {
+    constructor(
+        protected readonly dataSource: IDataSource,
+        protected readonly model: VariantTrackModel,
+        protected readonly contig: string
+    ) {
         super(
             1 << 15, // tile size
             1

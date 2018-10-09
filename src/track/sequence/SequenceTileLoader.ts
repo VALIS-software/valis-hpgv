@@ -1,7 +1,7 @@
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
-import { SiriusApi } from "valis";
 import TileLoader, { Tile } from "../TileLoader";
 import { SequenceTrackModel } from "./SequenceTrackModel";
+import { IDataSource } from "../../data-source/IDataSource";
 
 type TilePayload = {
     array: Uint8Array,
@@ -22,7 +22,11 @@ export type SequenceTilePayload = TilePayload;
 
 export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
 
-    constructor(protected model: SequenceTrackModel, protected contig: string) {
+    constructor(
+        protected readonly dataSource: IDataSource,
+        protected readonly model: SequenceTrackModel,
+        protected readonly contig: string
+    ) {
         super(1024, 8);
     }
 
@@ -33,7 +37,7 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
 
     protected getTilePayload(tile: Tile<TilePayload>) {
         let tileLoader = this;
-        return SiriusApi.loadACGTSubSequence(this.contig, tile.lodLevel, tile.lodX, tile.lodSpan)
+        return this.dataSource.loadACGTSequence(this.contig, tile.x, tile.span, tile.lodLevel)
             .then((sequenceData) => {
                 return {
                     ...sequenceData,

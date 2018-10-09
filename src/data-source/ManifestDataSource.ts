@@ -34,6 +34,23 @@ export class ManifestDataSource implements IDataSource {
         return this.manifestPromise.then((manifest) => manifest.contigs);
     }
 
+    loadACGTSequence(
+        contig: string,
+        lodLevel: number,
+        startBaseIndex: number,
+        span: number,
+    ): Promise<{
+        array: Uint8Array,
+        sequenceMinMax: {
+            min: number,
+            max: number,
+        },
+        indicesPerBase: number,
+    }> {
+        console.error(`TODO, support ACGT sequence loading`);
+        return null;
+    }
+
 }
 
 export default ManifestDataSource;

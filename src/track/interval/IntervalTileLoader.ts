@@ -1,6 +1,7 @@
 import { Tile, TileLoader } from "../TileLoader";
 import { SiriusApi } from "valis";
 import { IntervalTrackModel } from "./IntervalTrackModel";
+import IDataSource from "../../data-source/IDataSource";
 
 type TilePayload = Float32Array;
 
@@ -19,6 +20,7 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
     readonly macroLodLevel = 10;
 
     constructor(
+        protected readonly dataSource: IDataSource,
         protected readonly model: IntervalTrackModel,
         protected readonly contig: string,
         tileSize = 1 << 15

@@ -1,6 +1,6 @@
 import { UsageCache } from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import SequenceTileLoader, { SequenceTilePayload } from "./SequenceTileLoader";
+import { SequenceTilePayload } from "./SequenceTileLoader";
 import { Tile, TileState } from "../TileLoader";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext, DrawMode } from "engine/rendering/Renderer";

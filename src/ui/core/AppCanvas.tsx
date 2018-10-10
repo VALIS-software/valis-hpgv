@@ -87,10 +87,15 @@ export class AppCanvas extends React.Component<Props, State> {
         this.addInputListeners();
 
         console.log(`AppCanvas created with device %c"${this.device.name}"`, 'font-weight: bold');
-        let vao = this.device.capabilities.vertexArrayObjects;
-        let inst = this.device.capabilities.instancing;
-        console.log(`\tVertex Array Objects: %c${vao ? 'enabled' : 'disabled'}`, `font-weight: bold; color: ${vao ? 'green' : 'red'}`);
-        console.log(`\tInstancing: %c${inst ? 'enabled' : 'disabled'}`, `font-weight: bold; color: ${inst ? 'green' : 'red'}`);
+
+        function printExtensionSupport(name: string, enabled: boolean) {
+            console.log(`\t${name}: %c${enabled ? 'enabled' : 'disabled'}`, `font-weight: bold; color: ${enabled ? 'green' : 'red'}`);
+        }
+
+        printExtensionSupport('Vertex Array Objects', this.device.capabilities.vertexArrayObjects);
+        printExtensionSupport('Instancing', this.device.capabilities.instancing);
+        printExtensionSupport('Float Textures', this.device.capabilities.floatTextures);
+        printExtensionSupport('Float Textures Linear Filtering', this.device.capabilities.floatTexturesLinearFiltering);
 
         if (!this.device.capabilities.instancing) {
             // support is expected on 100% of desktops and ~95% of mobile devices

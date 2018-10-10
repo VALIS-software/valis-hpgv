@@ -1,13 +1,22 @@
-import Animator from "engine/animation/Animator";
 import * as React from "react";
-import IDataSource from "./data-source/IDataSource";
+
+import { Animator } from "engine/animation/Animator";
+import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
 import { ManifestDataSource } from "./data-source/ManifestDataSource";
-import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
-import { TileLoader, TrackObject } from "./track";
-import TrackModel from "./track/TrackModel";
-import AppCanvas from "./ui/core/AppCanvas";
-import TrackViewer, { Track } from "./ui/TrackViewer";
+import { GenomeBrowserConfiguration } from "./GenomeBrowserConfiguration";
+import { TrackModel } from "./track/TrackModel";
+import { AppCanvas } from "./ui/core/AppCanvas";
+import { TrackViewer, Track } from "./ui/TrackViewer";
+import { IntervalTileLoader, IntervalTrack } from "./track/interval";
+import { TileLoader } from "./track/TileLoader";
+import { AnnotationTileLoader } from "./track/annotation/AnnotationTileLoader";
+import { AnnotationTrack } from "./track/annotation/AnnotationTrack";
+import { SequenceTileLoader } from "./track/sequence/SequenceTileLoader";
+import { SequenceTrack } from "./track/sequence/SequenceTrack";
+import { VariantTileLoader } from "./track/variant/VariantTileLoader";
+import { VariantTrack } from "./track/variant/VariantTrack";
+import { TrackObject } from "./track/TrackObject";
 
 export interface GenomeBrowserRenderProps {
     width: number,
@@ -22,7 +31,7 @@ interface CustomTileLoader<ModelType> {
 }
 
 interface CustomTrackObject {
-    new(model: TrackModel): TrackObject<TrackModel, any>
+    new(model: TrackModel): TrackObject<TrackModel, any>;
 }
 
 export class GenomeBrowser {
@@ -160,5 +169,11 @@ export class GenomeBrowser {
     } = {};
 
 }
+
+// register track types
+GenomeBrowser.registerTrackType('annotation', AnnotationTileLoader, AnnotationTrack);
+GenomeBrowser.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
+GenomeBrowser.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
+GenomeBrowser.registerTrackType('variant', VariantTileLoader, VariantTrack);
 
 export default GenomeBrowser;

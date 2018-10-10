@@ -32,8 +32,6 @@ export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileP
 
 }
 
-GenomeBrowser.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
-
 /**
  * - A TileNode render field should only be set to true if it's TileEntry is in the Complete state
  */

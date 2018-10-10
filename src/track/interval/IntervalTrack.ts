@@ -124,6 +124,4 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
 
 }
 
-GenomeBrowser.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
-
 export default IntervalTrack;

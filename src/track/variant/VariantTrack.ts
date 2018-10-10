@@ -384,6 +384,4 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
 
 }
 
-GenomeBrowser.registerTrackType('variant', VariantTileLoader, VariantTrack);
-
 export default VariantTrack;

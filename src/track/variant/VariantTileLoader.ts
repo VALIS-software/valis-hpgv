@@ -33,14 +33,14 @@ type VariantInfo = {
     variant_affected_genes: Array<string>
 }
 
-type TilePayload = Array<{
+export type VariantTilePayload = Array<{
     id: string,
     baseIndex: number,
     refSequence: string,
     alts: string[]
 }>;
 
-export class VariantTileLoader extends TileLoader<TilePayload, void> {
+export class VariantTileLoader extends TileLoader<VariantTilePayload, void> {
 
     constructor(
         protected readonly dataSource: IDataSource,
@@ -61,7 +61,7 @@ export class VariantTileLoader extends TileLoader<TilePayload, void> {
         return Math.floor(l / 10) * 10;
     }
 
-    protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
+    protected getTilePayload(tile: Tile<VariantTilePayload>): Promise<VariantTilePayload> | VariantTilePayload {
         /*
         const startBase = tile.x + 1;
         const endBase = startBase + tile.span;

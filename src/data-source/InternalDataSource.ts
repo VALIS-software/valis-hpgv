@@ -43,13 +43,6 @@ export class InternalDataSource {
 
                 if (matchingContigInfo != null) {
                     tileLoader.maximumX = matchingContigInfo.span - 1;
-
-                    // preload low-resolution data
-                    // @! needs to be validated and tested that this works as expected
-                    /*
-                    let minSpan = 512;
-                    tileLoader.getTiles(0, tileLoader.maximumX, matchingContigInfo.span / minSpan, true, () => { });
-                    */
                 }
             });
         }

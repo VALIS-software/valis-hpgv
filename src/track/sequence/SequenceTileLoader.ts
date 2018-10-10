@@ -28,6 +28,16 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
         protected readonly contig: string
     ) {
         super(1024, 8);
+
+        // preload low-resolution data when we know the size of the contig
+        dataSource.getContigs().then((contigs) => {
+            let contigInfo = contigs.find((c) => c.id === contig);
+            if (contigInfo != null) {
+                let maxX = contigInfo.span - 1;
+                let minSpan = 512;
+                this.getTiles(0, maxX, contigInfo.span / minSpan, true, () => { });
+            }
+        });
     }
 
     // skip odd lod levels to trade visual fidelity for improved load time and performance

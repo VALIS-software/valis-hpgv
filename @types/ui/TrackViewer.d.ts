@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import { InternalDataSource } from "../data-source/InternalDataSource";
@@ -71,6 +72,18 @@ export declare class TrackViewer extends Object2D {
     protected endResizingPanel(panel: Panel): void;
     protected startResizingTrack(track: Track): void;
     protected endResizingTrack(track: Track): void;
+    static TrackCloseButton(props: {
+        onClick: (track: RowObject) => void;
+        track: RowObject;
+    }): JSX.Element;
+    static TrackHeader(props: {
+        title: string;
+        setExpanded?: (state: boolean) => void;
+        isExpanded: boolean;
+    }): JSX.Element;
+    static AddPanelButton(props: {
+        onClick: () => void;
+    }): JSX.Element;
 }
 export declare class Track {
     readonly model: TrackModel;

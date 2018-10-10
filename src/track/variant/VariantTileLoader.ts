@@ -2,37 +2,6 @@ import { IDataSource } from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
 
-// Tile payload is a list of genes extended with nesting
-type VariantGenomeNode = {
-    contig: string,
-    type: string,
-    start: number,
-    end: number,
-    source: Array<string>,
-    name: string,
-    info: VariantInfo,
-    id: string
-};
-
-type VariantInfo = {
-    flags: Array<string>,
-    RSPOS: number,
-    dbSNPBuildID: number,
-    SSR: number,
-    SAO: number,
-    VP: string,
-    WGT: number,
-    VC: string,
-    TOPMED: string,
-    variant_ref: string,
-    variant_alt: string,
-    filter: string,
-    qual: string,
-    allele_frequencies: { [key: string]: number },
-    variant_tags: Array<string>,
-    variant_affected_genes: Array<string>
-}
-
 export type VariantTilePayload = Array<{
     id: string,
     baseIndex: number,

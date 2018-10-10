@@ -10,7 +10,7 @@ import { TrackObject } from "./TrackObject";
 /**
  * - to use, override constructTileNode()
  */
-export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoader<P, any>> {
+export class ShaderTrack<M extends TrackModel, TilePayload> extends TrackObject<M, TileLoader<TilePayload, any>> {
 
     get pixelRatio() { return this._pixelRatio; }
 
@@ -26,9 +26,9 @@ export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoa
         super(model);
     }
 
-    protected constructTileNode() { return new TileNode<P>(); }
+    protected constructTileNode() { return new TileNode<TilePayload>(); }
 
-    protected _tileNodeCache = new UsageCache<TileNode<P>>();
+    protected _tileNodeCache = new UsageCache<TileNode<TilePayload>>();
 
     protected updateDisplay() {
         const x0 = this.x0;
@@ -118,7 +118,7 @@ export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoa
         this.displayNeedUpdate = false;
     }
 
-    protected createTileNode = (): TileNode<P> => {
+    protected createTileNode = (): TileNode<TilePayload> => {
         // create empty tile node
         let tileNode = this.constructTileNode();
         tileNode.mask = this;
@@ -126,13 +126,13 @@ export class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoa
         return tileNode;
     }
 
-    protected deleteTileNode = (tileNode: TileNode<P>) => {
+    protected deleteTileNode = (tileNode: TileNode<TilePayload>) => {
         tileNode.setTile(null); // ensure cleanup is performed
         tileNode.releaseGPUResources();
         this.remove(tileNode);
     }
 
-    protected updateTileNode(tileNode: TileNode<P>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number) {
+    protected updateTileNode(tileNode: TileNode<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number) {
         tileNode.layoutParentX = (tile.x - x0) / span;
         tileNode.layoutW = tile.span / span;
         tileNode.layoutH = 1;

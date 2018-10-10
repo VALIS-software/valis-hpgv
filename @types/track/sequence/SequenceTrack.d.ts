@@ -11,7 +11,6 @@ export declare class SequenceTrack extends ShaderTrack<SequenceTrackModel, Seque
     protected densityMultiplier: number;
     constructor(model: SequenceTrackModel);
     protected constructTileNode(): SequenceTile;
-    static thing(): number;
 }
 declare class SequenceTile extends TileNode<SequenceTilePayload> {
     protected gpuTexture: GPUTexture;

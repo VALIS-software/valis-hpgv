@@ -11,7 +11,6 @@ import { OpenSansRegular } from "../../ui/font/Fonts";
 import { ShaderTrack, TileNode } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
-import GenomeBrowser from "../../GenomeBrowser";
 
 export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTilePayload> {
 

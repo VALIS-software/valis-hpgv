@@ -10,7 +10,7 @@ import { AppCanvas } from "./ui/core/AppCanvas";
 import { TrackViewer, Track } from "./ui/TrackViewer";
 import { IntervalTileLoader, IntervalTrack } from "./track/interval";
 import { TileLoader } from "./track/TileLoader";
-import { AnnotationTileLoader } from "./track/annotation/AnnotationTileLoader";
+import { AnnotationTileLoader, MacroAnnotationTileLoader } from "./track/annotation/AnnotationTileLoader";
 import { AnnotationTrack } from "./track/annotation/AnnotationTrack";
 import { SequenceTileLoader } from "./track/sequence/SequenceTileLoader";
 import { SequenceTrack } from "./track/sequence/SequenceTrack";
@@ -172,6 +172,7 @@ export class GenomeBrowser {
 
 // register track types
 GenomeBrowser.registerTrackType('annotation', AnnotationTileLoader, AnnotationTrack);
+GenomeBrowser.registerTrackType('macro-annotation', MacroAnnotationTileLoader, AnnotationTrack);
 GenomeBrowser.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
 GenomeBrowser.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
 GenomeBrowser.registerTrackType('variant', VariantTileLoader, VariantTrack);

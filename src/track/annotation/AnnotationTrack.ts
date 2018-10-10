@@ -218,8 +218,6 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
 }
 
-GenomeBrowser.registerTrackType('macro-annotation', MacroAnnotationTileLoader, AnnotationTrack);
-
 type TrackPointerState = {
     pointerOver: boolean,
 }

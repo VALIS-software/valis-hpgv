@@ -69,7 +69,7 @@ export class TrackViewer extends Object2D {
         this.initializeGridResizing();
 
         this.addPanelButton = new ReactObject(
-            <AddPanelButton onClick={() => {
+            <TrackViewer.AddPanelButton onClick={() => {
                 this.addPanel({ contig: 'chr1', x0: 0, x1: 249e6}, true);
             }} />,
             this.panelHeaderHeight,
@@ -781,6 +781,122 @@ export class TrackViewer extends Object2D {
         this.layoutTrackRows(false);
     }
 
+    public static TrackCloseButton(props: {
+        onClick: (track: RowObject) => void,
+        track: RowObject,
+    }) {
+        return <div
+            style={{
+                position: 'relative',
+                height: '100%',
+                width: '100%',
+                color: '#e8e8e8',
+                overflow: 'hidden',
+                userSelect: 'none',
+                backgroundColor: '#171615',
+                borderRadius: '0px 8px 8px 0px',
+            }}
+        >
+            <div style={{
+                position: 'absolute',
+                width: '100%',
+                textAlign: 'right',
+                top: '50%',
+                transform: 'translate(0, -50%)',
+            }}>
+                <IconButton onClick={() => props.onClick(props.track)} color='inherit'>
+                    <CloseIcon /*colorPrimary='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                </IconButton>
+            </div>
+        </div>
+    }
+
+    public static TrackHeader(props: {
+        title: string,
+        setExpanded?: (state: boolean) => void,
+        isExpanded: boolean,
+    }) {
+        const iconColor = 'rgb(171, 171, 171)';
+        const iconHoverColor = 'rgb(255, 255, 255)';
+        const iconViewBoxSize = '0 0 32 32';
+        const style = {
+            marginTop: 8,
+            marginLeft: 16,
+            color: 'inherit'
+        }
+        const headerContainerStyle: React.CSSProperties = {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start'
+        };
+
+        const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
+
+        const expandArrow = (<ArrowElem
+            style={style}
+            viewBox={iconViewBoxSize}
+        // color={iconColor}	
+        // hoverColor={iconHoverColor}	
+        />);
+        return <div
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                color: '#e8e8e8',
+                backgroundColor: '#171615',
+                borderRadius: '8px 0px 0px 8px',
+                fontSize: '15px',
+                overflow: 'hidden',
+                userSelect: 'none',
+            }}
+        >
+            <div style={{
+                position: 'absolute',
+                width: '100%',
+                textAlign: 'center',
+                top: '50%',
+                transform: 'translate(0, -50%)',
+            }}>
+                <div onClick={() => {
+                    props.setExpanded(!props.isExpanded);
+                }} style={headerContainerStyle}>
+                    <IconButton color="inherit">
+                        {expandArrow}
+                    </IconButton>
+                    {props.title}
+                </div>
+            </div>
+        </div>
+    }
+
+    public static AddPanelButton(props: {
+        onClick: () => void,
+    }) {
+        return <div
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                color: '#e8e8e8',
+                backgroundColor: '#171615',
+                borderRadius: '8px 0px 0px 8px',
+            }}
+        >
+            <div style={{
+                position: 'absolute',
+                width: '100%',
+                textAlign: 'right',
+                top: '50%',
+                transform: 'translate(0, -50%)',
+            }}>
+                <IconButton onClick={props.onClick} color="inherit">
+                    <AddIcon />
+                </IconButton>
+            </div>
+        </div>
+    }
+
 }
 
 interface TrackInternal {
@@ -912,14 +1028,14 @@ class RowObject {
 
     protected updateHeader() {
         this._headerIsExpandedState = this.isExpanded();
-        this.header.content = (<TrackHeader
+        this.header.content = (<TrackViewer.TrackHeader
             title={this._title}
             isExpanded={this._headerIsExpandedState}
             setExpanded={(toggle: boolean) => {
                 this.setHeight(toggle ? RowObject.expandedTrackHeight : RowObject.collapsedTrackHeight);
             }}
         />);
-        this.closeButton.content = (<TrackCloseButton track={this} onClick={() => {
+        this.closeButton.content = (<TrackViewer.TrackCloseButton track={this} onClick={() => {
             this.onClose(this);
         }} />);
     }
@@ -930,122 +1046,7 @@ class RowObject {
 
     public static readonly expandedTrackHeight = 200;
     public static readonly collapsedTrackHeight = 50;
-}
 
-function TrackCloseButton(props: {
-    onClick: (track: RowObject) => void,
-    track: RowObject,
-}) {
-    return <div
-        style={{
-            position: 'relative',
-            height: '100%',
-            width: '100%',
-            color: '#e8e8e8',
-            overflow: 'hidden',
-            userSelect: 'none',
-            backgroundColor: '#171615',
-            borderRadius: '0px 8px 8px 0px',
-        }}
-    >
-        <div style={{
-            position: 'absolute',
-            width: '100%',
-            textAlign: 'right',
-            top: '50%',
-            transform: 'translate(0, -50%)',
-        }}>
-            <IconButton onClick={() => props.onClick(props.track)} color='inherit'>
-                <CloseIcon /*colorPrimary='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
-            </IconButton>
-        </div>
-    </div>
-}
-
-function TrackHeader(props: {
-    title: string,
-    setExpanded?: (state: boolean) => void,
-    isExpanded: boolean,
-}) {
-    const iconColor = 'rgb(171, 171, 171)';
-    const iconHoverColor = 'rgb(255, 255, 255)';
-    const iconViewBoxSize = '0 0 32 32';
-    const style = {
-        marginTop: 8,
-        marginLeft: 16,
-        color: 'inherit'
-    }
-    const headerContainerStyle: React.CSSProperties = {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-start'
-    };
-
-    const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
-
-    const expandArrow = (<ArrowElem
-        style={style}	
-        viewBox={iconViewBoxSize}	
-        // color={iconColor}	
-        // hoverColor={iconHoverColor}	
-    />);
-    return <div
-        style={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            color: '#e8e8e8',
-            backgroundColor: '#171615',
-            borderRadius: '8px 0px 0px 8px',
-            fontSize: '15px',
-            overflow: 'hidden',
-            userSelect: 'none',
-        }}
-    >
-        <div style={{
-            position: 'absolute',
-            width: '100%',
-            textAlign: 'center',
-            top: '50%',
-            transform: 'translate(0, -50%)',
-        }}>
-            <div onClick={() => {
-                props.setExpanded(!props.isExpanded);
-            }} style={headerContainerStyle}>
-                <IconButton color="inherit">
-                    {expandArrow}
-                </IconButton>
-                {props.title}
-            </div>
-        </div>
-    </div>
-}
-
-function AddPanelButton(props: {
-    onClick: () => void,
-}) {
-    return <div
-    style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        color: '#e8e8e8',
-        backgroundColor: '#171615',
-        borderRadius: '8px 0px 0px 8px',
-    }}
-    >
-        <div style={{
-            position: 'absolute',
-            width: '100%',
-            textAlign: 'right',
-            top: '50%',
-            transform: 'translate(0, -50%)',
-        }}>
-            <IconButton onClick={props.onClick} color="inherit">
-                <AddIcon />
-            </IconButton>
-        </div>
-    </div>
 }
 
 export default TrackViewer;

@@ -7,7 +7,6 @@ import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { Strand } from "genomics-formats/dist/gff3/Strand";
-import GenomeBrowser from "../../GenomeBrowser";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { TileState } from "../TileLoader";
@@ -94,7 +93,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
-        this.dataSource.getTileLoader(this.macroModel, this.contig).getTiles(x0, x1, samplingDensity, true, (tile) => {
+        (this.dataSource.getTileLoader(this.macroModel, this.contig) as MacroAnnotationTileLoader).getTiles(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 // if the tile is incomplete then wait until complete and call updateAnnotations() again
                 this._pendingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));

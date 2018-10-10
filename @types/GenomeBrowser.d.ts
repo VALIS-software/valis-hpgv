@@ -1,11 +1,12 @@
 import * as React from "react";
-import IDataSource from "./data-source/IDataSource";
+import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
-import GenomeBrowserConfiguration from "./GenomeBrowserConfiguration";
-import { TileLoader, TrackObject } from "./track";
-import TrackModel from "./track/TrackModel";
-import AppCanvas from "./ui/core/AppCanvas";
-import TrackViewer, { Track } from "./ui/TrackViewer";
+import { GenomeBrowserConfiguration } from "./GenomeBrowserConfiguration";
+import { TrackModel } from "./track/TrackModel";
+import { AppCanvas } from "./ui/core/AppCanvas";
+import { TrackViewer, Track } from "./ui/TrackViewer";
+import { TileLoader } from "./track/TileLoader";
+import { TrackObject } from "./track/TrackObject";
 export interface GenomeBrowserRenderProps {
     width: number;
     height: number;

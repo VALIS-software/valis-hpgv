@@ -6,17 +6,17 @@ import { TrackObject } from "./TrackObject";
 /**
  * - to use, override constructTileNode()
  */
-export declare class ShaderTrack<M extends TrackModel, P> extends TrackObject<M, TileLoader<P, any>> {
+export declare class ShaderTrack<M extends TrackModel, TilePayload> extends TrackObject<M, TileLoader<TilePayload, any>> {
     pixelRatio: number;
     protected densityMultiplier: number;
     protected _pixelRatio: number;
     constructor(model: M);
-    protected constructTileNode(): TileNode<P>;
-    protected _tileNodeCache: UsageCache<TileNode<P>>;
+    protected constructTileNode(): TileNode<TilePayload>;
+    protected _tileNodeCache: UsageCache<TileNode<TilePayload>>;
     protected updateDisplay(): void;
-    protected createTileNode: () => TileNode<P>;
-    protected deleteTileNode: (tileNode: TileNode<P>) => void;
-    protected updateTileNode(tileNode: TileNode<P>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number): void;
+    protected createTileNode: () => TileNode<TilePayload>;
+    protected deleteTileNode: (tileNode: TileNode<TilePayload>) => void;
+    protected updateTileNode(tileNode: TileNode<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number): void;
     protected tileNodeIsOpaque(tileNode: TileNode<any>): boolean;
 }
 export declare class TileNode<TilePayload> extends Object2D {

@@ -77,7 +77,7 @@ export declare class TrackViewer extends Object2D {
         track: RowObject;
     }): JSX.Element;
     static TrackHeader(props: {
-        title: string;
+        model: TrackModel;
         setExpanded?: (state: boolean) => void;
         isExpanded: boolean;
     }): JSX.Element;
@@ -99,6 +99,7 @@ export declare class Track {
  * Internal to TrackViewer
  */
 declare class RowObject {
+    protected model: TrackModel;
     protected readonly spacing: {
         x: number;
         y: number;
@@ -115,9 +116,8 @@ declare class RowObject {
     title: string;
     protected _y: number;
     protected _h: number;
-    protected _title: string;
     protected _headerIsExpandedState: boolean | undefined;
-    constructor(title: string, spacing: {
+    constructor(model: TrackModel, spacing: {
         x: number;
         y: number;
     }, onClose: (t: RowObject) => void, setHeight: (h: number) => void, getHeight: () => number);

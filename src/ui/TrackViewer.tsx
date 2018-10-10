@@ -127,7 +127,7 @@ export class TrackViewer extends Object2D {
         );
 
         let rowObject = new RowObject(
-            model.name,
+            model,
             this.spacing,
             () => this.closeTrack(track),
             (h: number) => track.heightPx = h,
@@ -812,7 +812,7 @@ export class TrackViewer extends Object2D {
     }
 
     public static TrackHeader(props: {
-        title: string,
+        model: TrackModel,
         setExpanded?: (state: boolean) => void,
         isExpanded: boolean,
     }) {
@@ -864,7 +864,7 @@ export class TrackViewer extends Object2D {
                     <IconButton color="inherit">
                         {expandArrow}
                     </IconButton>
-                    {props.title}
+                    {props.model.name}
                 </div>
             </div>
         </div>
@@ -950,28 +950,26 @@ class RowObject {
     }
 
     get title() {
-        return this._title;
+        return this.model.name;
     }
 
     set title(v: string) {
-        this._title = v;
+        this.model.name = v;
         this.updateHeader();
     }
 
     protected _y: number;
     protected _h: number;
-    protected _title: string;
 
     protected _headerIsExpandedState: boolean | undefined = undefined;
 
     constructor(
-        title: string,
+        protected model: TrackModel,
         protected readonly spacing: { x: number, y: number },
         protected onClose: (t: RowObject) => void,
         protected readonly setHeight: (h: number) => void,
         protected readonly getHeight: () => number
     ) {
-        this._title = title;
         this.header = new ReactObject();
         this.closeButton = new ReactObject();
 
@@ -1029,7 +1027,7 @@ class RowObject {
     protected updateHeader() {
         this._headerIsExpandedState = this.isExpanded();
         this.header.content = (<TrackViewer.TrackHeader
-            title={this._title}
+            model={this.model}
             isExpanded={this._headerIsExpandedState}
             setExpanded={(toggle: boolean) => {
                 this.setHeight(toggle ? RowObject.expandedTrackHeight : RowObject.collapsedTrackHeight);

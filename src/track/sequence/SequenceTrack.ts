@@ -26,10 +26,6 @@ export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileP
         return new SequenceTile();
     }
 
-    public static thing() {
-        return 1;
-    }
-
 }
 
 /**

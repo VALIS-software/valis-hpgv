@@ -40,10 +40,6 @@ class SequenceTile extends TileNode<SequenceTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
 
-    constructor() {
-        super();
-    }
-
     setTile(tile: Tile<SequenceTilePayload>) {
         super.setTile(tile);
 

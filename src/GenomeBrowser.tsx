@@ -18,6 +18,9 @@ import { VariantTileLoader } from "./track/variant/VariantTileLoader";
 import { VariantTrack } from "./track/variant/VariantTrack";
 import { TrackObject } from "./track/TrackObject";
 
+// expose GenomeBrowser's shared GPU resources
+export * from "engine/SharedResources";
+
 export interface GenomeBrowserRenderProps {
     width: number,
     height: number,

@@ -15,7 +15,6 @@ export declare class SequenceTrack extends ShaderTrack<SequenceTrackModel, Seque
 declare class SequenceTile extends TileNode<SequenceTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
-    constructor();
     setTile(tile: Tile<SequenceTilePayload>): void;
     private _lastComputedWidth;
     private _lastComputedX;

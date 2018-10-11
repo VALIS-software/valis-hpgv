@@ -7,6 +7,7 @@ import { AppCanvas } from "./ui/core/AppCanvas";
 import { TrackViewer, Track } from "./ui/TrackViewer";
 import { TileLoader } from "./track/TileLoader";
 import { TrackObject } from "./track/TrackObject";
+export * from "engine/SharedResources";
 export interface GenomeBrowserRenderProps {
     width: number;
     height: number;

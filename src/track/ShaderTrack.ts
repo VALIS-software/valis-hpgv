@@ -10,7 +10,11 @@ import { TrackObject } from "./TrackObject";
 /**
  * - to use, override constructTileNode()
  */
-export class ShaderTrack<M extends TrackModel, TilePayload> extends TrackObject<M, TileLoader<TilePayload, any>> {
+export class ShaderTrack<
+    Model extends TrackModel,
+    Loader extends TileLoader<TilePayload, any>,
+    TilePayload = any
+> extends TrackObject<Model, Loader> {
 
     get pixelRatio() { return this._pixelRatio; }
 
@@ -22,7 +26,7 @@ export class ShaderTrack<M extends TrackModel, TilePayload> extends TrackObject<
     protected densityMultiplier = 1.0;
     protected _pixelRatio: number = window.devicePixelRatio || 1;
 
-    constructor(model: M) {
+    constructor(model: Model) {
         super(model);
     }
 

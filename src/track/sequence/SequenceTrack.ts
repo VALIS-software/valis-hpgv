@@ -1,6 +1,6 @@
 import { UsageCache } from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
-import { SequenceTilePayload } from "./SequenceTileLoader";
+import SequenceTileLoader, { SequenceTilePayload } from "./SequenceTileLoader";
 import { Tile, TileState } from "../TileLoader";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext, DrawMode } from "engine/rendering/Renderer";
@@ -12,7 +12,7 @@ import { ShaderTrack, TileNode } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
 
-export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTilePayload> {
+export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileLoader> {
 
     protected densityMultiplier = 2.0;
  

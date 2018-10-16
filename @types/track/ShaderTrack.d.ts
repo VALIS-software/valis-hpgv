@@ -6,11 +6,11 @@ import { TrackObject } from "./TrackObject";
 /**
  * - to use, override constructTileNode()
  */
-export declare class ShaderTrack<M extends TrackModel, TilePayload> extends TrackObject<M, TileLoader<TilePayload, any>> {
+export declare class ShaderTrack<Model extends TrackModel, Loader extends TileLoader<TilePayload, any>, TilePayload = any> extends TrackObject<Model, Loader> {
     pixelRatio: number;
     protected densityMultiplier: number;
     protected _pixelRatio: number;
-    constructor(model: M);
+    constructor(model: Model);
     protected constructTileNode(): TileNode<TilePayload>;
     protected _tileNodeCache: UsageCache<TileNode<TilePayload>>;
     protected updateDisplay(): void;

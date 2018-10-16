@@ -1,4 +1,4 @@
-import { SequenceTilePayload } from "./SequenceTileLoader";
+import SequenceTileLoader, { SequenceTilePayload } from "./SequenceTileLoader";
 import { Tile } from "../TileLoader";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawContext } from "engine/rendering/Renderer";
@@ -7,7 +7,7 @@ import { Text } from "engine/ui/Text";
 import { ShaderTrack, TileNode } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
-export declare class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTilePayload> {
+export declare class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileLoader> {
     protected densityMultiplier: number;
     constructor(model: SequenceTrackModel);
     protected constructTileNode(): SequenceTile;

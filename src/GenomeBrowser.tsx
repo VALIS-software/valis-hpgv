@@ -18,8 +18,7 @@ import { VariantTileLoader } from "./track/variant/VariantTileLoader";
 import { VariantTrack } from "./track/variant/VariantTrack";
 import { TrackObject } from "./track/TrackObject";
 
-// expose GenomeBrowser's shared GPU resources
-export * from "engine/SharedResources";
+import Engine from "engine";
 
 export interface GenomeBrowserRenderProps {
     width: number,
@@ -36,7 +35,6 @@ interface CustomTileLoader<ModelType> {
 interface CustomTrackObject {
     new(model: TrackModel): TrackObject<TrackModel, any>;
 }
-
 export class GenomeBrowser {
 
     protected trackViewer: TrackViewer;
@@ -170,6 +168,9 @@ export class GenomeBrowser {
             trackObjectClass: CustomTrackObject
         }
     } = {};
+
+    // make engine accessible
+    static engine = Engine;
 
 }
 

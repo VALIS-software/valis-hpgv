@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Animator } from "engine/animation/Animator";
 import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
 import { GenomeBrowserConfiguration } from "./GenomeBrowserConfiguration";
@@ -44,31 +43,5 @@ export declare class GenomeBrowser {
         trackObjectClass: CustomTrackObject;
     };
     private static trackTypes;
-    static engine: {
-        SharedResources: typeof import("engine/SharedResources").SharedResources;
-        ui: {
-            InteractionEvent: typeof import("engine/ui/InteractionEvent").InteractionEvent;
-            Object2DInstances: typeof import("engine/ui/Object2DInstances").Object2DInstances;
-            Text: typeof import("engine/ui/Text").Text;
-            Object2D: typeof import("engine/ui/Object2D").Object2D;
-            Rect: typeof import("engine/ui/Rect").Rect;
-        };
-        ds: {
-            UsageCache: typeof import("engine/ds/UsageCache").UsageCache;
-        };
-        animation: {
-            Animator: typeof Animator;
-        };
-        math: {
-            Scalar: typeof import("engine/math/Scalar").Scalar;
-        };
-        rendering: {
-            Node: typeof import("engine/rendering/Node").Node;
-            RenderPass: typeof import("engine/rendering/RenderPass").RenderPass;
-            Renderer: typeof import("engine/rendering/Renderer").Renderer;
-            Renderable: typeof import("engine/rendering/Renderable").Renderable;
-            GPUDevice: typeof import("engine/rendering/GPUDevice").GPUDevice;
-        };
-    };
 }
 export default GenomeBrowser;

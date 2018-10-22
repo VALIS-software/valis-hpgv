@@ -18,8 +18,6 @@ import { VariantTileLoader } from "./track/variant/VariantTileLoader";
 import { VariantTrack } from "./track/variant/VariantTrack";
 import { TrackObject } from "./track/TrackObject";
 
-import Engine from "engine";
-
 export interface GenomeBrowserRenderProps {
     width: number,
     height: number,
@@ -168,9 +166,6 @@ export class GenomeBrowser {
             trackObjectClass: CustomTrackObject
         }
     } = {};
-
-    // make engine accessible
-    static engine = Engine;
 
 }
 

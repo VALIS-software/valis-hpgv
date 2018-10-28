@@ -97,7 +97,7 @@ export class Panel extends Object2D {
 
         // 1/2 spacing around the x-axis
         let offset = 0.5; // offset labels by 0.5 to center on basepairs
-        this.xAxis = new XAxis(this.x0, this.x1, 11, OpenSansRegular, offset, 1, 1);
+        this.xAxis = new XAxis(this.x0, this.x1, [0, 0, 0], 11, OpenSansRegular, offset, 1, 1, 80);
         this.xAxis.minDisplay = 0;
         this.xAxis.maxDisplay = Infinity;
         this.xAxis.y = -this.spacing.y;

@@ -4,18 +4,15 @@ import { Renderable } from "engine/rendering/Renderable";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
+import { OpenSansRegular } from "./font";
 
 export class XAxis extends Object2D {
 
     maxMajorTicks: number = 10000; // failsafe to avoid rendering hangs in case of bugs
 
     set maxTextLength(v: number) {
-        let change = this._maxTextLength !== v;
+        if (v !== this._maxTextLength) this.labelsNeedUpdate();
         this._maxTextLength = v;
-        if (change) {
-            this.labelsNeedUpdate = true;
-            this.labelCache.removeAll(this.deleteLabel);
-        }
     }
 
     get maxTextLength() {
@@ -23,12 +20,20 @@ export class XAxis extends Object2D {
     }
 
     set fontSizePx(v: number) {
+        if (v !== this._fontSizePx) this.labelsNeedUpdate();
         this._fontSizePx = v;
-        this.labelCache.removeAll(this.deleteLabel);
-        this.labelsNeedUpdate = true;
     }
     get fontSizePx() {
         return this._fontSizePx;
+    }
+
+    set color(v: ArrayLike<number>) {
+        this._color = v;
+        this.labelsNeedUpdate();
+    }
+
+    get color() {
+        return this._color;
     }
 
     minDisplay: number = -Infinity;
@@ -36,56 +41,69 @@ export class XAxis extends Object2D {
 
     protected x0: number = 0;
     protected x1: number = 1;
+    
+    protected _color: ArrayLike<number>;
     protected _fontSizePx: number;
     protected _maxTextLength: number = 4;
 
-    protected labelsNeedUpdate: boolean;
-    protected lastComputedWidth: number;
+    protected _labelsNeedUpdate: boolean;
+    protected _lastComputedWidth: number;
 
     protected clippingMask: Rect;
 
-    // valid for stable (fontSize, fontPath)
     protected labelCache = new UsageCache<Label>();
 
     constructor(
         x0: number = 0,
         x1: number = 1,
+        color: ArrayLike<number> = [0, 0, 0],
         fontSizePx: number = 16,
-        protected fontPath: string,
+        protected fontPath: string = OpenSansRegular,
         protected offset: number = 0,
         protected snap: number = 1,
         protected startFrom: number = 0,
+        protected tickSpacingPx: number = 50,
     ) {
         super();
         this.render = false;
         this.x0 = x0;
         this.x1 = x1;
+        this._color = color;
         this._fontSizePx = fontSizePx;
-        this.labelsNeedUpdate = true;
+        this._labelsNeedUpdate = true;
+
+        // default size
+        this.h = fontSizePx * 2;
+        this.w = 200;
 
         this.clippingMask = new Rect(0, 0, [0.9, 0.9, 0.9, 1]);
         this.clippingMask.layoutW = 1;
         this.clippingMask.layoutH = 1;
-        this.clippingMask.opacity = 0;
+        this.clippingMask.visible = false;
         this.add(this.clippingMask);
     }
 
     setRange(x0: number, x1: number) {
-        this.labelsNeedUpdate = this.labelsNeedUpdate || this.x0 !== x0 || this.x1 !== x1;
+        this._labelsNeedUpdate = this._labelsNeedUpdate || this.x0 !== x0 || this.x1 !== x1;
         this.x0 = x0;
         this.x1 = x1;
     }
 
     // override applyTreeTransforms to call updateLabels so that it's applied when world-space layouts are known
     applyTransformToSubNodes(root?: boolean) {
-        this.labelsNeedUpdate = this.labelsNeedUpdate || this.computedWidth !== this.lastComputedWidth;
+        this._labelsNeedUpdate = this._labelsNeedUpdate || this.computedWidth !== this._lastComputedWidth;
 
-        if (this.labelsNeedUpdate) {
+        if (this._labelsNeedUpdate) {
             this.updateLabels();
-            this.lastComputedWidth = this.computedWidth;
+            this._lastComputedWidth = this.computedWidth;
         }
 
         super.applyTransformToSubNodes(root);
+    }
+
+    protected labelsNeedUpdate() {
+        this.labelCache.removeAll(this.deleteLabel);
+        this._labelsNeedUpdate = true;
     }
 
     protected updateLabels() {
@@ -98,7 +116,7 @@ export class XAxis extends Object2D {
             return;
         }
 
-        const tickSpacingPx = 80 * 2;
+        const tickSpacingPx = this.tickSpacingPx * 2;
         const rangeWidthPx = this.computedWidth;
         const tickRatio = tickSpacingPx / rangeWidthPx;
         const snap = this.snap;
@@ -135,7 +153,8 @@ export class XAxis extends Object2D {
                 let str = XAxis.formatValue(xMinor + this.startFrom, this._maxTextLength);
                 let textMinor = this.labelCache.get(xMinor + '_' + str, () => this.createLabel(str));
                 textMinor.layoutParentX = minorParentX;
-                textMinor.setColor(0, 0, 0, minorAlpha);
+                let c = this._color;
+                textMinor.setColor(c[0], c[1], c[2], minorAlpha);
                 textMinor.opacity = minorAlpha;
             }
 
@@ -144,12 +163,13 @@ export class XAxis extends Object2D {
                 let str = XAxis.formatValue(xMajor + this.startFrom, this._maxTextLength);
                 let textMajor = this.labelCache.get(xMajor + '_' + str, () => this.createLabel(str));
                 textMajor.layoutParentX = majorParentX;
-                textMajor.setColor(0, 0, 0, 1);
+                let c = this._color;
+                textMajor.setColor(c[0], c[1], c[2], 1);
             }
         }
 
         this.labelCache.removeUnused(this.deleteLabel);
-        this.labelsNeedUpdate = false;
+        this._labelsNeedUpdate = false;
     }
 
     protected createLabel = (str: string) => {

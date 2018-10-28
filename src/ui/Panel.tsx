@@ -618,7 +618,7 @@ export class Panel extends Object2D {
             rangeString={ rangeString }
             rangeSpecifier={ rangeSpecifier }
             enableClose = { this._closable && !this.closing } 
-            enableContigNavigation = { this.availableContigs != null }
+            enableContigNavigation={this.availableContigs != null && (this.availableContigs.length > 1) }
             onClose = { this.onClose } 
             isEditing = { this.isEditing }
             onEditCancel = { () => this.finishEditing() }

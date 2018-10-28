@@ -5,7 +5,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import CloseIcon from "@material-ui/icons/Close";
 import EditIcon from "@material-ui/icons/Edit";
-import Animator from "engine/animation/Animator";
+import Animator from "../Animator";
 import { InteractionEvent, WheelDeltaMode, WheelInteractionEvent } from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";

@@ -1,4 +1,4 @@
-import Animator from "engine/animation/Animator";
+import Animator from "../Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";

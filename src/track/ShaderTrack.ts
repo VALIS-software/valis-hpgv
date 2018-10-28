@@ -1,4 +1,4 @@
-import Animator from "engine/animation/Animator";
+import Animator from "../Animator";
 import UsageCache from "engine/ds/UsageCache";
 import Scalar from "engine/math/Scalar";
 import Object2D from "engine/ui/Object2D";

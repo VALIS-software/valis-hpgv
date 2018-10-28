@@ -13,7 +13,7 @@ import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Animator from "engine/animation/Animator";
+import Animator from "../Animator";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import { InternalDataSource } from "../data-source/InternalDataSource";

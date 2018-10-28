@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Animator } from "engine/animation/Animator";
+import { Animator } from "./Animator";
 import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
 import { ManifestDataSource } from "./data-source/ManifestDataSource";

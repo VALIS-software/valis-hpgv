@@ -20,6 +20,7 @@ export type AxisConfig = {
     snap: number,
     startFrom: number,
 
+    clip: boolean,
     color: ArrayLike<number>,
     fontSizePx: number,
     fontPath: string,
@@ -69,6 +70,7 @@ export class Axis extends Object2D {
     protected fontPath: string;
     protected tickSpacingPx: number;
     
+    protected clip: boolean;
     protected _color: ArrayLike<number>;
     protected _fontSizePx: number;
     protected _maxTextLength: number;
@@ -97,6 +99,7 @@ export class Axis extends Object2D {
             offset: 0,
             snap: 1,
             startFrom: 0,
+            clip: false,
             color: [0, 0, 0],
             fontSizePx: 16,
             fontPath: OpenSansRegular,
@@ -114,6 +117,7 @@ export class Axis extends Object2D {
         this.offset = config.offset;
         this.snap = config.snap;
         this.startFrom = config.startFrom;
+        this.clip = config.clip;
         this._color = config.color;
         this._fontSizePx = config.fontSizePx;
         this.fontPath = config.fontPath;
@@ -126,11 +130,13 @@ export class Axis extends Object2D {
         this.h = this.fontSizePx * 2;
         this.w = 200;
 
-        this.clippingMask = new Rect(0, 0, [0.9, 0.9, 0.9, 1]);
-        this.clippingMask.layoutW = 1;
-        this.clippingMask.layoutH = 1;
-        this.clippingMask.visible = false;
-        this.add(this.clippingMask);
+        if (this.clip) {
+            this.clippingMask = new Rect(0, 0, [0.9, 0.9, 0.9, 1]);
+            this.clippingMask.layoutW = 1;
+            this.clippingMask.layoutH = 1;
+            this.clippingMask.visible = false;
+            this.add(this.clippingMask);
+        }
     }
 
     setRange(x0: number, x1: number) {
@@ -209,44 +215,53 @@ export class Axis extends Object2D {
             let xMinor = xMinorSpacing * (i + 0.5);
             let xMajor = xMajorSpacing * i;
 
-            if (xMinor >= this.minDisplay && xMinor <= this.maxDisplay && isFinite(xMinor)) {
+            if ((xMinor >= this.minDisplay) && (xMinor <= this.maxDisplay) && isFinite(xMinor)) {
                 let minorParentX = (xMinor - this.x0 + this.offset) / span;
 
-                if (this.invert) {
-                    minorParentX = 1 - minorParentX;
+                let display = this.clip ? true : (minorParentX >= 0 && minorParentX <= 1);
+                
+                if (display) {
+                    if (this.invert) {
+                        minorParentX = 1 - minorParentX;
+                    }
+
+                    let str = Axis.formatValue(xMinor + this.startFrom, this._maxTextLength);
+                    let textMinor = this.labelCache.get(xMinor + '_' + str, () => this.createLabel(str));
+
+                    let c = this._color;
+                    textMinor.setColor(c[0], c[1], c[2], minorAlpha);
+                    textMinor.opacity = minorAlpha;
+
+                    if (yMode) {
+                        textMinor.layoutParentY = minorParentX;
+                    } else {
+                        textMinor.layoutParentX = minorParentX;
+                    }
                 }
 
-                let str = Axis.formatValue(xMinor + this.startFrom, this._maxTextLength);
-                let textMinor = this.labelCache.get(xMinor + '_' + str, () => this.createLabel(str));
-
-                let c = this._color;
-                textMinor.setColor(c[0], c[1], c[2], minorAlpha);
-                textMinor.opacity = minorAlpha;
-
-                if (yMode) {
-                    textMinor.layoutParentY = minorParentX;
-                } else {
-                    textMinor.layoutParentX = minorParentX;
-                }
             }
 
-            if (xMajor >= this.minDisplay && xMajor <= this.maxDisplay && isFinite(xMajor)) {
+            if ((xMajor >= this.minDisplay) && (xMajor <= this.maxDisplay) && isFinite(xMajor)) {
                 let majorParentX = (xMajor - this.x0 + this.offset) / span;
 
-                if (this.invert) {
-                    majorParentX = 1 - majorParentX;
-                }
+                let display = this.clip ? true : (majorParentX >= 0 && majorParentX <= 1);
 
-                let str = Axis.formatValue(xMajor + this.startFrom, this._maxTextLength);
-                let textMajor = this.labelCache.get(xMajor + '_' + str, () => this.createLabel(str));
+                if (display) {
+                    if (this.invert) {
+                        majorParentX = 1 - majorParentX;
+                    }
 
-                let c = this._color;
-                textMajor.setColor(c[0], c[1], c[2], 1);
+                    let str = Axis.formatValue(xMajor + this.startFrom, this._maxTextLength);
+                    let textMajor = this.labelCache.get(xMajor + '_' + str, () => this.createLabel(str));
 
-                if (yMode) {
-                    textMajor.layoutParentY = majorParentX;
-                } else {
-                    textMajor.layoutParentX = majorParentX;
+                    let c = this._color;
+                    textMajor.setColor(c[0], c[1], c[2], 1);
+
+                    if (yMode) {
+                        textMajor.layoutParentY = majorParentX;
+                    } else {
+                        textMajor.layoutParentX = majorParentX;
+                    }
                 }
             }
         }

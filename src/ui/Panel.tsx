@@ -103,6 +103,7 @@ export class Panel extends Object2D {
             offset: offset,
             snap: 1,
             startFrom: 1,
+            clip: true,
             color: [0, 0, 0],
             fontSizePx: 11,
         });

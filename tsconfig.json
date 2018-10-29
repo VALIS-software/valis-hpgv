@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "./dist/@types",
+        "outDir": "@types",
         "target": "es5",
         "declaration": true,
         "downlevelIteration": true,

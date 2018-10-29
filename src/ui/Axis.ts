@@ -103,7 +103,7 @@ export class Axis extends Object2D {
             color: [0, 0, 0],
             fontSizePx: 16,
             fontPath: OpenSansRegular,
-            tickSpacingPx: 50,
+            tickSpacingPx: 30,
             maxTextLength: 4,
 
             ...options,

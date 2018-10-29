@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rimraf ./@types ./dist",
     "prod": "npm run clean && cti src && webpack --mode=production",
-    "dev": "npm run clean && cti src && webpack-dev-server --mode=development",
+    "dev": "webpack-dev-server --mode=development",
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
     "build": "npm run prod"
   },

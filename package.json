@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
-  "types": "./@types/index.d.ts",
+  "types": "./dist/@types/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./@types ./dist",
+    "clean": "rimraf ./dist",
     "prod": "npm run clean && cti src && webpack --mode=production",
     "dev": "webpack-dev-server --mode=development",
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",

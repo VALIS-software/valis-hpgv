@@ -127,8 +127,13 @@ export class Axis extends Object2D {
         this._labelsNeedUpdate = true;
 
         // default size
-        this.h = this.fontSizePx * 2;
-        this.w = 200;
+        if (this.isYMode()) {
+            this.w = this.fontSizePx * 2;
+            this.h = 200;
+        } else {
+            this.w = 200;
+            this.h = this.fontSizePx * 2;
+        }
 
         if (this.clip) {
             this.clippingMask = new Rect(0, 0, [0.9, 0.9, 0.9, 1]);

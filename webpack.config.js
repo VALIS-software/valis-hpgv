@@ -13,10 +13,14 @@ module.exports = (env, argv) => {
 
         entry: "./index",
         output: {
-            path: `${__dirname}/@types`, // hack to make sure the @types directory gets generated
-            filename: '../index.js',
+            path: path.join(__dirname, "dist"),
+            filename: 'index.js',
             library: '',
             libraryTarget: 'umd',
+        },
+
+        devServer: {
+            publicPath: '/dist',
         },
 
         // Enable sourcemaps for debugging webpack's output.

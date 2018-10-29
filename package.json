@@ -2,12 +2,12 @@
   "name": "genome-browser",
   "version": "1.0.0",
   "description": "",
-  "main": "./index.js",
+  "main": "./dist/index.js",
   "types": "./@types/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./@types ./index.js ./index.js.map",
+    "clean": "rimraf ./@types ./dist",
     "prod": "npm run clean && cti src && webpack --mode=production",
-    "dev": "npm run clean && cti src && webpack --watch --mode=development & live-server --watch=index.js,examples",
+    "dev": "npm run clean && cti src && webpack-dev-server --mode=development",
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
     "build": "npm run prod"
   },
@@ -23,14 +23,14 @@
     "@types/node": "10.11.7",
     "create-ts-index": "1.0.x",
     "file-loader": "2.0.x",
-    "live-server": "^1.2.0",
     "rimraf": "^2.6.2",
     "ts-loader": "4.2.x",
     "typescript": "3.0.x",
     "url-loader": "1.1.x",
     "webpack": "4.4.x",
     "webpack-bundle-analyzer": "^3.0.2",
-    "webpack-cli": "2.0.x"
+    "webpack-cli": "2.0.x",
+    "webpack-dev-server": "^3.1.10"
   },
   "peerDependencies": {
     "react": "16.x",

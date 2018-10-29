@@ -103,8 +103,17 @@ export class Panel extends Object2D {
         this.xAxis.y = -this.spacing.y;
         this.xAxis.h = this.xAxisHeight;
         this.xAxis.layoutY = -1;
+        this.xAxis.z = 20;
         this.fillX(this.xAxis);
         this.add(this.xAxis);
+
+        // add solid a white background to XAxis so that content is hidden underneath
+        let xAxisBg = new Rect(0, this.xAxisHeight, [1, 1, 1, 1]);
+        xAxisBg.z = 10;
+        xAxisBg.layoutY = -1;
+        xAxisBg.y = -this.spacing.y;
+        this.fillX(xAxisBg);
+        this.add(xAxisBg);
 
         this.resizeHandle = new Rect(0, 0, [1, 0, 0, 1]);
         this.resizeHandle.layoutX = -0.5;

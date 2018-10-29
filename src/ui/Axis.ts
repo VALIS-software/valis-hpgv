@@ -6,12 +6,31 @@ import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { OpenSansRegular } from "./font";
 
-export class XAxis extends Object2D {
+export type AxisAlign = 'top' | 'bottom' | 'left' | 'right';
 
-    maxMajorTicks: number = 10000; // failsafe to avoid rendering hangs in case of bugs
+export type AxisConfig = {
+    x0: number,
+    x1: number,
+
+    align: AxisAlign,
+
+    invert: boolean,
+
+    offset: number,
+    snap: number,
+    startFrom: number,
+
+    color: ArrayLike<number>,
+    fontSizePx: number,
+    fontPath: string,
+    tickSpacingPx: number,
+    maxTextLength: number,
+}
+
+export class Axis extends Object2D {
 
     set maxTextLength(v: number) {
-        if (v !== this._maxTextLength) this.labelsNeedUpdate();
+        if (v !== this._maxTextLength) this.resetLabels();
         this._maxTextLength = v;
     }
 
@@ -20,7 +39,7 @@ export class XAxis extends Object2D {
     }
 
     set fontSizePx(v: number) {
-        if (v !== this._fontSizePx) this.labelsNeedUpdate();
+        if (v !== this._fontSizePx) this.resetLabels();
         this._fontSizePx = v;
     }
     get fontSizePx() {
@@ -29,7 +48,7 @@ export class XAxis extends Object2D {
 
     set color(v: ArrayLike<number>) {
         this._color = v;
-        this.labelsNeedUpdate();
+        this._labelsNeedUpdate = true;
     }
 
     get color() {
@@ -39,41 +58,72 @@ export class XAxis extends Object2D {
     minDisplay: number = -Infinity;
     maxDisplay: number = Infinity;
 
-    protected x0: number = 0;
-    protected x1: number = 1;
+    protected x0: number;
+    protected x1: number;
+    protected align: AxisAlign;
+    protected invert: boolean;
+    protected offset: number;
+    protected snap: number;
+    protected startFrom: number;
+
+    protected fontPath: string;
+    protected tickSpacingPx: number;
     
     protected _color: ArrayLike<number>;
     protected _fontSizePx: number;
-    protected _maxTextLength: number = 4;
+    protected _maxTextLength: number;
 
-    protected _labelsNeedUpdate: boolean;
-    protected _lastComputedWidth: number;
+    protected maxMajorTicks: number = 10000; // failsafe to avoid rendering hangs in case of bugs
 
     protected clippingMask: Rect;
 
     protected labelCache = new UsageCache<Label>();
 
+    protected _labelsNeedUpdate: boolean;
+    protected _lastComputedWidth: number;
+    protected _lastComputedHeight: number;
+
     constructor(
-        x0: number = 0,
-        x1: number = 1,
-        color: ArrayLike<number> = [0, 0, 0],
-        fontSizePx: number = 16,
-        protected fontPath: string = OpenSansRegular,
-        protected offset: number = 0,
-        protected snap: number = 1,
-        protected startFrom: number = 0,
-        protected tickSpacingPx: number = 50,
+        options?: Partial<AxisConfig>
     ) {
         super();
+
+        // default style & user style
+        let config: AxisConfig = {
+            x0: 0,
+            x1: 1,
+            align: 'top',
+            invert: false,
+            offset: 0,
+            snap: 1,
+            startFrom: 0,
+            color: [0, 0, 0],
+            fontSizePx: 16,
+            fontPath: OpenSansRegular,
+            tickSpacingPx: 50,
+            maxTextLength: 4,
+
+            ...options,
+        };
+
         this.render = false;
-        this.x0 = x0;
-        this.x1 = x1;
-        this._color = color;
-        this._fontSizePx = fontSizePx;
+        this.x0 = config.x0;
+        this.x1 = config.x1;
+        this.align = config.align;
+        this.invert = config.invert;
+        this.offset = config.offset;
+        this.snap = config.snap;
+        this.startFrom = config.startFrom;
+        this._color = config.color;
+        this._fontSizePx = config.fontSizePx;
+        this.fontPath = config.fontPath;
+        this.tickSpacingPx = config.tickSpacingPx;
+        this._maxTextLength = config.maxTextLength;
+
         this._labelsNeedUpdate = true;
 
         // default size
-        this.h = fontSizePx * 2;
+        this.h = this.fontSizePx * 2;
         this.w = 200;
 
         this.clippingMask = new Rect(0, 0, [0.9, 0.9, 0.9, 1]);
@@ -84,24 +134,32 @@ export class XAxis extends Object2D {
     }
 
     setRange(x0: number, x1: number) {
-        this._labelsNeedUpdate = this._labelsNeedUpdate || this.x0 !== x0 || this.x1 !== x1;
+        this._labelsNeedUpdate = this._labelsNeedUpdate || (this.x0 !== x0) || (this.x1 !== x1);
         this.x0 = x0;
         this.x1 = x1;
     }
 
     // override applyTreeTransforms to call updateLabels so that it's applied when world-space layouts are known
     applyTransformToSubNodes(root?: boolean) {
-        this._labelsNeedUpdate = this._labelsNeedUpdate || this.computedWidth !== this._lastComputedWidth;
+        // mark labels need update if dimensions change
+        if (!this._labelsNeedUpdate) {
+            if (this.isYMode()) {
+                this._labelsNeedUpdate = this.computedHeight !== this._lastComputedHeight;
+            } else {
+                this._labelsNeedUpdate = this.computedWidth !== this._lastComputedWidth;
+            }
+        }
 
         if (this._labelsNeedUpdate) {
             this.updateLabels();
             this._lastComputedWidth = this.computedWidth;
+            this._lastComputedHeight = this.computedHeight;
         }
 
         super.applyTransformToSubNodes(root);
     }
 
-    protected labelsNeedUpdate() {
+    protected resetLabels() {
         this.labelCache.removeAll(this.deleteLabel);
         this._labelsNeedUpdate = true;
     }
@@ -116,8 +174,10 @@ export class XAxis extends Object2D {
             return;
         }
 
+        let yMode: boolean = this.isYMode();
+
         const tickSpacingPx = this.tickSpacingPx * 2;
-        const rangeWidthPx = this.computedWidth;
+        const rangeWidthPx = yMode ? this.computedHeight : this.computedWidth;
         const tickRatio = tickSpacingPx / rangeWidthPx;
         const snap = this.snap;
 
@@ -142,6 +202,7 @@ export class XAxis extends Object2D {
         let lastDisplayTick = Math.ceil(this.x1 / xMajorSpacing);
 
         let ticksRemaining = this.maxMajorTicks;
+
         for (let i = firstDisplayTick; i <= lastDisplayTick && ticksRemaining > 0; i++) {
             ticksRemaining--;
 
@@ -150,21 +211,43 @@ export class XAxis extends Object2D {
 
             if (xMinor >= this.minDisplay && xMinor <= this.maxDisplay && isFinite(xMinor)) {
                 let minorParentX = (xMinor - this.x0 + this.offset) / span;
-                let str = XAxis.formatValue(xMinor + this.startFrom, this._maxTextLength);
+
+                if (this.invert) {
+                    minorParentX = 1 - minorParentX;
+                }
+
+                let str = Axis.formatValue(xMinor + this.startFrom, this._maxTextLength);
                 let textMinor = this.labelCache.get(xMinor + '_' + str, () => this.createLabel(str));
-                textMinor.layoutParentX = minorParentX;
+
                 let c = this._color;
                 textMinor.setColor(c[0], c[1], c[2], minorAlpha);
                 textMinor.opacity = minorAlpha;
+
+                if (yMode) {
+                    textMinor.layoutParentY = minorParentX;
+                } else {
+                    textMinor.layoutParentX = minorParentX;
+                }
             }
 
             if (xMajor >= this.minDisplay && xMajor <= this.maxDisplay && isFinite(xMajor)) {
                 let majorParentX = (xMajor - this.x0 + this.offset) / span;
-                let str = XAxis.formatValue(xMajor + this.startFrom, this._maxTextLength);
+
+                if (this.invert) {
+                    majorParentX = 1 - majorParentX;
+                }
+
+                let str = Axis.formatValue(xMajor + this.startFrom, this._maxTextLength);
                 let textMajor = this.labelCache.get(xMajor + '_' + str, () => this.createLabel(str));
-                textMajor.layoutParentX = majorParentX;
+
                 let c = this._color;
                 textMajor.setColor(c[0], c[1], c[2], 1);
+
+                if (yMode) {
+                    textMajor.layoutParentY = majorParentX;
+                } else {
+                    textMajor.layoutParentX = majorParentX;
+                }
             }
         }
 
@@ -173,8 +256,21 @@ export class XAxis extends Object2D {
     }
 
     protected createLabel = (str: string) => {
-        let label = new Label(this.fontPath, str, this.fontSizePx);
-        label.layoutParentY = 1;
+        let label = new Label(this.fontPath, str, this.fontSizePx, this.align);
+        switch (this.align) {
+            case 'top': 
+                label.layoutParentY = 0;
+                break;
+            case 'bottom':
+                label.layoutParentY = 1;
+                break;
+            case 'left':
+                label.layoutParentX = 0;
+                break;
+            case 'right':
+                label.layoutParentX = 1;
+                break;
+        }
         label.z = 0.1;
         label.setMask(this.clippingMask);
         this.add(label);
@@ -184,6 +280,10 @@ export class XAxis extends Object2D {
     protected deleteLabel = (label: Label) => {
         label.releaseGPUResources();
         this.remove(label);
+    }
+
+    protected isYMode() {
+        return (this.align === 'left') || (this.align === 'right');
     }
 
     /**
@@ -250,7 +350,7 @@ export class XAxis extends Object2D {
             let expSign = Scalar.sign(exp10);
             let exp1000Int = Math.floor(Math.abs(exp10 / 3)) * expSign;
     
-            let symbol = XAxis.siPrefixes[exp1000Int.toFixed(0)];
+            let symbol = Axis.siPrefixes[exp1000Int.toFixed(0)];
             let reductionFactor = Math.pow(1000, exp1000Int);
     
             if (symbol === undefined) {
@@ -262,7 +362,7 @@ export class XAxis extends Object2D {
             let reducedXIntStr = Math.floor(reducedX).toFixed(0);
             let dp = maxLength - reducedXIntStr.length - symbol.length - 1;
     
-            let numString = XAxis.toFixedTrunc(reducedX, Math.max(dp, 0));
+            let numString = Axis.toFixedTrunc(reducedX, Math.max(dp, 0));
     
             str = numString + symbol;
         }
@@ -277,20 +377,53 @@ class Label extends Object2D {
     text: Text;
     tick: Rect;
 
-    constructor(fontPath: string, string: string, fontSizePx: number) {
+    constructor(fontPath: string, string: string, fontSizePx: number, align: AxisAlign) {
         super();
         let tickHeightPx = 5;
         let tickWidthPx = 1;
 
         this.text = new Text(fontPath, string, fontSizePx);
-        this.text.layoutX = -0.5;
-        this.text.layoutY = -1;
-        this.text.y = -tickHeightPx - 3;
-        this.add(this.text);
 
-        this.tick = new Rect(tickWidthPx, tickHeightPx);
-        this.tick.layoutX = -0.5;
-        this.tick.layoutY = -1;
+        switch (align) {
+            case 'top': {
+                this.tick = new Rect(tickWidthPx, tickHeightPx);
+                this.tick.layoutX = -0.5;
+                this.tick.layoutY = 0;
+                this.text.layoutX = -0.5;
+                this.text.layoutY = 0;
+                this.text.y = tickHeightPx + 3;
+                break;
+            }
+            case 'bottom': {
+                this.tick = new Rect(tickWidthPx, tickHeightPx);
+                this.tick.layoutX = -0.5;
+                this.tick.layoutY = -1;
+                this.text.layoutX = -0.5;
+                this.text.layoutY = -1;
+                this.text.y = -tickHeightPx - 3;
+                break;
+            }
+            case 'left': {
+                this.tick = new Rect(tickHeightPx, tickWidthPx);
+                this.tick.layoutX = 0;
+                this.tick.layoutY = -0.5;
+                this.text.layoutX = 0;
+                this.text.layoutY = -0.5;
+                this.text.x = tickHeightPx + 3;
+                break;
+            }
+            case 'right': {
+                this.tick = new Rect(tickHeightPx, tickWidthPx);
+                this.tick.layoutX = -1;
+                this.tick.layoutY = -0.5;
+                this.text.layoutX = -1;
+                this.text.layoutY = -0.5;
+                this.text.x = -tickHeightPx - 3;
+                break;
+            }
+        }
+
+        this.add(this.text);
         this.tick.transparent = true;
         this.add(this.tick);
 
@@ -315,4 +448,4 @@ class Label extends Object2D {
 
 }
 
-export default XAxis;
+export default Axis;

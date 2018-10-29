@@ -14,8 +14,7 @@ import { InternalDataSource } from "../data-source/InternalDataSource";
 import { Contig } from "../model";
 import TrackObject, { AxisPointerStyle } from "../track/TrackObject";
 import ReactObject from "./core/ReactObject";
-import { OpenSansRegular } from "./font/Fonts";
-import XAxis from "./XAxis";
+import Axis from "./Axis";
 
 enum DragMode {
     Move,
@@ -34,7 +33,7 @@ export class Panel extends Object2D {
     minRange: number = 10;
 
     readonly header: ReactObject;
-    readonly xAxis: XAxis;
+    readonly xAxis: Axis;
     readonly resizeHandle: Rect;
     readonly trackViews = new Set<TrackObject>();
 
@@ -97,7 +96,16 @@ export class Panel extends Object2D {
 
         // 1/2 spacing around the x-axis
         let offset = 0.5; // offset labels by 0.5 to center on basepairs
-        this.xAxis = new XAxis(this.x0, this.x1, [0, 0, 0], 11, OpenSansRegular, offset, 1, 1, 80);
+        this.xAxis = new Axis({
+            x0: this.x0,
+            x1: this.x1,
+            align: 'bottom',
+            offset: offset,
+            snap: 1,
+            startFrom: 1,
+            color: [0, 0, 0],
+            fontSizePx: 11,
+        });
         this.xAxis.minDisplay = 0;
         this.xAxis.maxDisplay = Infinity;
         this.xAxis.y = -this.spacing.y;
@@ -616,7 +624,7 @@ export class Panel extends Object2D {
     }
 
     protected updatePanelHeader() {
-        let rangeString = `${XAxis.formatValue(this.x0, 8)}bp to ${XAxis.formatValue(this.x1, 8)}bp`;
+        let rangeString = `${Axis.formatValue(this.x0, 8)}bp to ${Axis.formatValue(this.x1, 8)}bp`;
         const startBp = Math.floor(this.x0).toFixed(0);
         const endBp = Math.ceil(this.x1).toFixed(0);
         let rangeSpecifier = `${this.contig}:${startBp}-${endBp}`;

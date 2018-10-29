@@ -50,6 +50,7 @@ module.exports = (env, argv) => {
             // pass --env to javascript build via process.env
             new webpack.DefinePlugin({ "process.env": JSON.stringify(env) }),
         ].concat(
+            // add bundle analyzer plugin if flag is set
             env.analyze ? [new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)] : []
         ),
 

@@ -5,7 +5,7 @@ import { InternalDataSource } from "../data-source/InternalDataSource";
 import { Contig } from "../model";
 import TrackObject from "../track/TrackObject";
 import ReactObject from "./core/ReactObject";
-import XAxis from "./XAxis";
+import Axis from "./Axis";
 declare enum DragMode {
     Move = 0,
     SelectRegion = 1
@@ -27,7 +27,7 @@ export declare class Panel extends Object2D {
     maxRange: number;
     minRange: number;
     readonly header: ReactObject;
-    readonly xAxis: XAxis;
+    readonly xAxis: Axis;
     readonly resizeHandle: Rect;
     readonly trackViews: Set<TrackObject<import("../track/TrackModel").TrackModel, import("../track/TileLoader").TileLoader<any, any>>>;
     closable: boolean;

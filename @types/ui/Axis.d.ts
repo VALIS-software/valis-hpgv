@@ -12,6 +12,7 @@ export declare type AxisConfig = {
     offset: number;
     snap: number;
     startFrom: number;
+    clip: boolean;
     color: ArrayLike<number>;
     fontSizePx: number;
     fontPath: string;
@@ -33,6 +34,7 @@ export declare class Axis extends Object2D {
     protected startFrom: number;
     protected fontPath: string;
     protected tickSpacingPx: number;
+    protected clip: boolean;
     protected _color: ArrayLike<number>;
     protected _fontSizePx: number;
     protected _maxTextLength: number;
@@ -47,6 +49,7 @@ export declare class Axis extends Object2D {
     applyTransformToSubNodes(root?: boolean): void;
     protected resetLabels(): void;
     protected updateLabels(): void;
+    protected touchLabel(x: number, alpha: number, span: number, yMode: boolean): void;
     protected createLabel: (str: string) => Label;
     protected deleteLabel: (label: Label) => void;
     protected isYMode(): boolean;

@@ -215,59 +215,39 @@ export class Axis extends Object2D {
             let xMinor = xMinorSpacing * (i + 0.5);
             let xMajor = xMajorSpacing * i;
 
-            if ((xMinor >= this.minDisplay) && (xMinor <= this.maxDisplay) && isFinite(xMinor)) {
-                let minorParentX = (xMinor - this.x0 + this.offset) / span;
-
-                let display = this.clip ? true : (minorParentX >= 0 && minorParentX <= 1);
-                
-                if (display) {
-                    if (this.invert) {
-                        minorParentX = 1 - minorParentX;
-                    }
-
-                    let str = Axis.formatValue(xMinor + this.startFrom, this._maxTextLength);
-                    let textMinor = this.labelCache.get(xMinor + '_' + str, () => this.createLabel(str));
-
-                    let c = this._color;
-                    textMinor.setColor(c[0], c[1], c[2], minorAlpha);
-                    textMinor.opacity = minorAlpha;
-
-                    if (yMode) {
-                        textMinor.layoutParentY = minorParentX;
-                    } else {
-                        textMinor.layoutParentX = minorParentX;
-                    }
-                }
-
-            }
-
-            if ((xMajor >= this.minDisplay) && (xMajor <= this.maxDisplay) && isFinite(xMajor)) {
-                let majorParentX = (xMajor - this.x0 + this.offset) / span;
-
-                let display = this.clip ? true : (majorParentX >= 0 && majorParentX <= 1);
-
-                if (display) {
-                    if (this.invert) {
-                        majorParentX = 1 - majorParentX;
-                    }
-
-                    let str = Axis.formatValue(xMajor + this.startFrom, this._maxTextLength);
-                    let textMajor = this.labelCache.get(xMajor + '_' + str, () => this.createLabel(str));
-
-                    let c = this._color;
-                    textMajor.setColor(c[0], c[1], c[2], 1);
-
-                    if (yMode) {
-                        textMajor.layoutParentY = majorParentX;
-                    } else {
-                        textMajor.layoutParentX = majorParentX;
-                    }
-                }
-            }
+            this.touchLabel(xMinor, minorAlpha, span, yMode);
+            this.touchLabel(xMajor, 1, span, yMode);
         }
 
         this.labelCache.removeUnused(this.deleteLabel);
         this._labelsNeedUpdate = false;
+    }
+
+    protected touchLabel(x: number, alpha: number, span: number, yMode: boolean) {
+        if ((x >= this.minDisplay) && (x <= this.maxDisplay) && isFinite(x)) {
+            let parentX = (x - this.x0 + this.offset) / span;
+
+            let display = this.clip ? true : (parentX >= 0 && parentX <= 1);
+
+            if (display) {
+                if (this.invert) {
+                    parentX = 1 - parentX;
+                }
+
+                let str = Axis.formatValue(x + this.startFrom, this._maxTextLength);
+                let textMinor = this.labelCache.get(x + '_' + str, () => this.createLabel(str));
+
+                let c = this._color;
+                textMinor.setColor(c[0], c[1], c[2], alpha);
+                textMinor.opacity = alpha;
+
+                if (yMode) {
+                    textMinor.layoutParentY = parentX;
+                } else {
+                    textMinor.layoutParentX = parentX;
+                }
+            }
+        }
     }
 
     protected createLabel = (str: string) => {

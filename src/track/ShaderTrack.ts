@@ -7,9 +7,10 @@ import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { TrackObject } from "./TrackObject";
 
-/**
- * - to use, override constructTileNode()
- */
+interface CustomTileNode<Payload> {
+    new(): ShaderTile<Payload>;
+}
+
 export class ShaderTrack<
     Model extends TrackModel,
     Loader extends TileLoader<TilePayload, any>,
@@ -26,13 +27,11 @@ export class ShaderTrack<
     protected densityMultiplier = 1.0;
     protected _pixelRatio: number = window.devicePixelRatio || 1;
 
-    constructor(model: Model) {
+    constructor(model: Model, protected customTileNodeClass: CustomTileNode<TilePayload>) {
         super(model);
     }
 
-    protected constructTileNode() { return new TileNode<TilePayload>(); }
-
-    protected _tileNodeCache = new UsageCache<TileNode<TilePayload>>();
+    protected _tileNodeCache = new UsageCache<ShaderTile<TilePayload>>();
 
     protected updateDisplay() {
         const x0 = this.x0;
@@ -122,21 +121,21 @@ export class ShaderTrack<
         this.displayNeedUpdate = false;
     }
 
-    protected createTileNode = (): TileNode<TilePayload> => {
+    protected createTileNode = (): ShaderTile<TilePayload> => {
         // create empty tile node
-        let tileNode = this.constructTileNode();
+        let tileNode = new this.customTileNodeClass();
         tileNode.mask = this;
         this.add(tileNode);
         return tileNode;
     }
 
-    protected deleteTileNode = (tileNode: TileNode<TilePayload>) => {
+    protected deleteTileNode = (tileNode: ShaderTile<TilePayload>) => {
         tileNode.setTile(null); // ensure cleanup is performed
         tileNode.releaseGPUResources();
         this.remove(tileNode);
     }
 
-    protected updateTileNode(tileNode: TileNode<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number) {
+    protected updateTileNode(tileNode: ShaderTile<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number) {
         tileNode.layoutParentX = (tile.x - x0) / span;
         tileNode.layoutW = tile.span / span;
         tileNode.layoutH = 1;
@@ -144,7 +143,7 @@ export class ShaderTrack<
         tileNode.setTile(tile);
     }
 
-    protected tileNodeIsOpaque(tileNode: TileNode<any>) {
+    protected tileNodeIsOpaque(tileNode: ShaderTile<any>) {
         return (tileNode.render === true) &&
             (tileNode.opacity >= 1) &&
             (tileNode.getTile().state === TileState.Complete);
@@ -152,7 +151,7 @@ export class ShaderTrack<
 
 }
 
-export class TileNode<TilePayload> extends Object2D {
+export class ShaderTile<TilePayload> extends Object2D {
 
     set opacity(opacity: number) {
         this._opacity = opacity;

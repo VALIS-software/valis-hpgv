@@ -8,7 +8,7 @@ import Object2D from "engine/ui/Object2D";
 import SharedResources from "engine/SharedResources";
 import { Text } from "engine/ui/Text";
 import { OpenSansRegular } from "../../ui/font/Fonts";
-import { ShaderTrack, TileNode } from "../ShaderTrack";
+import { ShaderTrack, ShaderTile } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
 
@@ -17,12 +17,8 @@ export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileL
     protected densityMultiplier = 2.0;
  
     constructor(model: SequenceTrackModel) {
-        super(model);
+        super(model, SequenceTile);
         this.color.set([0, 0, 0, 1]);
-    }
-
-    protected constructTileNode() {
-        return new SequenceTile();
     }
 
 }
@@ -35,7 +31,7 @@ const NUCLEOBASE_T_COLOR = new Float32Array([0.200, 0.200, 0.404, 1.0]); // #333
 const NUCLEOBASE_C_COLOR = new Float32Array([0.043, 0.561, 0.608, 1.0]); // #0B8F9B;
 const NUCLEOBASE_G_COLOR = new Float32Array([0.071, 0.725, 0.541, 1.0]); // #12B98A;
 
-class SequenceTile extends TileNode<SequenceTilePayload> {
+class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;

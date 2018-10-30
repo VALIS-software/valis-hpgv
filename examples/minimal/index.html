@@ -16,8 +16,14 @@
     let browser = new GenomeBrowser(
         './manifest.json',
         {
-            panels: [{ location: { contig: 'chr1', x0: 0, x1: 249e6 } }],
-            tracks: [{ model: { name: 'GRCh38', type: 'sequence' }, heightPx: 100 }],
+            panels: [ {
+                location: { contig: 'chr1', x0: 0, x1: 249e6 }
+            }],
+            tracks: [{
+                type: 'signal',
+                name: 'Signal',
+                path: 'bigwig-test/ENCFF000WGM.bigWig',
+            }],
         }
     );
 

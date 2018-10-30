@@ -5,7 +5,11 @@
  */
 export type TrackModel = {
     type: string,
+
+    // display properties
     name: string,
+    heightPx?: number,
+
     [field: string]: any,
 };
 

@@ -2,7 +2,7 @@
     "contigs": [{
         "id": "chr1",
         "name": "Test Contig",
-        "start": 10,
-        "length": 100 
+        "startIndex": 0,
+        "span": 249e6
     }]
 }

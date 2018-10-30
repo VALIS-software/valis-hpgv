@@ -116,7 +116,9 @@ export class TrackViewer extends Object2D {
     }
 
     // track-viewer state deltas
-    addTrack(model: TrackModel, heightPx: number = 50, animate: boolean = true): Track {
+    addTrack(model: TrackModel, animate: boolean = true): Track {
+        let heightPx = model.heightPx != null ? model.heightPx : 50;
+
         // create a track and add the header element to the grid
         let track: Track = new Track(
             model,
@@ -342,7 +344,7 @@ export class TrackViewer extends Object2D {
         let tracks: TrackViewerConfiguration['tracks'] = new Array();
         for (let track of this.tracks) {
             tracks.push({
-                model: track.model,
+                ...track.model,
                 heightPx: track.heightPx,
             });
         }
@@ -403,7 +405,7 @@ export class TrackViewer extends Object2D {
 
         // create rows
         for (let track of state.tracks) {
-            this.addTrack(track.model, track.heightPx, false);
+            this.addTrack(track, false);
         }
 
         this.layoutTrackRows(false);

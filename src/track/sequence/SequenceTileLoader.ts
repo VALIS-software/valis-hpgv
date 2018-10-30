@@ -27,7 +27,7 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
         protected readonly model: SequenceTrackModel,
         protected readonly contig: string
     ) {
-        super(1024, 8);
+        super(2048, 32);
 
         // preload low-resolution data when we know the size of the contig
         dataSource.getContigs().then((contigs) => {

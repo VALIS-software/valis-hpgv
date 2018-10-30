@@ -144,8 +144,8 @@ export class AppCanvas extends React.Component<Props, State> {
         const style : React.CSSProperties = {
             position: 'relative', 
             overflow: 'hidden',
-            width: canvasWidth,
-            height: canvasHeight,
+            width: this.props.width + 'px',
+            height: this.props.height + 'px',
             ...(this.props.style || {})
         };
         return (

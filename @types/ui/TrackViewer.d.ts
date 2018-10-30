@@ -27,7 +27,7 @@ export declare class TrackViewer extends Object2D {
     protected addPanelButton: ReactObject;
     protected dataSource: InternalDataSource;
     constructor();
-    addTrack(model: TrackModel, heightPx?: number, animate?: boolean): Track;
+    addTrack(model: TrackModel, animate?: boolean): Track;
     closeTrack(track: Track, animate?: boolean, onComplete?: () => void): void;
     addPanel(location: GenomicLocation, animate?: boolean): void;
     closePanel(panel: Panel, animate?: boolean, onComplete?: () => void): void;

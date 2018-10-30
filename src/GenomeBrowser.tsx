@@ -78,8 +78,8 @@ export class GenomeBrowser {
         return this.trackViewer.getConfiguration();
     }
 
-    addTrack(model: TrackModel, heightPx: number = 50, animateIn: boolean = true) {
-        return this.trackViewer.addTrack(model, heightPx, animateIn);
+    addTrack(model: TrackModel, animateIn: boolean = true) {
+        return this.trackViewer.addTrack(model, animateIn);
     }
 
     closeTrack(track: Track, animateOut: boolean = true, onComplete: () => void) {

@@ -17,7 +17,8 @@
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
     "engine": "github:VALIS-software/Engine",
-    "genomics-formats": "github:VALIS-software/Genomics-Formats"
+    "genomics-formats": "github:VALIS-software/Genomics-Formats",
+    "bigwig-reader": "^1.0.6"
   },
   "devDependencies": {
     "@types/node": "10.11.7",

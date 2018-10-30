@@ -13,20 +13,26 @@
 <script src="../../dist/index.js"></script>
 
 <script>
-    let browser = new GenomeBrowser(
-        './manifest.json',
-        {
-            panels: [ {
-                location: { contig: 'chr1', x0: 0, x1: 249e6 }
-            }],
-            tracks: [{
-                type: 'signal',
-                name: 'Signal',
-                path: 'bigwig-test/ENCFF000WGM.bigWig',
-            }],
-        }
-    );
+    let config = {
+        panels: [{
+            location: { contig: 'chr1', x0: 0, x1: 249e6 }
+        }],
+        tracks: [{
+            type: 'signal',
+            name: 'Signal',
+            path: 'bigwig-test/ENCFF000WGM.bigWig',
+        }, {
+            type: 'signal',
+            name: 'Signal',
+            path: 'bigwig-test/ENCFF000WGM.bigWig',
+        }],
+    };
 
+    if (window.location.hash) {
+        config = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
+    }
+
+    let browser = new GenomeBrowser('./manifest.json', config);
     let container = document.getElementById('root');
 
     window.addEventListener('resize', update);
@@ -39,4 +45,9 @@
             height: window.innerHeight
         }), container);
     }
+
+    function saveState() {
+        window.history.replaceState(null, null, '#' + JSON.stringify(browser.getConfiguration()));
+    }
+
 </script>

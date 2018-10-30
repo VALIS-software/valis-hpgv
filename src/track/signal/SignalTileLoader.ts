@@ -38,7 +38,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         protected readonly model: SignalTrackModel,
         protected readonly contig: string
     ) {
-        super(1024, 8);
+        super(2048, 32);
 
         this.bigWigLoader = new AxiosDataLoader(model.path);
         this.bigWigReader = new BigWigReader(this.bigWigLoader);

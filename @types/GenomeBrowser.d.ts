@@ -27,7 +27,7 @@ export declare class GenomeBrowser {
     setDataSource(dataSourceArg: IDataSource | string): void;
     setConfiguration(configuration: GenomeBrowserConfiguration): void;
     getConfiguration(): import("./ui/TrackViewerConfiguration").TrackViewerConfiguration;
-    addTrack(model: TrackModel, heightPx?: number, animateIn?: boolean): Track;
+    addTrack(model: TrackModel, animateIn?: boolean): Track;
     closeTrack(track: Track, animateOut: boolean, onComplete: () => void): void;
     getTracks(): Track[];
     getPanels(): Set<import("./ui/Panel").Panel>;

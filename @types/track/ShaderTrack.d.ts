@@ -3,23 +3,23 @@ import Object2D from "engine/ui/Object2D";
 import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { TrackObject } from "./TrackObject";
-/**
- * - to use, override constructTileNode()
- */
+interface CustomTileNode<Payload> {
+    new (): ShaderTile<Payload>;
+}
 export declare class ShaderTrack<Model extends TrackModel, Loader extends TileLoader<TilePayload, any>, TilePayload = any> extends TrackObject<Model, Loader> {
+    protected customTileNodeClass: CustomTileNode<TilePayload>;
     pixelRatio: number;
     protected densityMultiplier: number;
     protected _pixelRatio: number;
-    constructor(model: Model);
-    protected constructTileNode(): TileNode<TilePayload>;
-    protected _tileNodeCache: UsageCache<TileNode<TilePayload>>;
+    constructor(model: Model, customTileNodeClass: CustomTileNode<TilePayload>);
+    protected _tileNodeCache: UsageCache<ShaderTile<TilePayload>>;
     protected updateDisplay(): void;
-    protected createTileNode: () => TileNode<TilePayload>;
-    protected deleteTileNode: (tileNode: TileNode<TilePayload>) => void;
-    protected updateTileNode(tileNode: TileNode<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number): void;
-    protected tileNodeIsOpaque(tileNode: TileNode<any>): boolean;
+    protected createTileNode: () => ShaderTile<TilePayload>;
+    protected deleteTileNode: (tileNode: ShaderTile<TilePayload>) => void;
+    protected updateTileNode(tileNode: ShaderTile<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number): void;
+    protected tileNodeIsOpaque(tileNode: ShaderTile<any>): boolean;
 }
-export declare class TileNode<TilePayload> extends Object2D {
+export declare class ShaderTile<TilePayload> extends Object2D {
     opacity: number;
     displayLodLevel: number;
     protected _opacity: number;

@@ -187,9 +187,8 @@ export class Axis extends Object2D {
 
         let yMode: boolean = this.isYMode();
 
-        const tickSpacingPx = this.tickSpacingPx * 2;
         const rangeWidthPx = yMode ? this.computedHeight : this.computedWidth;
-        const tickRatio = tickSpacingPx / rangeWidthPx;
+        const tickRatio = (this.tickSpacingPx * 2) / rangeWidthPx;
         const snap = this.snap;
 
         // we're dealing in absolute space too much

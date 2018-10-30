@@ -17,6 +17,8 @@ import { SequenceTrack } from "./track/sequence/SequenceTrack";
 import { VariantTileLoader } from "./track/variant/VariantTileLoader";
 import { VariantTrack } from "./track/variant/VariantTrack";
 import { TrackObject } from "./track/TrackObject";
+import { SignalTileLoader } from "./track/signal/SignalTileLoader";
+import { SignalTrack } from "./track/signal/SignalTrack";
 
 export interface GenomeBrowserRenderProps {
     width: number,
@@ -175,5 +177,6 @@ GenomeBrowser.registerTrackType('macro-annotation', MacroAnnotationTileLoader, A
 GenomeBrowser.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
 GenomeBrowser.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
 GenomeBrowser.registerTrackType('variant', VariantTileLoader, VariantTrack);
+GenomeBrowser.registerTrackType('signal', SignalTileLoader, SignalTrack);
 
 export default GenomeBrowser;

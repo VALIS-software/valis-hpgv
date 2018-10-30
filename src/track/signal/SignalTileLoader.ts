@@ -75,7 +75,8 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         let reductionLevelToLod = (reductionLevel: number) => Math.floor(Math.log2(reductionLevel));
 
         let availableLods = bigWigHeader.zoomLevelHeaders.map((h) => reductionLevelToLod(h.reductionLevel));
-        availableLods = availableLods.sort((a, b) => a - b); // so javascript doesn't sort our numbers alphabetically 
+        availableLods = availableLods.sort((a, b) => a - b); // manual sort method so that javascript doesn't sort our numbers alphabetically X_X
+        
         // lod level 0 should always be available
         if (availableLods[0] !== 0) availableLods.unshift(0);
 
@@ -87,7 +88,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
         const diffLowerLimit = 2;
 
-        for (let i = 0; i < highestLod; i++) {
+        for (let i = 0; i <= highestLod; i++) {
 
             // find nearest lod either side of i
             for (let j = 0; j < availableLods.length; j++) {
@@ -107,6 +108,12 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 }
             }
 
+            // we failed to find an upper lod therefore use highest lod
+            if (lodMap[i] === undefined) {
+                lodMap[i] = highestLod;
+            }
+
+
             // find corresponding index for this lod
             let zoomHeaderEntry = bigWigHeader.zoomLevelHeaders.find((h) => reductionLevelToLod(h.reductionLevel) === lodMap[i]);
 
@@ -124,13 +131,11 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     }
 
     protected mapLodLevel(l: number) {
-        let mappedLod = this.lodMap[l];
-        if (mappedLod == null) {
+        if (l >= this.lodMap.length) {
             // l is out of range of lookup table, return the top lod
             return this.lodMap[this.lodMap.length - 1];
-        } else {
-            return mappedLod;
         }
+        return this.lodMap[l];
     }
 
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {

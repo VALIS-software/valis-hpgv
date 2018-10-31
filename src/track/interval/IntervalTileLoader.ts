@@ -43,6 +43,7 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
+        /*
         // @! generate random interval for testing
         let n = 100;
         let intervals = new Float32Array(n * 2);
@@ -53,6 +54,7 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
             intervals[i * 2 + 1] = length;
         }
         return intervals;
+        */
 
         // @! quality improvement; reduce perception of shivering when zooming in
 

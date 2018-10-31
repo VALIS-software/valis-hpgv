@@ -1,4 +1,5 @@
 examples/
 webpack.config.js
 tsconfig.js
+update-dist.sh
 .gitignore

@@ -112,6 +112,8 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected macro: boolean = false;
 
+    static cacheKey(model: AnnotationTrackModel): string { return null; }
+
     constructor(
         protected readonly dataSource: IDataSource,
         protected readonly model: AnnotationTrackModel,
@@ -134,6 +136,8 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected annotationCache: AnnotationTileLoader;
+
+    static cacheKey(model: MacroAnnotationTrackModel): string { return null; }
 
     constructor(
         protected readonly dataSource: IDataSource,

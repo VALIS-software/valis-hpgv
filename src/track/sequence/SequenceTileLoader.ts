@@ -22,6 +22,8 @@ export type SequenceTilePayload = TilePayload;
 
 export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
 
+    static cacheKey(model: SequenceTrackModel): string { return null; }
+
     constructor(
         protected readonly dataSource: IDataSource,
         protected readonly model: SequenceTrackModel,

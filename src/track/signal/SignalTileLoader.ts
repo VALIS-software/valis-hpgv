@@ -33,6 +33,10 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     protected bigWigLoader: AxiosDataLoader;
     protected bigWigReader: BigWigReader;
 
+    static cacheKey(model: SignalTrackModel) {
+        return model.path;
+    }
+
     constructor(
         protected readonly dataSource: IDataSource,
         protected readonly model: SignalTrackModel,

@@ -23,7 +23,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
     protected pointerOverTrack = false;
 
     constructor(model: VariantTrackModel) {
-        super(model, JSON.stringify(model.query));
+        super(model);
 
         this.addInteractionListener('pointerenter', (e) => {
             this.pointerOverTrack = true;

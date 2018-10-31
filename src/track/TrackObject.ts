@@ -30,7 +30,7 @@ export class TrackObject<
 
     protected displayNeedUpdate = true;
 
-    constructor(protected readonly model: ModelType, protected readonly tileDataKey?: string) {
+    constructor(protected readonly model: ModelType) {
         super(0, 0, [0.1, 0.1, 0.1, 1]);
 
         this.cursorStyle = this.defaultCursor;
@@ -145,7 +145,7 @@ export class TrackObject<
     }
 
     protected getTileLoader(): TileLoaderType {
-        return this.dataSource.getTileLoader(this.model, this.contig, this.tileDataKey) as any;
+        return this.dataSource.getTileLoader(this.model, this.contig) as any;
     }
 
     protected _pendingTiles = new UsageCache<Tile<any>>();

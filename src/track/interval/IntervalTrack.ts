@@ -15,7 +15,7 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
     blendEnabled: boolean = true;
 
     constructor(model: IntervalTrackModel) {
-        super(model, model.tileCacheType + ':' + JSON.stringify(model.query));
+        super(model);
         this.setBlendMode(model.blendEnabled);
     }
 

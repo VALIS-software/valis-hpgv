@@ -30,6 +30,9 @@ export interface GenomeBrowserRenderProps {
 
 interface CustomTileLoader<ModelType> {
     new(dataSource: IDataSource, model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
+
+    // produce a key differentiates models that require a separate tile loader / data cache instance
+    cacheKey (model: ModelType): string | null;
 }
 
 interface CustomTrackObject {

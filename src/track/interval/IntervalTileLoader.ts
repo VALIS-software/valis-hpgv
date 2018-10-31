@@ -18,6 +18,10 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
     readonly microLodThreshold = 3;
     readonly macroLodLevel = 10;
 
+    static cacheKey(model: IntervalTrackModel): string {
+        return model.tileCacheType + ':' + JSON.stringify(model.query);
+    }
+
     constructor(
         protected readonly dataSource: IDataSource,
         protected readonly model: IntervalTrackModel,

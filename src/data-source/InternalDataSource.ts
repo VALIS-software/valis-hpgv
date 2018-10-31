@@ -18,9 +18,12 @@ export class InternalDataSource {
         return this.dataSource.getContigs();
     }
 
-    getTileLoader(model: TrackModel, contig: string, differentiatingKey?: string): TileLoader<any, any> {
+    getTileLoader(model: TrackModel, contig: string): TileLoader<any, any> {
         let type = model.type;
         let key = contig;
+        let trackTypeDescriptor = GenomeBrowser.getTrackType(type);
+
+        let differentiatingKey = trackTypeDescriptor.tileLoaderClass.cacheKey(model);
 
         if (differentiatingKey != null) {
             key += '\x1f' + differentiatingKey;
@@ -33,9 +36,7 @@ export class InternalDataSource {
 
         let tileLoader = tileCaches[key];
         if (tileLoader === undefined) {
-
-            let trackDescriptor = GenomeBrowser.getTrackType(type);
-            tileCaches[key] = tileLoader = new trackDescriptor.tileLoaderClass(this.dataSource, model, contig);
+            tileCaches[key] = tileLoader = new trackTypeDescriptor.tileLoaderClass(this.dataSource, model, contig);
 
             // set maximumX when we have access to contig info
             this.dataSource.getContigs().then((contigInfoArray) => {

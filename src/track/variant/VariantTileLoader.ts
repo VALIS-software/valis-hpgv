@@ -11,6 +11,10 @@ export type VariantTilePayload = Array<{
 
 export class VariantTileLoader extends TileLoader<VariantTilePayload, void> {
 
+    static cacheKey(model: VariantTrackModel) {
+        return JSON.stringify(model.query);
+    }
+
     constructor(
         protected readonly dataSource: IDataSource,
         protected readonly model: VariantTrackModel,

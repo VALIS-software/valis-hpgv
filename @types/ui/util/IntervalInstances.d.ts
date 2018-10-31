@@ -2,11 +2,15 @@ import GPUDevice, { AttributeLayout, VertexAttributeBuffer } from "engine/render
 import { DrawContext } from "engine/rendering/Renderer";
 import Object2DInstances from "engine/ui/Object2DInstances";
 export declare type IntervalInstance = {
-    xFractional: number;
+    x: number;
     y: number;
     z: number;
-    wFractional: number;
+    relativeX: number;
+    relativeY: number;
+    w: number;
     h: number;
+    relativeW: number;
+    relativeH: number;
     color: Array<number>;
 };
 export declare class IntervalInstances extends Object2DInstances<IntervalInstance> {

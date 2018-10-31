@@ -5,7 +5,7 @@ let browser = new GenomeBrowser(
     './manifest.json',
     {
         panels: [{ location: { contig: 'chr1', x0: 0, x1: 249e6 } }],
-        tracks: [{ model: { name: 'GRCh38', type: 'sequence' }, heightPx: 100 }],
+        tracks: [{ name: 'GRCh38', type: 'sequence' }],
     }
 );
 

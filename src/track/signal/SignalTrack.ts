@@ -151,7 +151,7 @@ class SignalTile extends ShaderTile<SignalTilePayload> {
             vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y); // * vec3( 1., 0., 0. );
             #endif
             
-            float debug = step((1.0 - vUv.y) * size.y, 10.);
+            float debug = step((1.0 - vUv.y) * size.y, 5.);
             
             gl_FragColor = vec4(
                 mix(

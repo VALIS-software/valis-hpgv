@@ -17,6 +17,7 @@ export declare class IntervalTileLoader extends TileLoader<TilePayload, void> {
     protected readonly contig: string;
     readonly microLodThreshold: number;
     readonly macroLodLevel: number;
+    static cacheKey(model: IntervalTrackModel): string;
     constructor(dataSource: IDataSource, model: IntervalTrackModel, contig: string, tileSize?: number);
     protected mapLodLevel(l: number): 0 | 10;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;

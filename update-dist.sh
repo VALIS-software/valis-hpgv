@@ -1,0 +1,1 @@
+npm run prod && git add dist @types && git commit -m "Update generated"

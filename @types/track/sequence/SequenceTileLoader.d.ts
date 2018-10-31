@@ -20,6 +20,7 @@ export declare class SequenceTileLoader extends TileLoader<TilePayload, BlockPay
     protected readonly dataSource: IDataSource;
     protected readonly model: SequenceTrackModel;
     protected readonly contig: string;
+    static cacheKey(model: SequenceTrackModel): string;
     constructor(dataSource: IDataSource, model: SequenceTrackModel, contig: string);
     protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<{

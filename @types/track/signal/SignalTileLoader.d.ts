@@ -27,6 +27,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected lodZoomIndexMap: Array<number | null>;
     protected bigWigLoader: AxiosDataLoader;
     protected bigWigReader: BigWigReader;
+    static cacheKey(model: SignalTrackModel): string;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
     protected onReady(): void;
     protected generateLodLookups(bigWigHeader: HeaderData): {

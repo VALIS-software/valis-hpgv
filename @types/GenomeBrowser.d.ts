@@ -15,6 +15,7 @@ export interface GenomeBrowserRenderProps {
 }
 interface CustomTileLoader<ModelType> {
     new (dataSource: IDataSource, model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
+    cacheKey(model: ModelType): string | null;
 }
 interface CustomTrackObject {
     new (model: TrackModel): TrackObject<TrackModel, any>;

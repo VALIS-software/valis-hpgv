@@ -10,7 +10,7 @@ export declare class InternalDataSource {
     };
     constructor(dataSource: IDataSource);
     getContigs(): Promise<import("../model/Contig").Contig[]>;
-    getTileLoader(model: TrackModel, contig: string, differentiatingKey?: string): TileLoader<any, any>;
+    getTileLoader(model: TrackModel, contig: string): TileLoader<any, any>;
     clearTileCache(type: string): void;
     clearTileCaches(): void;
 }

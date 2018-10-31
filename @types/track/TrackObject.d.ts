@@ -6,7 +6,6 @@ import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>> extends Rect {
     protected readonly model: ModelType;
-    protected readonly tileDataKey?: string;
     protected dataSource: InternalDataSource;
     protected contig: string | undefined;
     protected x0: number;
@@ -21,7 +20,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     protected focusRegionRectRight: Rect;
     protected loadingIndicator: LoadingIndicator;
     protected displayNeedUpdate: boolean;
-    constructor(model: ModelType, tileDataKey?: string);
+    constructor(model: ModelType);
     setDataSource(dataSource: InternalDataSource): void;
     setContig(contig: string): void;
     setRange(x0: number, x1: number): void;

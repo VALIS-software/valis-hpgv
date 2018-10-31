@@ -199,11 +199,17 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
                                 }
 
                                 instanceData.push({
-                                    xFractional: fractionX,
+                                    x: 0,
                                     y: altIndex * altHeightPx,
                                     z: 0,
-                                    wFractional: altSpan / tile.span,
+                                    w: 0,
                                     h: altHeightPx,
+
+                                    relativeX: fractionX,
+                                    relativeY: 0,
+                                    relativeW: altSpan / tile.span,
+                                    relativeH: 0,
+
                                     color: color,
                                 });
 
@@ -213,22 +219,34 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
                             // no alts were drawn so there's no handle to click, create an empty one to make them clickable
                             if (altIndex === 0) {
                                 instanceData.push({
-                                    xFractional: fractionX,
+                                    x: 0,
                                     y: 0,
                                     z: 0,
-                                    wFractional: refSpan / tile.span,
+                                    w: 0,
                                     h: altHeightPx,
+
+                                    relativeX: fractionX,
+                                    relativeY: 0,
+                                    relativeW: refSpan / tile.span,
+                                    relativeH: 0,
+
                                     color: [1, 0, 0, 0.5],
                                 });
                             }
 
                             // draw line to show reference span
                             instanceData.push({
-                                xFractional: fractionX,
+                                x: 0,
                                 y: -5,
                                 z: 0,
-                                wFractional: refSpan / tile.span,
+                                w: 0,
                                 h: 2,
+
+                                relativeX: fractionX,
+                                relativeY: 0,
+                                relativeW: refSpan / tile.span,
+                                relativeH: 0,
+
                                 color: color.slice(0, 3).concat([1]),
                             });
                         }

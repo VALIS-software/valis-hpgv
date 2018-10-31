@@ -1,7 +1,6 @@
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
 import { Object2D } from "engine/ui/Object2D";
-import GenomeBrowser from "../../GenomeBrowser";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { Tile, TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
@@ -11,16 +10,9 @@ import { IntervalTrackModel } from "./IntervalTrackModel";
 type TilePayload = Float32Array;
 
 export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileLoader> {
-    
-    blendEnabled: boolean = true;
 
     constructor(model: IntervalTrackModel) {
         super(model);
-        this.setBlendMode(model.blendEnabled);
-    }
-
-    setBlendMode(enabled: boolean) {
-        this.blendEnabled = enabled;
     }
 
     protected _pendingTiles = new UsageCache<Tile<any>>();
@@ -80,18 +72,22 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         // decrease opacity at large lods to prevent white-out as interval cluster together and overlap
         let e = 2;
         let t = Math.pow((Math.max(continuousLodLevel - 2, 0) / 15), e);
-        node.opacity = this.blendEnabled ? Scalar.lerp(1, 0.1, Scalar.clamp(t, 0, 1)) : 1.0;
+        node.opacity = Scalar.lerp(1, 0.1, Scalar.clamp(t, 0, 1));
 
         this._onStage.get(tileKey, () => {
             this.add(node);
             return node;
         });
+
+        return node;
     }
     
     protected createTileNode(tile: Tile<TilePayload>) {
         let nIntervals = tile.payload.length * 0.5;
 
         let instanceData = new Array<IntervalInstance>(nIntervals);
+
+        let yPadding = 5;
 
         for (let i = 0; i < nIntervals; i++) {
             let intervalStartIndex = tile.payload[i * 2 + 0];
@@ -100,11 +96,15 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
             let fractionX = (intervalStartIndex - tile.x) / tile.span
             let wFractional = intervalSpan / tile.span;
             instanceData[i] = {
-                xFractional: fractionX,
-                wFractional: wFractional,
-                y: 0,
+                x: 0,
+                y: yPadding,
                 z: 0,
-                h: 35,
+                w: 0,
+                h: - 2 * yPadding,
+                relativeX: fractionX,
+                relativeY: 0,
+                relativeW: wFractional,
+                relativeH: 1.0,
                 color: [74/0xff, 52/0xff, 226/0xff, 0.66],
             };
         }
@@ -112,8 +112,9 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         let instancesTile = new IntervalInstances(instanceData);
         instancesTile.minWidth = 0.5;
         instancesTile.blendFactor = 0.2; // nearly full additive
-        instancesTile.y = 5;
+        instancesTile.y = 0;
         instancesTile.mask = this;
+        instancesTile.layoutH = 1;
 
         return instancesTile;
     }

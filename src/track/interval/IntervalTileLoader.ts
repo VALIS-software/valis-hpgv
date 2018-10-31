@@ -19,7 +19,7 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
     readonly macroLodLevel = 10;
 
     static cacheKey(model: IntervalTrackModel): string {
-        return model.tileCacheType + ':' + JSON.stringify(model.query);
+        return null;
     }
 
     constructor(
@@ -43,9 +43,20 @@ export class IntervalTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
-        // @! quality improvement; reduce perception of shivering when zooming in
-        // if lod level = 0 and a macro track exists that covers this tile then we can filter that tile to get the lod 0 tile (so no network request or promise)
+        // @! generate random interval for testing
+        let n = 100;
+        let intervals = new Float32Array(n * 2);
+        for (let i = 0; i < n; i++) {
+            let start = Math.random() * tile.span + tile.x;
+            let length = Math.random() * 1000;
+            intervals[i * 2 + 0] = start;
+            intervals[i * 2 + 1] = length;
+        }
+        return intervals;
 
+        // @! quality improvement; reduce perception of shivering when zooming in
+
+        // if lod level = 0 and a macro track exists that covers this tile then we can filter that tile to get the lod 0 tile (so no network request or promise)
         /*
         let startBase = tile.x + 1;
         let endBase = startBase + tile.span;

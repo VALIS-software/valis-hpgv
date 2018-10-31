@@ -115,11 +115,18 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     let height = gene.transcriptCount * 20 + (gene.transcriptCount - 1) * 10 + 60;
 
                     instanceData.push({
-                        xFractional: (gene.startIndex - tile.x) / tile.span,
+                        x: 0,
                         y: 0,
                         z: 0,
-                        wFractional: gene.length / tile.span,
+                        w: 0,
                         h: height,
+
+                        relativeX: (gene.startIndex - tile.x) / tile.span,
+                        relativeY: 0,
+
+                        relativeW: gene.length / tile.span,
+                        relativeH: 0,
+
                         color: color,
                     });
                 }

@@ -4,8 +4,16 @@ import SharedResources from "engine/SharedResources";
 import Object2DInstances from "engine/ui/Object2DInstances";
 
 export type IntervalInstance = {
-    xFractional: number, y: number, z: number,
-    wFractional: number, h: number,
+    // position in pixels (dom units)
+    x: number, y: number, z: number,
+    // fractional position relative to the IntervalInstances object
+    relativeX: number, relativeY: number,
+
+    // size in pixels (dom units)
+    w: number, h: number,
+    // fractional size relative to the IntervalInstances object
+    relativeW: number, relativeH: number,
+
     color: Array<number>,
 };
 
@@ -22,13 +30,15 @@ export class IntervalInstances extends Object2DInstances<IntervalInstance> {
                 { name: 'position', type: AttributeType.VEC2 }
             ],
             [
-                { name: 'instancePosition', type: AttributeType.VEC3 },
-                { name: 'instanceSize', type: AttributeType.VEC2 },
+                { name: 'instanceAbsPosition', type: AttributeType.VEC3 },
+                { name: 'instanceRelPosition', type: AttributeType.VEC2 },
+                { name: 'instanceSize', type: AttributeType.VEC4 },
                 { name: 'instanceColor', type: AttributeType.VEC4 },
             ],
             {
-                'instancePosition': (inst: IntervalInstance) => [inst.xFractional, inst.y, inst.z],
-                'instanceSize': (inst: IntervalInstance) => [inst.wFractional, inst.h],
+                'instanceAbsPosition': (inst: IntervalInstance) => [inst.x, inst.y, inst.z],
+                'instanceRelPosition': (inst: IntervalInstance) => [inst.relativeX, inst.relativeY],
+                'instanceSize': (inst: IntervalInstance) => [inst.w, inst.h, inst.relativeW, inst.relativeH],
                 'instanceColor': (inst: IntervalInstance) => inst.color,
             }
         );
@@ -78,8 +88,10 @@ export class IntervalInstances extends Object2DInstances<IntervalInstance> {
             uniform vec2 groupSize;
 
             // per instance attributes
-            attribute vec3 instancePosition;
-            attribute vec2 instanceSize;
+            attribute vec3 instanceAbsPosition;
+            attribute vec2 instanceRelPosition;
+
+            attribute vec4 instanceSize;
             attribute vec4 instanceColor;
 
             varying vec2 vUv;
@@ -91,10 +103,14 @@ export class IntervalInstances extends Object2DInstances<IntervalInstance> {
                 vUv = position;
 
                 // yz are absolute domPx units, x is in fractions of groupSize
-                vec3 pos = vec3(groupSize.x * instancePosition.x, instancePosition.yz);
-                size = vec2(groupSize.x * instanceSize.x, instanceSize.y);
+                vec3 pos = vec3(
+                    instanceAbsPosition.xy + instanceRelPosition.xy * groupSize.xy,
+                    instanceAbsPosition.z
+                );
 
-                // apply a minimum size
+                size = vec2(instanceSize.xy + instanceSize.zw * groupSize.xy);
+
+                // apply a minimum width
                 size.x = max(size.x, minWidth);
 
                 color = instanceColor;

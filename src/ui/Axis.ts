@@ -55,6 +55,16 @@ export class Axis extends Object2D {
     get color() {
         return this._color;
     }
+    
+    protected _mask: Renderable<any>;
+    set mask(v: Renderable<any>) {
+        this._mask = v;
+        this.resetLabels();
+    }
+
+    get mask() {
+        return this._mask;
+    }
 
     minDisplay: number = -Infinity;
     maxDisplay: number = Infinity;
@@ -171,6 +181,8 @@ export class Axis extends Object2D {
     }
 
     protected resetLabels() {
+        if (this.labelCache === undefined) return;
+
         this.labelCache.removeAll(this.deleteLabel);
         this._labelsNeedUpdate = true;
     }
@@ -271,7 +283,7 @@ export class Axis extends Object2D {
                 break;
         }
         label.z = 0.1;
-        label.setMask(this.clippingMask);
+        label.setMask(this.clippingMask || this._mask);
         this.add(label);
         return label;
     }

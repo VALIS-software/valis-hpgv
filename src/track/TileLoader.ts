@@ -99,7 +99,13 @@ export class TileLoader<TilePayload, BlockPayload> {
         let lodDensity = Math.pow(2, lodLevel);
         let x_lodSpace = Math.floor(x / lodDensity);
 
-        return this.getTileFromLodX(lodLevel, x_lodSpace, requestData);
+        let tile = this.getTileFromLodX(lodLevel, x_lodSpace, requestData);
+
+        if (requestData && (tile.state === TileState.Empty)) {
+            this.loadTilePayload(tile);
+        }
+
+        return tile;
     }
 
     isWithinInitializedLodRange(samplingDensity: number) {
@@ -162,33 +168,46 @@ export class TileLoader<TilePayload, BlockPayload> {
 
         let tile = block.rows[rowIndex];
 
-        if (requestData && (tile.state === TileState.Empty)) {
-            this.loadTilePayload(tile);
-        }
-
         return tile;
     }
 
+    private activeRequests = 0;
+    private loadTileQueue = new Array<Tile<TilePayload>>();
+    readonly requestBatchLimit = 4;
+
     private loadTilePayload(tile: Tile<TilePayload>) {
         const tileInternal = tile as any as TileInternal<TilePayload>;
-
         tileInternal._state = TileState.Loading;
-
-        try {
-            let result = this.getTilePayload(tile);
-
-            if (Promise.resolve(result) === result) {
-                // result is a promise
-                result
-                    .then((payload) => this.tileLoadComplete(tile, payload))
-                    .catch((reason) => this.tileLoadFailed(tile, reason));
-            } else {
-                // assume result is the payload
-                this.tileLoadComplete(tile, result as TilePayload);
+        
+        if (this.activeRequests < this.requestBatchLimit) {
+            this.activeRequests++;
+            try {
+                let result = this.getTilePayload(tile);
+    
+                if (Promise.resolve(result) === result) {
+                    // result is a promise
+                    result
+                        .then((payload) => this.tileLoadComplete(tile, payload))
+                        .catch((reason) => this.tileLoadFailed(tile, reason));
+                } else {
+                    // assume result is the payload
+                    this.tileLoadComplete(tile, result as TilePayload);
+                }
+            } catch(e) {
+                this.tileLoadFailed(tile, e);
             }
-        } catch(e) {
-            this.tileLoadFailed(tile, e);
+        } else {
+            this.enqueueLoadTilePayload(tile);
         }
+    }
+
+    private enqueueLoadTilePayload(tile: Tile<TilePayload>) {
+        let idx = this.loadTileQueue.indexOf(tile);
+        if (idx !== -1) {
+            this.loadTileQueue.splice(idx, 1);
+        }
+        this.loadTileQueue.push(tile);
+        console.log('enqueue', tile, this.loadTileQueue.length);
     }
 
     private tileLoadComplete(tile: Tile<TilePayload>, payload: TilePayload) {
@@ -196,6 +215,7 @@ export class TileLoader<TilePayload, BlockPayload> {
         tileInternal._payload = payload;
         tileInternal._state = TileState.Complete;
         tileInternal.emitComplete();
+        this.tileLoadEnd(tile);
     }
 
     private tileLoadFailed(tile: Tile<TilePayload>, reason: any) {
@@ -203,6 +223,18 @@ export class TileLoader<TilePayload, BlockPayload> {
         tileInternal._state = TileState.Empty;
         tileInternal.emitLoadFailed(reason);
         console.warn(`Tile payload request failed: ${reason}`, tile);
+        this.tileLoadEnd(tile);
+    }
+
+    private tileLoadEnd(tile: Tile<TilePayload>) {
+        this.activeRequests--;
+        console.log('tileLoadEnd', this.activeRequests);
+
+        if (this.loadTileQueue.length > 0) {
+            let queuedTile = this.loadTileQueue.pop();
+            console.log('dequeue and load', queuedTile);
+            this.loadTilePayload(queuedTile);
+        }
     }
 
     private getBlock(lodLevel: number, blockIndex: number) {

@@ -232,10 +232,20 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                         let nChannels = 4;
                         let dataWidthPixels = payload.array.length / nChannels;
 
+                        let data: Uint8Array | Float32Array = payload.array;
+                        
+                        // convert float32array to bytes, we lose lots of precision but atleast we see something
+                        if (blockPayload.floatPacking) {
+                            data = new Uint8Array(payload.array.length);
+                            for (let i = 0; i < payload.array.length; i++) {
+                                data[i] = payload.array[i] * 0xFF;
+                            }
+                        }
+
                         gpuTexture.updateTextureData(
                             0,
                             TextureFormat.RGBA,
-                            payload.array,
+                            data,
                             0, tile.blockRowIndex, // x, y
                             Math.min(gpuTexture.w, dataWidthPixels), 1, // w, h
                         );
@@ -263,7 +273,9 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     // console.log(`%ccreate texture ${lodLevel}`, 'color: blue');
 
                     // use float packing if float textures are not supported
-                    payload.floatPacking = !device.capabilities.floatTextures;
+                    let floatSupported = device.capabilities.floatTextures && false;
+                    let linearFilteringSupported = floatSupported ? device.capabilities.floatTexturesLinearFiltering : true;
+                    payload.floatPacking = !floatSupported;
 
                     payload._gpuTexture = device.createTexture({
                         format: TextureFormat.RGBA,
@@ -277,10 +289,10 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                         mipmapData: null, //[new Uint8Array(BLOCK_SIZE * nChannels)],
                         width: tileWidth,
                         height: rows,
-                        dataType: device.capabilities.floatTextures ? TextureDataType.FLOAT : TextureDataType.UNSIGNED_BYTE,
+                        dataType: floatSupported ? TextureDataType.FLOAT : TextureDataType.UNSIGNED_BYTE,
 
                         samplingParameters: {
-                            magFilter: (lodLevel > 0 && device.capabilities.floatTexturesLinearFiltering) ? TextureMagFilter.LINEAR : TextureMagFilter.NEAREST,
+                            magFilter: (lodLevel > 0 && linearFilteringSupported) ? TextureMagFilter.LINEAR : TextureMagFilter.NEAREST,
                             minFilter: TextureMinFilter.LINEAR,
                             wrapS: TextureWrapMode.CLAMP_TO_EDGE,
                             wrapT: TextureWrapMode.CLAMP_TO_EDGE,

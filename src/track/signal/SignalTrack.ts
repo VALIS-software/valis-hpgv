@@ -47,7 +47,12 @@ export class SignalTrack extends ShaderTrack<SignalTrackModel, SignalTileLoader>
             super.updateDisplay();
         } else {
             this.toggleLoadingIndicator(true, true);
+
+            this._tileNodeCache.markAllUnused();
+            this._tileNodeCache.removeUnused(this.deleteTileNode);
+            // this.displayNeedUpdate = false;
         }
+
     }
 
 }

@@ -17,6 +17,7 @@ export class TileLoader<TilePayload, BlockPayload> {
     // cached tile data
     protected lods = new Array<Blocks<TilePayload, BlockPayload>>();
     protected readonly blockSize: number;
+    protected requestManager = new TileRequestManager(4);
 
     constructor(
         readonly tileWidth: number = 1024,
@@ -73,9 +74,8 @@ export class TileLoader<TilePayload, BlockPayload> {
             for (let rowIndex = firstRowIndex; rowIndex <= lastRowIndex; rowIndex++) {
                 let tile = block.rows[rowIndex];
 
-                if (requestData && (tile.state === TileState.Empty)) {
-                    // no data requests have been made yet for this tile
-                    this.loadTilePayload(tile);
+                if (requestData) {
+                    this.touchTileRequest(tile);
                 }
 
                 callback(tile);
@@ -101,8 +101,8 @@ export class TileLoader<TilePayload, BlockPayload> {
 
         let tile = this.getTileFromLodX(lodLevel, x_lodSpace, requestData);
 
-        if (requestData && (tile.state === TileState.Empty)) {
-            this.loadTilePayload(tile);
+        if (requestData) {
+            this.touchTileRequest(tile);
         }
 
         return tile;
@@ -156,6 +156,18 @@ export class TileLoader<TilePayload, BlockPayload> {
         return selectedLodLevel;
     }
 
+    /**
+     * Request tile if not requested, if tile loading then bump priority
+     */
+    private touchTileRequest(tile: Tile<TilePayload>) {
+        if (tile.state === TileState.Empty) {
+            // no data requests have been made yet for this tile
+            this.requestManager.loadTile(tile, (tile) => this.getTilePayload(tile));
+        } else if (tile.state === TileState.Loading) {
+            this.requestManager.bringToFrontOfQueue(tile);
+        }
+    }
+
     private getTileFromLodX(
         lodLevel: number,
         lodX: number,
@@ -169,72 +181,6 @@ export class TileLoader<TilePayload, BlockPayload> {
         let tile = block.rows[rowIndex];
 
         return tile;
-    }
-
-    private activeRequests = 0;
-    private loadTileQueue = new Array<Tile<TilePayload>>();
-    readonly requestBatchLimit = 4;
-
-    private loadTilePayload(tile: Tile<TilePayload>) {
-        const tileInternal = tile as any as TileInternal<TilePayload>;
-        tileInternal._state = TileState.Loading;
-        
-        if (this.activeRequests < this.requestBatchLimit) {
-            this.activeRequests++;
-            try {
-                let result = this.getTilePayload(tile);
-    
-                if (Promise.resolve(result) === result) {
-                    // result is a promise
-                    result
-                        .then((payload) => this.tileLoadComplete(tile, payload))
-                        .catch((reason) => this.tileLoadFailed(tile, reason));
-                } else {
-                    // assume result is the payload
-                    this.tileLoadComplete(tile, result as TilePayload);
-                }
-            } catch(e) {
-                this.tileLoadFailed(tile, e);
-            }
-        } else {
-            this.enqueueLoadTilePayload(tile);
-        }
-    }
-
-    private enqueueLoadTilePayload(tile: Tile<TilePayload>) {
-        let idx = this.loadTileQueue.indexOf(tile);
-        if (idx !== -1) {
-            this.loadTileQueue.splice(idx, 1);
-        }
-        this.loadTileQueue.push(tile);
-        console.log('enqueue', tile, this.loadTileQueue.length);
-    }
-
-    private tileLoadComplete(tile: Tile<TilePayload>, payload: TilePayload) {
-        const tileInternal = tile as any as TileInternal<TilePayload>;
-        tileInternal._payload = payload;
-        tileInternal._state = TileState.Complete;
-        tileInternal.emitComplete();
-        this.tileLoadEnd(tile);
-    }
-
-    private tileLoadFailed(tile: Tile<TilePayload>, reason: any) {
-        const tileInternal = tile as any as TileInternal<TilePayload>;
-        tileInternal._state = TileState.Empty;
-        tileInternal.emitLoadFailed(reason);
-        console.warn(`Tile payload request failed: ${reason}`, tile);
-        this.tileLoadEnd(tile);
-    }
-
-    private tileLoadEnd(tile: Tile<TilePayload>) {
-        this.activeRequests--;
-        console.log('tileLoadEnd', this.activeRequests);
-
-        if (this.loadTileQueue.length > 0) {
-            let queuedTile = this.loadTileQueue.pop();
-            console.log('dequeue and load', queuedTile);
-            this.loadTilePayload(queuedTile);
-        }
     }
 
     private getBlock(lodLevel: number, blockIndex: number) {
@@ -373,6 +319,145 @@ export class Tile<Payload> {
 
     protected emitLoadFailed(reason: string) {
         this.eventEmitter.emit('load-failed', this, reason);
+    }
+
+}
+
+/**
+ * # Tile Request Manager
+ * 
+ * If a user is navigating around then many requests may be started but the most recently started request are the highest priority as these correspond to regions currently visible
+ * Once a browser request has been created we cannot deprioritise it if we decide a new request should take precedence. To work around this we create a request stack (that's dequeued
+ * in order of the most recently enqueued).
+ * 
+ * The manager allows a small number of concurrent requests (a limitation also provided by the browser), when request finishes and slot opens up, the executed request is the one
+ * most recently pushed to the stack.
+ * 
+ * If request management is done at a global level so it potentially includes requests made by other genome browsers active at the same time.
+ */
+class TileRequestManager {
+
+    // this is allowed be changed at runtime
+    public maxActiveRequests: number;
+
+    private requestStack = new Array<{
+        tile: Tile<any>,
+        requestPayload: (tile: Tile<any>) => Promise<any> | any
+    }>();
+    private activeRequests = 0;
+
+    constructor(maxActiveRequests = 4) {
+        this.maxActiveRequests = maxActiveRequests;
+    }
+
+    public loadTile(
+        tile: Tile<any>,
+        requestPayload: (tile: Tile<any>) => Promise<any> | any
+    ) {
+        console.log('Requesting tile', tile.key, TileState[tile.state]);
+
+        if (tile.state !== TileState.Empty) {
+            console.warn(`Tile loading was requested when state was "${TileState[tile.state]} (${tile.state})" and not "Empty"`);
+            return;
+        }
+
+        this.tryLoadTile(tile, requestPayload);
+    }
+
+    public removeFromQueue(tile: Tile<any>) {
+        let idx = this.requestStack.findIndex((e) => e.tile === tile);
+        if (idx !== -1) {
+            console.log('%cTile removed from queue', 'color: orange; font-weight: bold');
+            this.requestStack.splice(idx, 1);
+        }
+
+        if (tile.state === TileState.Loading) {
+            let tileInternal = tile as any as TileInternal<any>;
+            tileInternal._state = TileState.Empty;
+        }
+    }
+
+    public bringToFrontOfQueue(tile: Tile<any>) {
+        // if a request for tile is queued, bring it to the front
+        let idx = this.requestStack.findIndex((e) => e.tile === tile);
+        if ((idx !== -1) && (idx !== this.requestStack.length - 1)) {
+            let entry = this.requestStack[idx];
+            this.requestStack.splice(idx, 1);
+            this.requestStack.push(entry);
+        }
+    }
+
+    private tryLoadTile(
+        tile: Tile<any>,
+        requestPayload: (tile: Tile<any>) => Promise<any> | any
+    ) {
+        // is this tile already queued?
+        // if so, remove it (and potentially re-queue it later)
+        this.removeFromQueue(tile);
+
+        // mark tile as in 'Loading' mode
+        let tileInternal = tile as any as TileInternal<any>;
+        tileInternal._state = TileState.Loading;
+
+        // can we load the tile immediately or should we add it to the request queue
+        if (this.activeRequests < this.maxActiveRequests) {
+            this.activeRequests++;
+
+            try {
+                let result = requestPayload(tile);
+
+                if (Promise.resolve(result) === result) {
+                    // result is a promise
+                    result
+                        .then((payload: any) => this.tileLoadComplete(tile, payload))
+                        .catch((reason: any) => this.tileLoadFailed(tile, reason));
+                } else {
+                    // assume result is the payload
+                    this.tileLoadComplete(tile, result);
+                }
+            } catch (e) {
+                this.tileLoadFailed(tile, e);
+            }
+
+        } else {
+            console.log('%cQueuing tile', 'color: purple; font-weight: bold', tile.key);
+            // no free request slots at this time, add it to the queue
+            this.requestStack.push({
+                tile: tile,
+                requestPayload: requestPayload
+            });
+        }
+    }
+
+    private tileLoadComplete(tile: Tile<any>, payload: any) {
+        const tileInternal = tile as any as TileInternal<any>;
+        tileInternal._payload = payload;
+        tileInternal._state = TileState.Complete;
+        tileInternal.emitComplete();
+        this.tileLoadEnd(tile);
+    }
+
+    private tileLoadFailed(tile: Tile<any>, reason: any) {
+        const tileInternal = tile as any as TileInternal<any>;
+        tileInternal._state = TileState.Empty;
+        tileInternal.emitLoadFailed(reason);
+        console.warn(`Tile payload request failed: ${reason}`, tile.key);
+        this.tileLoadEnd(tile);
+    }
+
+    private tileLoadEnd(tile: Tile<any>) {
+        this.activeRequests--;
+
+        if (this.requestStack.length > 0) {
+            let nextRequest = this.requestStack.pop();
+
+            console.log('%cPopping tile from queue', 'color: blue; font-weight: bold', nextRequest.tile.key);
+
+            this.tryLoadTile(
+                nextRequest.tile,
+                nextRequest.requestPayload
+            );
+        }
     }
 
 }

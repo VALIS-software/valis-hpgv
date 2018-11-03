@@ -1,7 +1,17 @@
 {
     "contigs": [{
         "id": "chr1",
-        "name": "Test Contig",
+        "name": "Chromosome 1",
+        "startIndex": 0,
+        "span": 249e6
+    },{
+        "id": "chr2",
+        "name": "Chromosome 2",
+        "startIndex": 0,
+        "span": 249e6
+    },{
+        "id": "chr3",
+        "name": "Chromosome 3",
         "startIndex": 0,
         "span": 249e6
     }]

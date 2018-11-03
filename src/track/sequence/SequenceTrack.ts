@@ -47,7 +47,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
     private _lastComputedWidth: number;
     private _lastComputedX: number;
     applyTransformToSubNodes(root?: boolean) {
-        // updateLabels depends on computedWidth and layoutX, if any of those has changed we need to call it
+        // updateLabels depends on computedWidth and relativeX, if any of those has changed we need to call it
         if (
             this.computedWidth !== this._lastComputedWidth ||
             this._lastComputedX !== this.computedX
@@ -124,10 +124,10 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
                     // determine the portion of this tile that's visible, only touch labels for this portion
                     // we assume:
-                    //     - layoutX and layoutW are used for positioning
+                    //     - relativeX and relativeW are used for positioning
                     //     - x >= 0 and x <= 1 is visible range
-                    let visibleX0 = -this.layoutParentX / this.layoutW;
-                    let visibleX1 = (1 - this.layoutParentX) / this.layoutW;
+                    let visibleX0 = -this.relativeX / this.relativeW;
+                    let visibleX1 = (1 - this.relativeX) / this.relativeW;
                     let firstVisibleBase = Scalar.clamp(Math.floor(visibleX0 / baseWidth), 0, nBases - 1);
                     let lastVisibleBase = Scalar.clamp(Math.floor(visibleX1 / baseWidth), 0, nBases - 1);
 
@@ -150,8 +150,8 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
                         }
 
                         let label = this._labelCache.get(i + '', () => this.createLabel(baseChar));
-                        label.container.layoutParentX = (i + 0.5) * baseWidth;
-                        label.container.layoutParentY = 0.5;
+                        label.container.relativeX = (i + 0.5) * baseWidth;
+                        label.container.relativeY = 0.5;
 
                         label.container.sx = label.container.sy = textSizePx;
 
@@ -170,8 +170,8 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
         let textClone = new TextClone(SequenceTile.baseTextInstances[baseCharacter], [1, 1, 1, 1]);
         textClone.additiveBlendFactor = 1.0;
 
-        textClone.layoutX = -0.5;
-        textClone.layoutY = -0.5;
+        textClone.originX = -0.5;
+        textClone.originY = -0.5;
 
         let container = new Object2D();
         container.add(textClone);

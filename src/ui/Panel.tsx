@@ -90,7 +90,7 @@ export class Panel extends Object2D {
             zIndex: 3,
             backgroundColor: '#fff',
         }
-        this.header.layoutY = -1;
+        this.header.originY = -1;
         this.header.y = -this.xAxisHeight - this.spacing.y * 0.5;
         this.add(this.header);
 
@@ -112,7 +112,7 @@ export class Panel extends Object2D {
         this.xAxis.maxDisplay = Infinity;
         this.xAxis.y = -this.spacing.y;
         this.xAxis.h = this.xAxisHeight;
-        this.xAxis.layoutY = -1;
+        this.xAxis.originY = -1;
         this.xAxis.z = 20;
         this.fillX(this.xAxis);
         this.add(this.xAxis);
@@ -120,18 +120,18 @@ export class Panel extends Object2D {
         // add solid a white background to XAxis so that content is hidden underneath
         let xAxisBg = new Rect(0, this.xAxisHeight, [1, 1, 1, 1]);
         xAxisBg.z = 10;
-        xAxisBg.layoutY = -1;
+        xAxisBg.originY = -1;
         xAxisBg.y = -this.spacing.y;
         this.fillX(xAxisBg);
         this.add(xAxisBg);
 
         this.resizeHandle = new Rect(0, 0, [1, 0, 0, 1]);
-        this.resizeHandle.layoutX = -0.5;
-        this.resizeHandle.layoutX = -0.5;
-        this.resizeHandle.layoutParentX = 1;
-        this.resizeHandle.layoutParentX = 1;
+        this.resizeHandle.originX = -0.5;
+        this.resizeHandle.originX = -0.5;
+        this.resizeHandle.relativeX = 1;
+        this.resizeHandle.relativeX = 1;
         this.resizeHandle.w = this.spacing.x;
-        this.resizeHandle.layoutH = 1;
+        this.resizeHandle.relativeH = 1;
         this.resizeHandle.z = 1;
         this.resizeHandle.render = false;
         this.setResizable(false);
@@ -607,9 +607,9 @@ export class Panel extends Object2D {
 
     protected fillX(obj: Object2D) {
         obj.x = this.spacing.x * 0.5;
-        obj.layoutX = 0;
-        obj.layoutParentX = 0;
-        obj.layoutW = 1;
+        obj.originX = 0;
+        obj.relativeX = 0;
+        obj.relativeW = 1;
         obj.w = -this.spacing.x;
     }
 

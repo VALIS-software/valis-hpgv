@@ -58,8 +58,8 @@ export class TrackViewer extends Object2D {
         this.render = false;
 
         // fill parent dimensions
-        this.layoutW = 1;
-        this.layoutH = 1;
+        this.relativeW = 1;
+        this.relativeH = 1;
 
         this.grid = new Rect(0, 0, [0.9, 0.9, 0.9, 1]); // grid is Rect type for debug display
         this.grid.render = false;
@@ -79,8 +79,8 @@ export class TrackViewer extends Object2D {
         this.addPanelButton.containerStyle = {
             zIndex: 3,
         }
-        this.addPanelButton.layoutParentX = 1;
-        this.addPanelButton.layoutY = -1;
+        this.addPanelButton.relativeX = 1;
+        this.addPanelButton.originY = -1;
         this.addPanelButton.y = -this.xAxisHeight - this.spacing.x * 0.5;
         this.grid.add(this.addPanelButton);
 
@@ -106,7 +106,7 @@ export class TrackViewer extends Object2D {
                 }
             }
         />, this.panelHeaderHeight + 1.5 * this.spacing.x, this.panelHeaderHeight + this.xAxisHeight - 0.5 * this.spacing.y);
-        rightTrackMask.layoutParentX = 1;
+        rightTrackMask.relativeX = 1;
         rightTrackMask.x = -this.panelHeaderHeight - 1.5 * this.spacing.x;
         this.add(rightTrackMask);
 
@@ -147,13 +147,13 @@ export class TrackViewer extends Object2D {
 
         this.tracks.push(track);
 
-        rowObject.closeButton.layoutParentX = 1;
+        rowObject.closeButton.relativeX = 1;
         rowObject.closeButton.x = -this.spacing.x;
         rowObject.closeButton.w = 50;
         rowObject.header.x = -this.trackHeaderWidth + this.spacing.x * 0.5;
         rowObject.header.w = this.trackHeaderWidth;
 
-        rowObject.resizeHandle.layoutW = 1;
+        rowObject.resizeHandle.relativeW = 1;
         rowObject.resizeHandle.addInteractionListener('dragstart', (e) => {
             if (e.isPrimary && e.buttonState === 1) {
                 e.preventDefault();
@@ -233,7 +233,7 @@ export class TrackViewer extends Object2D {
         panel.setContig(location.contig);
         panel.setRange(location.x0, location.x1);
         panel.column = newColumnIndex; // @! should use array of panels instead of column field
-        panel.layoutH = 1; // fill the full grid height
+        panel.relativeH = 1; // fill the full grid height
         this.grid.add(panel);
 
         // initialize tracks for this panel
@@ -303,11 +303,11 @@ export class TrackViewer extends Object2D {
 
         // animate panel's width to 0, after which delete the panel
         if (animate) {
-            Animator.addAnimationCompleteCallback(panel, 'layoutW', () => {
+            Animator.addAnimationCompleteCallback(panel, 'relativeW', () => {
                 this.deletePanel(panel);
                 onComplete();
             }, true);
-            Animator.springTo(panel, { layoutW: 0 }, DEFAULT_SPRING);
+            Animator.springTo(panel, { relativeW: 0 }, DEFAULT_SPRING);
         } else {
             Animator.stop(panel);
             this.deletePanel(panel);
@@ -474,7 +474,7 @@ export class TrackViewer extends Object2D {
         // stop any active animations on the panel
         Animator.stop(panel);
         // remove any open cleanupPanel panel callbacks
-        Animator.removeAnimationCompleteCallbacks(panel, 'layoutW', this.deletePanel);
+        Animator.removeAnimationCompleteCallbacks(panel, 'relativeW', this.deletePanel);
 
         // remove the panel from the scene
         this.grid.remove(panel);
@@ -512,14 +512,14 @@ export class TrackViewer extends Object2D {
             // animate panels to column positions
             if (singlePanelOnly === undefined || (singlePanelOnly === panel)) {
                 let edges = this.panelEdges;
-                let layoutParentX = edges[panel.column];
-                let layoutW = panel.closing ? 0 : edges[panel.column + 1] - edges[panel.column];
+                let relativeX = edges[panel.column];
+                let relativeW = panel.closing ? 0 : edges[panel.column + 1] - edges[panel.column];
                 if (animate) {
-                    Animator.springTo(panel, { layoutParentX: layoutParentX, layoutW: layoutW }, DEFAULT_SPRING);
+                    Animator.springTo(panel, { relativeX: relativeX, relativeW: relativeW }, DEFAULT_SPRING);
                 } else {
-                    Animator.stop(panel, ['layoutParentX', 'layoutW']);
-                    panel.layoutParentX = layoutParentX;
-                    panel.layoutW = layoutW;
+                    Animator.stop(panel, ['relativeX', 'relativeW']);
+                    panel.relativeX = relativeX;
+                    panel.relativeW = relativeW;
                 }
             }
         }
@@ -599,9 +599,9 @@ export class TrackViewer extends Object2D {
     protected onAnimationStep = () => {
         let maxX = 1;
         for (let panel of this.panels) {
-            maxX = Math.max(panel.layoutParentX + panel.layoutW, maxX);
+            maxX = Math.max(panel.relativeX + panel.relativeW, maxX);
         }
-        this.addPanelButton.layoutParentX = maxX;
+        this.addPanelButton.relativeX = maxX;
     }
 
     protected layoutGridContainer() {
@@ -609,7 +609,7 @@ export class TrackViewer extends Object2D {
         this.grid.w =
             -this.trackHeaderWidth - this.spacing.x
             - this.addPanelButton.w;
-        this.grid.layoutW = 1;
+        this.grid.relativeW = 1;
         this.grid.y = this.panelHeaderHeight + this.spacing.y * 0.5 + this.xAxisHeight;
 
         // (grid height is set dynamically when laying out tracks)
@@ -1004,7 +1004,7 @@ class RowObject {
     protected layoutY() {
         // handle
         let handle = this.resizeHandle;
-        handle.layoutY = -0.5;
+        handle.originY = -0.5;
         handle.y = this.y + this.h;
 
         // header

@@ -136,9 +136,9 @@ export class ShaderTrack<
     }
 
     protected updateTileNode(tileNode: ShaderTile<TilePayload>, tile: Tile<any>, x0: number, span: number, displayLodLevel: number) {
-        tileNode.layoutParentX = (tile.x - x0) / span;
-        tileNode.layoutW = tile.span / span;
-        tileNode.layoutH = 1;
+        tileNode.relativeX = (tile.x - x0) / span;
+        tileNode.relativeW = tile.span / span;
+        tileNode.relativeH = 1;
         tileNode.displayLodLevel = displayLodLevel;
         tileNode.setTile(tile);
     }

@@ -41,13 +41,13 @@ export class TrackObject<
 
         this.loadingIndicator = new LoadingIndicator();
         this.loadingIndicator.cursorStyle = 'pointer';
-        this.loadingIndicator.layoutY = -1;
-        this.loadingIndicator.layoutParentY = 1;
+        this.loadingIndicator.originY = -1;
+        this.loadingIndicator.relativeY = 1;
         this.loadingIndicator.x = 10;
         this.loadingIndicator.y = -10;
         this.loadingIndicator.mask = this;
         this.add(this.loadingIndicator);
-        // @! depth-box, should be at top, maybe layoutParentZ = 1
+        // @! depth-box, should be at top, maybe relativeZ = 1
         // - be careful to avoid conflict with cursor
         this.toggleLoadingIndicator(false, false);
         
@@ -57,7 +57,7 @@ export class TrackObject<
         this.focusRegionRectRight = new Rect(0, 0, focusRegionColor);
 
         this.focusRegionRectLeft.opacity = this.focusRegionRectRight.opacity = focusRegionOpacity;
-        this.focusRegionRectLeft.layoutH = this.focusRegionRectRight.layoutH = 1.0;
+        this.focusRegionRectLeft.relativeH = this.focusRegionRectRight.relativeH = 1.0;
         this.focusRegionRectLeft.z = this.focusRegionRectRight.z = 1.9;
         this.add(this.focusRegionRectLeft);
         this.add(this.focusRegionRectRight);
@@ -99,7 +99,7 @@ export class TrackObject<
         axisPointer.render = withinBounds;
 
         if (withinBounds) {
-            axisPointer.layoutParentX = fractionX;
+            axisPointer.relativeX = fractionX;
         }
 
         if (axisPointer.style !== style) {
@@ -119,12 +119,12 @@ export class TrackObject<
     }
 
     setFocusRegion(x0_fractional: number, x1_fractional: number) {        
-        this.focusRegionRectLeft.layoutParentX = 0;
-        this.focusRegionRectLeft.layoutW = Math.max(Math.min(x0_fractional, x1_fractional), 0);
+        this.focusRegionRectLeft.relativeX = 0;
+        this.focusRegionRectLeft.relativeW = Math.max(Math.min(x0_fractional, x1_fractional), 0);
         this.focusRegionRectLeft.render = true;
 
-        this.focusRegionRectRight.layoutParentX = Math.max(x0_fractional, x1_fractional);
-        this.focusRegionRectRight.layoutW = Math.max(1.0 - this.focusRegionRectRight.layoutParentX, 0);
+        this.focusRegionRectRight.relativeX = Math.max(x0_fractional, x1_fractional);
+        this.focusRegionRectRight.relativeW = Math.max(1.0 - this.focusRegionRectRight.relativeX, 0);
         this.focusRegionRectRight.render = true;
     }
 
@@ -202,8 +202,8 @@ class AxisPointer extends Rect {
 
     constructor(style: AxisPointerStyle, readonly activeColor: ArrayLike<number>, readonly secondaryColor: ArrayLike<number>) {
         super(0, 0);
-        this.layoutX = -0.5;
-        this.layoutH = 1;
+        this.originX = -0.5;
+        this.relativeH = 1;
         this.w = 1;
         this.setStyle(style);
     }

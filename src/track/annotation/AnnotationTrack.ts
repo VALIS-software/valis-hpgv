@@ -138,8 +138,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 return geneInstances;
             });
 
-            tileObject.layoutParentX = (tile.x - x0) / span;
-            tileObject.layoutW = tile.span / span;
+            tileObject.relativeX = (tile.x - x0) / span;
+            tileObject.relativeW = tile.span / span;
             tileObject.opacity = opacity;
 
             this._onStageAnnotations.get('macro-gene-tile:' + this.contig + ':' + tile.key, () => {
@@ -173,7 +173,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     // create
                     let object = new GeneAnnotation(gene, this.pointerState, this.onAnnotationClicked);
                     object.y = 40;
-                    object.layoutH = 0;
+                    object.relativeH = 0;
                     object.z = 1 / 4;
                     object.mask = this;
                     object.forEachSubNode((sub) => sub.mask = this);
@@ -187,8 +187,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     return annotation;
                 });
 
-                annotation.layoutParentX = (gene.startIndex - x0) / span;
-                annotation.layoutW = (gene.length) / span;
+                annotation.relativeX = (gene.startIndex - x0) / span;
+                annotation.relativeW = (gene.length) / span;
                 annotation.opacity = opacity;
             }
         });
@@ -263,7 +263,7 @@ class GeneAnnotation extends Object2D {
         /**
         let spanMarker = new TranscriptSpan(gene.strand);
         spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.38]);
-        spanMarker.layoutW = 1;
+        spanMarker.relativeW = 1;
         spanMarker.h = 10;
         spanMarker.transparent = true;
         this.add(spanMarker);
@@ -271,7 +271,7 @@ class GeneAnnotation extends Object2D {
         /**/
 
         this.name = new Text(OpenSansRegular, gene.name, 16, [1, 1, 1, 1]);
-        this.name.layoutY = -1;
+        this.name.originY = -1;
         this.name.y = -5;
         this.add(this.name);
 
@@ -286,8 +286,8 @@ class GeneAnnotation extends Object2D {
             transcriptAnnotation.h = transcriptHeight;
             transcriptAnnotation.y = i * (transcriptHeight + transcriptSpacing) + transcriptOffset;
 
-            transcriptAnnotation.layoutParentX = (transcript.startIndex - gene.startIndex) / gene.length;
-            transcriptAnnotation.layoutW = transcript.length / gene.length;
+            transcriptAnnotation.relativeX = (transcript.startIndex - gene.startIndex) / gene.length;
+            transcriptAnnotation.relativeW = transcript.length / gene.length;
 
             this.add(transcriptAnnotation);
         }
@@ -330,8 +330,8 @@ class TranscriptAnnotation extends Object2D {
         background.cursorStyle = 'pointer';
         background.z = 0;
         background.transparent = true;
-        background.layoutW = 1;
-        background.layoutH = 1;
+        background.relativeW = 1;
+        background.relativeH = 1;
 
         this.add(background);
 
@@ -364,9 +364,9 @@ class TranscriptAnnotation extends Object2D {
         let spanMarker = new TranscriptSpan(strand);
         spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.38]);
         spanMarker.h = 10;
-        spanMarker.layoutW = 1;
-        spanMarker.layoutY = -0.5;
-        spanMarker.layoutParentY = 0.5;
+        spanMarker.relativeW = 1;
+        spanMarker.originY = -0.5;
+        spanMarker.relativeY = 0.5;
         spanMarker.z = 0.1;
         spanMarker.transparent = true;
         this.add(spanMarker);
@@ -376,9 +376,9 @@ class TranscriptAnnotation extends Object2D {
         for (let exonInfo of transcript.exon) {
             let exon = new Exon();
             exon.z = 0.25;
-            exon.layoutH = 1;
-            exon.layoutParentX = (exonInfo.startIndex - transcript.startIndex) / transcript.length;
-            exon.layoutW = exonInfo.length / transcript.length;
+            exon.relativeH = 1;
+            exon.relativeX = (exonInfo.startIndex - transcript.startIndex) / transcript.length;
+            exon.relativeW = exonInfo.length / transcript.length;
             this.add(exon);
         }
 
@@ -386,9 +386,9 @@ class TranscriptAnnotation extends Object2D {
         for (let utrInfo of transcript.utr) {
             let utr = new UTR();
             utr.z = 0.5;
-            utr.layoutH = 1;
-            utr.layoutParentX = (utrInfo.startIndex - transcript.startIndex) / transcript.length;
-            utr.layoutW = utrInfo.length / transcript.length;
+            utr.relativeH = 1;
+            utr.relativeX = (utrInfo.startIndex - transcript.startIndex) / transcript.length;
+            utr.relativeW = utrInfo.length / transcript.length;
             this.add(utr);
         }
 
@@ -406,9 +406,9 @@ class TranscriptAnnotation extends Object2D {
             let cds = new CDS(cdsInfo.length, cdsInfo.phase, strand, mRnaIndex);
 
             cds.z = 0.75;
-            cds.layoutH = 1;
-            cds.layoutParentX = (cdsInfo.startIndex - transcript.startIndex) / transcript.length;
-            cds.layoutW = cdsInfo.length / transcript.length;
+            cds.relativeH = 1;
+            cds.relativeX = (cdsInfo.startIndex - transcript.startIndex) / transcript.length;
+            cds.relativeW = cdsInfo.length / transcript.length;
             this.add(cds);
 
             mRnaIndex += cdsInfo.length;

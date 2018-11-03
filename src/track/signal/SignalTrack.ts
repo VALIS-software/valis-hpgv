@@ -10,10 +10,12 @@ import { Tile } from "../TileLoader";
 
 export class SignalTrack extends ShaderTrack<SignalTrackModel, SignalTileLoader> {
 
+    protected yAxis: Axis;
+
     constructor(model: SignalTrackModel) {
         super(model, SignalTile);
 
-        let yAxis = new Axis({
+        this.yAxis = new Axis({
             x0: 0,
             x1: 1.0,
             align: 'left',
@@ -23,17 +25,18 @@ export class SignalTrack extends ShaderTrack<SignalTrackModel, SignalTileLoader>
             tickSpacingPx: 15,
             color: [1, 1, 1, 1],
         });
-        yAxis.x = 5;
-        yAxis.w = 25;
-        yAxis.h = -10;
-        yAxis.layoutH = 1;
-        yAxis.z = 2;
-        this.add(yAxis);
+        this.yAxis.x = 5;
+        this.yAxis.w = 25;
+        this.yAxis.h = 0;
+        this.yAxis.layoutH = 1;
+        this.yAxis.z = 2;
+        this.yAxis.mask = this;
+        this.add(this.yAxis);
 
-        let bg = new Rect(0, 0, [1, 0, 0, 1]);
-        bg.layoutW = 1;
-        bg.layoutH = 1;
-        bg.z = -0.5;
+        // let bg = new Rect(0, 0, [1, 0, 0, 1]);
+        // bg.layoutW = 1;
+        // bg.layoutH = 1;
+        // bg.z = -0.5;
         // yAxis.add(bg);
     }
 

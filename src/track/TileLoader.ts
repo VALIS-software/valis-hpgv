@@ -354,7 +354,7 @@ class TileRequestManager {
         tile: Tile<any>,
         requestPayload: (tile: Tile<any>) => Promise<any> | any
     ) {
-        console.log('Requesting tile', tile.key, TileState[tile.state]);
+        // console.log('Requesting tile', tile.key, TileState[tile.state]);
 
         if (tile.state !== TileState.Empty) {
             console.warn(`Tile loading was requested when state was "${TileState[tile.state]} (${tile.state})" and not "Empty"`);
@@ -367,7 +367,7 @@ class TileRequestManager {
     public removeFromQueue(tile: Tile<any>) {
         let idx = this.requestStack.findIndex((e) => e.tile === tile);
         if (idx !== -1) {
-            console.log('%cTile removed from queue', 'color: orange; font-weight: bold');
+            // console.log('%cTile removed from queue', 'color: orange; font-weight: bold');
             this.requestStack.splice(idx, 1);
         }
 
@@ -420,7 +420,7 @@ class TileRequestManager {
             }
 
         } else {
-            console.log('%cQueuing tile', 'color: purple; font-weight: bold', tile.key);
+            // console.log('%cQueuing tile', 'color: purple; font-weight: bold', tile.key);
             // no free request slots at this time, add it to the queue
             this.requestStack.push({
                 tile: tile,
@@ -451,7 +451,7 @@ class TileRequestManager {
         if (this.requestStack.length > 0) {
             let nextRequest = this.requestStack.pop();
 
-            console.log('%cPopping tile from queue', 'color: blue; font-weight: bold', nextRequest.tile.key);
+            // console.log('%cPopping tile from queue', 'color: blue; font-weight: bold', nextRequest.tile.key);
 
             this.tryLoadTile(
                 nextRequest.tile,

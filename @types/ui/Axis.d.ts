@@ -23,6 +23,8 @@ export declare class Axis extends Object2D {
     maxTextLength: number;
     fontSizePx: number;
     color: ArrayLike<number>;
+    protected _mask: Renderable<any>;
+    mask: Renderable<any>;
     minDisplay: number;
     maxDisplay: number;
     protected x0: number;

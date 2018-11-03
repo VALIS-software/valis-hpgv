@@ -17,6 +17,7 @@ export declare class TileLoader<TilePayload, BlockPayload> {
     maximumX: number;
     protected lods: Blocks<TilePayload, BlockPayload>[];
     protected readonly blockSize: number;
+    protected requestManager: TileRequestManager;
     constructor(tileWidth?: number, tilesPerBlock?: number, maximumX?: number);
     getTiles(x0: number, x1: number, samplingDensity: number, requestData: boolean, callback: (tile: Tile<TilePayload>) => void): void;
     getTile(x: number, samplingDensity: number, requestData: boolean): Tile<TilePayload>;
@@ -27,10 +28,11 @@ export declare class TileLoader<TilePayload, BlockPayload> {
     protected createBlockPayload(lodLevel: number, lodX: number, lodSpan: number, rows: number): BlockPayload;
     protected releaseBlockPayload(block: BlockPayload): void;
     protected mapLodLevel(selectedLodLevel: number): number;
+    /**
+     * Request tile if not requested, if tile loading then bump priority
+     */
+    private touchTileRequest;
     private getTileFromLodX;
-    private loadTilePayload;
-    private tileLoadComplete;
-    private tileLoadFailed;
     private getBlock;
     private getBlocks;
     private tileRowIndex;
@@ -74,5 +76,30 @@ export declare class Tile<Payload> {
     markLastUsed(): void;
     protected emitComplete(): void;
     protected emitLoadFailed(reason: string): void;
+}
+/**
+ * # Tile Request Manager
+ *
+ * If a user is navigating around then many requests may be started but the most recently started request are the highest priority as these correspond to regions currently visible
+ * Once a browser request has been created we cannot deprioritise it if we decide a new request should take precedence. To work around this we create a request stack (that's dequeued
+ * in order of the most recently enqueued).
+ *
+ * The manager allows a small number of concurrent requests (a limitation also provided by the browser), when request finishes and slot opens up, the executed request is the one
+ * most recently pushed to the stack.
+ *
+ * If request management is done at a global level so it potentially includes requests made by other genome browsers active at the same time.
+ */
+declare class TileRequestManager {
+    maxActiveRequests: number;
+    private requestStack;
+    private activeRequests;
+    constructor(maxActiveRequests?: number);
+    loadTile(tile: Tile<any>, requestPayload: (tile: Tile<any>) => Promise<any> | any): void;
+    removeFromQueue(tile: Tile<any>): void;
+    bringToFrontOfQueue(tile: Tile<any>): void;
+    private tryLoadTile;
+    private tileLoadComplete;
+    private tileLoadFailed;
+    private tileLoadEnd;
 }
 export default TileLoader;

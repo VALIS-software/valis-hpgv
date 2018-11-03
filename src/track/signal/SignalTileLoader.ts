@@ -273,7 +273,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     // console.log(`%ccreate texture ${lodLevel}`, 'color: blue');
 
                     // use float packing if float textures are not supported
-                    let floatSupported = device.capabilities.floatTextures && false;
+                    let floatSupported = device.capabilities.floatTextures;
                     let linearFilteringSupported = floatSupported ? device.capabilities.floatTexturesLinearFiltering : true;
                     payload.floatPacking = !floatSupported;
 

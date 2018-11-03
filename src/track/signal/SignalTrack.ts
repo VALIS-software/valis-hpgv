@@ -28,14 +28,14 @@ export class SignalTrack extends ShaderTrack<SignalTrackModel, SignalTileLoader>
         this.yAxis.x = 5;
         this.yAxis.w = 25;
         this.yAxis.h = 0;
-        this.yAxis.layoutH = 1;
+        this.yAxis.relativeH = 1;
         this.yAxis.z = 2;
         this.yAxis.mask = this;
         this.add(this.yAxis);
 
         // let bg = new Rect(0, 0, [1, 0, 0, 1]);
-        // bg.layoutW = 1;
-        // bg.layoutH = 1;
+        // bg.relativeW = 1;
+        // bg.relativeH = 1;
         // bg.z = -0.5;
         // yAxis.add(bg);
     }

@@ -65,8 +65,8 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
             return this.createTileNode(tile);
         });
 
-        node.layoutParentX = (tile.x - x0) / span;
-        node.layoutW = tile.span / span;
+        node.relativeX = (tile.x - x0) / span;
+        node.relativeW = tile.span / span;
         node.z = z;
 
         // decrease opacity at large lods to prevent white-out as interval cluster together and overlap
@@ -114,7 +114,7 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         instancesTile.blendFactor = 0.2; // nearly full additive
         instancesTile.y = 0;
         instancesTile.mask = this;
-        instancesTile.layoutH = 1;
+        instancesTile.relativeH = 1;
 
         return instancesTile;
     }

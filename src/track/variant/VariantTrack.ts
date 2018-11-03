@@ -113,10 +113,10 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
 
                                 for (let i = 0; i < altSpan; i++) {
                                     let baseCharacter = altSequence[i];
-                                    let layoutParentX = ((startIndex + i) - x0) / span;
+                                    let relativeX = ((startIndex + i) - x0) / span;
 
                                     // skip text outside visible range
-                                    if ((layoutParentX + baseLayoutW) < 0 || layoutParentX > 1) {
+                                    if ((relativeX + baseLayoutW) < 0 || relativeX > 1) {
                                         continue;
                                     }
 
@@ -127,7 +127,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
                                         startIndex,
                                         altIndex,
                                         i,
-                                        layoutParentX,
+                                        relativeX,
                                         baseLayoutW,
                                         altHeightPx,
                                         textSizePx,
@@ -141,10 +141,10 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
 
                             // no alts were drawn so there's no handle to click, create an empty one to make them clickable
                             if (altIndex === 0) {
-                                let layoutParentX = ((startIndex + 0) - x0) / span;
+                                let relativeX = ((startIndex + 0) - x0) / span;
 
                                 // skip text outside visible range
-                                if ((layoutParentX + baseLayoutW) < 0 || layoutParentX > 1) {
+                                if ((relativeX + baseLayoutW) < 0 || relativeX > 1) {
                                     continue;
                                 }
 
@@ -155,7 +155,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
                                     startIndex,
                                     altIndex,
                                     0,
-                                    layoutParentX,
+                                    relativeX,
                                     baseLayoutW,
                                     altHeightPx,
                                     textSizePx,
@@ -261,8 +261,8 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
                         return instancesTile;
                     });
 
-                    tileObject.layoutParentX = (tile.x - x0) / span;
-                    tileObject.layoutW = tile.span / span;
+                    tileObject.relativeX = (tile.x - x0) / span;
+                    tileObject.relativeW = tile.span / span;
                     tileObject.opacity = microOpacity;
 
                     this._onStageAnnotations.get('micro-tile:' + this.contig + ':' + tile.key, () => {
@@ -289,7 +289,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
         altIndex: number,
         charIndex: number,
 
-        layoutParentX: number,
+        relativeX: number,
         baseLayoutW: number,
 
         altHeightPx: number,
@@ -303,8 +303,8 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
             return this.createBaseLabel(baseCharacter, color, (e) => this.onVariantClicked(e, variantId));
         });
 
-        label.root.layoutParentX = layoutParentX;
-        label.root.layoutW = baseLayoutW;
+        label.root.relativeX = relativeX;
+        label.root.relativeW = baseLayoutW;
         label.root.y = altIndex * altHeightPx + tileY;
         label.root.h = altHeightPx;
 
@@ -351,8 +351,8 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
         // this is used to position the text
         let textParent = new Object2D();
         textParent.z = 0;
-        textParent.layoutParentX = 0.5;
-        textParent.layoutParentY = 0.5;
+        textParent.relativeX = 0.5;
+        textParent.relativeY = 0.5;
 
         let textClone: TextClone = null;
 
@@ -365,8 +365,8 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
 
             let textClone = new TextClone(textInstance, [1, 1, 1, 1]);
             textClone.additiveBlendFactor = 1.0;
-            textClone.layoutX = -0.5;
-            textClone.layoutY = -0.5;
+            textClone.originX = -0.5;
+            textClone.originY = -0.5;
             textClone.mask = this;
 
             textParent.add(textClone);

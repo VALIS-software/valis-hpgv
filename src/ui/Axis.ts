@@ -147,8 +147,8 @@ export class Axis extends Object2D {
 
         if (this.clip) {
             this.clippingMask = new Rect(0, 0, [0.9, 0.9, 0.9, 1]);
-            this.clippingMask.layoutW = 1;
-            this.clippingMask.layoutH = 1;
+            this.clippingMask.relativeW = 1;
+            this.clippingMask.relativeH = 1;
             this.clippingMask.visible = false;
             this.add(this.clippingMask);
         }
@@ -258,9 +258,9 @@ export class Axis extends Object2D {
                 textMinor.opacity = alpha;
 
                 if (yMode) {
-                    textMinor.layoutParentY = parentX;
+                    textMinor.relativeY = parentX;
                 } else {
-                    textMinor.layoutParentX = parentX;
+                    textMinor.relativeX = parentX;
                 }
             }
         }
@@ -270,16 +270,16 @@ export class Axis extends Object2D {
         let label = new Label(this.fontPath, str, this.fontSizePx, this.align);
         switch (this.align) {
             case 'top': 
-                label.layoutParentY = 0;
+                label.relativeY = 0;
                 break;
             case 'bottom':
-                label.layoutParentY = 1;
+                label.relativeY = 1;
                 break;
             case 'left':
-                label.layoutParentX = 0;
+                label.relativeX = 0;
                 break;
             case 'right':
-                label.layoutParentX = 1;
+                label.relativeX = 1;
                 break;
         }
         label.z = 0.1;
@@ -398,37 +398,37 @@ class Label extends Object2D {
         switch (align) {
             case 'top': {
                 this.tick = new Rect(tickWidthPx, tickHeightPx);
-                this.tick.layoutX = -0.5;
-                this.tick.layoutY = 0;
-                this.text.layoutX = -0.5;
-                this.text.layoutY = 0;
+                this.tick.originX = -0.5;
+                this.tick.originY = 0;
+                this.text.originX = -0.5;
+                this.text.originY = 0;
                 this.text.y = tickHeightPx + 3;
                 break;
             }
             case 'bottom': {
                 this.tick = new Rect(tickWidthPx, tickHeightPx);
-                this.tick.layoutX = -0.5;
-                this.tick.layoutY = -1;
-                this.text.layoutX = -0.5;
-                this.text.layoutY = -1;
+                this.tick.originX = -0.5;
+                this.tick.originY = -1;
+                this.text.originX = -0.5;
+                this.text.originY = -1;
                 this.text.y = -tickHeightPx - 3;
                 break;
             }
             case 'left': {
                 this.tick = new Rect(tickHeightPx, tickWidthPx);
-                this.tick.layoutX = 0;
-                this.tick.layoutY = -0.5;
-                this.text.layoutX = 0;
-                this.text.layoutY = -0.5;
+                this.tick.originX = 0;
+                this.tick.originY = -0.5;
+                this.text.originX = 0;
+                this.text.originY = -0.5;
                 this.text.x = tickHeightPx + 3;
                 break;
             }
             case 'right': {
                 this.tick = new Rect(tickHeightPx, tickWidthPx);
-                this.tick.layoutX = -1;
-                this.tick.layoutY = -0.5;
-                this.text.layoutX = -1;
-                this.text.layoutY = -0.5;
+                this.tick.originX = -1;
+                this.tick.originY = -0.5;
+                this.text.originX = -1;
+                this.text.originY = -0.5;
                 this.text.x = -tickHeightPx - 3;
                 break;
             }

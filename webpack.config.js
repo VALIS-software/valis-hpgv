@@ -14,7 +14,7 @@ module.exports = (env, argv) => {
         entry: "./index",
         output: {
             path: path.join(__dirname, "dist"),
-            filename: env.includeReact ? 'genome-browser.js' : 'genome-browser.react-peer.js',
+            filename: env.includeReact ? 'hpgv.js' : 'hpgv.react-peer.js',
             library: '',
             libraryTarget: 'umd',
         },

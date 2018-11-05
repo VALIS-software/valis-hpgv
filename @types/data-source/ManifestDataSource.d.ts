@@ -5,9 +5,9 @@ declare type Manifest = {
     contigs: Array<Contig>;
 };
 export declare class ManifestDataSource implements IDataSource {
-    readonly manifestPath: string;
+    readonly manifestPath: string | undefined;
     protected manifestPromise: Promise<Manifest>;
-    constructor(manifestPath: string);
+    constructor(manifestPath: string | undefined);
     getContigs(): Promise<Array<Contig>>;
     loadACGTSequence(contig: string, lodLevel: number, startBaseIndex: number, span: number): Promise<{
         array: Uint8Array;

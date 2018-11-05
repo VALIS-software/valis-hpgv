@@ -24,8 +24,8 @@ export declare class GenomeBrowser {
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
-    constructor(dataSource: IDataSource | string, configuration?: GenomeBrowserConfiguration);
-    setDataSource(dataSourceArg: IDataSource | string): void;
+    constructor(configuration?: GenomeBrowserConfiguration, dataSource?: IDataSource | string);
+    setDataSource(dataSourceArg: IDataSource | string | undefined): void;
     setConfiguration(configuration: GenomeBrowserConfiguration): void;
     getConfiguration(): import("./ui/TrackViewerConfiguration").TrackViewerConfiguration;
     addTrack(model: TrackModel, animateIn?: boolean): Track;

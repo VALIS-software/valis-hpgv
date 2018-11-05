@@ -33,7 +33,8 @@ export declare class GenomeBrowser {
     getTracks(): Track[];
     getPanels(): Set<import("./ui/Panel").Panel>;
     clearCaches(): void;
-    render(props: GenomeBrowserRenderProps): JSX.Element;
+    render(props: GenomeBrowserRenderProps, container: HTMLElement): void;
+    reactRender(props: GenomeBrowserRenderProps): JSX.Element;
     private _frameLoopHandle;
     protected startFrameLoop(): void;
     protected stopFrameLoop(): void;

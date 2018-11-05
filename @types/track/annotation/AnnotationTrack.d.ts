@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import UsageCache from "engine/ds/UsageCache";
 import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
@@ -33,7 +34,7 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     protected removeAnnotation: (annotation: Object2D) => void;
     protected deleteAnnotation: (annotation: Object2D) => void;
     protected annotationKey: (feature: {
-        soClass: string | number;
+        soClass: import("react").Key;
         name?: string;
         startIndex: number;
         length: number;

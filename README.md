@@ -28,10 +28,13 @@ let browser = new GenomeBrowser({
 ```
 - The visualizer can be displayed by calling its `render(props, container)` method:
 ```javascript
-browser.render({
-    width: window.innerWidth,
-    height: window.innerHeight
-}, document.body);
+browser.render(
+    {
+        width: window.innerWidth,
+        height: window.innerHeight
+    },
+    document.getElementById('container')
+);
 ```
 
 Opening the HTML you created should show

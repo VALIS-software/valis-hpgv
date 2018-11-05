@@ -10,8 +10,15 @@ export class ManifestDataSource implements IDataSource {
 
     protected manifestPromise: Promise<Manifest>;
 
-    constructor(readonly manifestPath: string) {
+    constructor(readonly manifestPath: string | undefined) {
         this.manifestPromise = new Promise((resolve, reject) => {
+            // if there's no manifest then return an empty manifest
+            if (this.manifestPath == null) {
+                return {
+                    contigs: [],
+                };
+            }
+
             let request = new XMLHttpRequest();
             request.addEventListener('loadend', (e) => {
                 // assume success if in 2xx range

@@ -45,23 +45,29 @@ export class GenomeBrowser {
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
 
-    constructor(dataSource: IDataSource | string, configuration?: GenomeBrowserConfiguration){
+    constructor(configuration?: GenomeBrowserConfiguration, dataSource?: IDataSource | string){
         this.trackViewer = new TrackViewer();
 
-        if (dataSource != null) {
-            this.setDataSource(dataSource);
-        }
+        this.setDataSource(dataSource);
 
         if (configuration != null) {
+            // default panel if none is set
+            if (configuration.panels == null) {
+                configuration.panels = [{
+                    location: { contig: 'chr1', x0: 0, x1: 249e6 }
+                }];
+            }
+
             this.setConfiguration(configuration);
         }
     }
 
-    setDataSource(dataSourceArg: IDataSource | string) {
+    setDataSource(dataSourceArg: IDataSource | string | undefined) {
         let dataSource: IDataSource;
-        if (typeof dataSourceArg === 'string') {
+        if ((typeof dataSourceArg === 'string') || (dataSourceArg == null)) {
             // if first argument is string, use a manifest data source
-            dataSource = new ManifestDataSource(dataSourceArg);
+            // if a manifest data source is created with a null path then it acts as an empty manifest
+            dataSource = new ManifestDataSource(dataSourceArg as any);
         } else {
             dataSource = dataSourceArg;
         }

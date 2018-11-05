@@ -16,7 +16,7 @@
         }],
         tracks: [{
             type: 'signal',
-            name: 'remote bigwig',
+            name: 'Bigwig',
             // path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeBroadHistone/wgEncodeBroadHistoneGm12878H3k36me3StdSig.bigWig',
             // path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeBroadHistone/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
             path: 'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
@@ -29,7 +29,7 @@
         config = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
     }
 
-    let browser = new GenomeBrowser('./manifest.json', config);
+    let browser = new GenomeBrowser(config, './manifest.json');
     let container = document.getElementById('root');
 
     window.addEventListener('resize', update);

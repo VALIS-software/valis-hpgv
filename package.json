@@ -1,13 +1,14 @@
 {
-  "name": "genome-browser",
+  "name": "HPGV",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/genome-browser.react-peer.js",
+  "main": "./dist/hpgv.react-peer.js",
   "types": "./@types/index.d.ts",
   "scripts": {
     "clean": "rimraf ./@types ./dist",
     "prod": "npm run clean && cti src && webpack --mode=production && webpack --mode=production --env.includeReact",
     "dev": "webpack-dev-server --mode=development",
+    "dev-react": "webpack-dev-server --mode=development --env.includeReact",
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
     "build": "npm run prod"
   },
@@ -24,6 +25,8 @@
   },
   "devDependencies": {
     "@types/node": "10.11.7",
+    "@types/react": "16.x",
+    "@types/react-dom": "16.x",
     "create-ts-index": "1.0.x",
     "file-loader": "2.0.x",
     "rimraf": "^2.6.2",

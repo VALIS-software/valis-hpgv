@@ -34,6 +34,10 @@ browser.render({
 }, document.body);
 ```
 
+Opening the HTML you created should show
+
+<img alt="Genome Visualizer Demo" src="https://user-images.githubusercontent.com/3742992/48023087-bd94e180-e134-11e8-931c-e9b946dfc1f4.png">
+
 
 ## Using the Preprocessing Script
 *todo*

@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 import { Animator } from "./Animator";
 import { IDataSource } from "./data-source/IDataSource";
@@ -105,7 +106,11 @@ export class GenomeBrowser {
         }
     }
 
-    render(props: GenomeBrowserRenderProps) {
+    render(props: GenomeBrowserRenderProps, container: HTMLElement) {
+        ReactDOM.render(this.reactRender(props), container);
+    }
+
+    reactRender(props: GenomeBrowserRenderProps) {
         return (
             <AppCanvas
                 ref={(v) => {

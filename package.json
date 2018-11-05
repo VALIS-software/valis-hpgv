@@ -2,11 +2,11 @@
   "name": "genome-browser",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/index.js",
+  "main": "./dist/genome-browser.react-peer.js",
   "types": "./@types/index.d.ts",
   "scripts": {
     "clean": "rimraf ./@types ./dist",
-    "prod": "npm run clean && cti src && webpack --mode=production",
+    "prod": "npm run clean && cti src && webpack --mode=production && webpack --mode=production --env.includeReact",
     "dev": "webpack-dev-server --mode=development",
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
     "build": "npm run prod"
@@ -18,7 +18,9 @@
     "@material-ui/icons": "^3.0.1",
     "engine": "github:VALIS-software/Engine",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",
-    "bigwig-reader": "^1.0.6"
+    "bigwig-reader": "^1.0.6",
+    "react": "16.x",
+    "react-dom": "16.x"
   },
   "devDependencies": {
     "@types/node": "10.11.7",

@@ -14,7 +14,7 @@ module.exports = (env, argv) => {
         entry: "./index",
         output: {
             path: path.join(__dirname, "dist"),
-            filename: 'index.js',
+            filename: env.includeReact ? 'genome-browser.js' : 'genome-browser.react-peer.js',
             library: '',
             libraryTarget: 'umd',
         },
@@ -54,7 +54,7 @@ module.exports = (env, argv) => {
             env.analyze ? [new (require('webpack-bundle-analyzer').BundleAnalyzerPlugin)] : []
         ),
 
-        externals: {
+        externals: env.includeReact ? {} : {
             // don't bundle react or react-dom
             'react': {
                 commonjs: "react",

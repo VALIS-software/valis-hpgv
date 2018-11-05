@@ -117,7 +117,7 @@ export class TrackViewer extends Object2D {
 
     // track-viewer state deltas
     addTrack(model: TrackModel, animate: boolean = true): Track {
-        let heightPx = model.heightPx != null ? model.heightPx : 50;
+        let heightPx = model.heightPx != null ? model.heightPx : 100;
 
         // create a track and add the header element to the grid
         let track: Track = new Track(

@@ -7,10 +7,7 @@
 
 <div id="root"></div>
 
-<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
-<script src="../../dist/index.js"></script>
+<script src="../../dist/hpgv.js"></script>
 
 <script>
     let config = {
@@ -22,9 +19,9 @@
             name: 'remote bigwig',
             // path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeBroadHistone/wgEncodeBroadHistoneGm12878H3k36me3StdSig.bigWig',
             // path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeBroadHistone/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
-            // path: 'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
-            path: 'https://www.encodeproject.org/files/ENCFF356YES/@@download/ENCFF356YES.bigWig',
-            heightPx: 250,
+            path: 'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
+            // path: 'https://www.encodeproject.org/files/ENCFF356YES/@@download/ENCFF356YES.bigWig',
+            // heightPx: 250,
         }],
     };
 
@@ -40,10 +37,10 @@
     update();
 
     function update() {
-        ReactDOM.render(browser.render({
+        browser.render({
             width: window.innerWidth,
             height: window.innerHeight
-        }), container);
+        }, container);
     }
 
     function saveState() {

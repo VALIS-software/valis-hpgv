@@ -1,5 +1,5 @@
 {
-  "name": "Genome-Visualizer",
+  "name": "genome-visualizer",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/hpgv.react-peer.js",

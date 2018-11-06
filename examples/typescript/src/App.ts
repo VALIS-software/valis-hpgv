@@ -1,7 +1,6 @@
-import * as ReactDOM from "react-dom";
-import { GenomeBrowser } from "genome-visualizer";
+import { GenomeVisualizer } from "genome-visualizer";
 
-let browser = new GenomeBrowser(
+let browser = new GenomeVisualizer(
     {
         panels: [{ location: { contig: 'chr1', x0: 0, x1: 249e6 } }],
         tracks: [{ name: 'GRCh38', type: 'sequence' }],

@@ -17,7 +17,7 @@ import Animator from "../Animator";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import { InternalDataSource } from "../data-source/InternalDataSource";
-import GenomeBrowser from "../GenomeBrowser";
+import GenomeVisualizer from "../GenomeVisualizer";
 import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../track/TrackModel";
 import TrackObject from "../track/TrackObject";
@@ -145,7 +145,7 @@ export class TrackViewer extends Object2D {
 
         // add track tile to all panels
         for (let panel of this.panels) {
-            var trackView = new (GenomeBrowser.getTrackType(model.type).trackObjectClass)(model);
+            var trackView = new (GenomeVisualizer.getTrackType(model.type).trackObjectClass)(model);
             panel.addTrackView(trackView);
             rowObject.addTrackView(trackView);
         }
@@ -243,7 +243,7 @@ export class TrackViewer extends Object2D {
 
         // initialize tracks for this panel
        for (let track of this.tracks) {
-           var trackView = new (GenomeBrowser.getTrackType(track.model.type).trackObjectClass)(track.model);
+           var trackView = new (GenomeVisualizer.getTrackType(track.model.type).trackObjectClass)(track.model);
            panel.addTrackView(trackView);
            (track as any as TrackInternal).rowObject.addTrackView(trackView);
        }

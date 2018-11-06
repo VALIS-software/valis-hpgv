@@ -5,7 +5,6 @@ import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import { Text } from "engine/ui/Text";
-import GenomeBrowser from "../../GenomeBrowser";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import TextClone from "../../ui/util/TextClone";

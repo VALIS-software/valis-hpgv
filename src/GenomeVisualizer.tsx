@@ -5,7 +5,7 @@ import { Animator } from "./Animator";
 import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
 import { ManifestDataSource } from "./data-source/ManifestDataSource";
-import { GenomeBrowserConfiguration } from "./GenomeBrowserConfiguration";
+import { GenomeVisualizerConfiguration } from "./GenomeVisualizerConfiguration";
 import { TrackModel } from "./track/TrackModel";
 import { AppCanvas } from "./ui/core/AppCanvas";
 import { TrackViewer, Track } from "./ui/TrackViewer";
@@ -21,7 +21,7 @@ import { TrackObject } from "./track/TrackObject";
 import { SignalTileLoader } from "./track/signal/SignalTileLoader";
 import { SignalTrack } from "./track/signal/SignalTrack";
 
-export interface GenomeBrowserRenderProps {
+export interface GenomeVisualizerRenderProps {
     width: number,
     height: number,
 
@@ -39,13 +39,13 @@ interface CustomTileLoader<ModelType> {
 interface CustomTrackObject {
     new(model: TrackModel): TrackObject<TrackModel, any>;
 }
-export class GenomeBrowser {
+export class GenomeVisualizer {
 
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
 
-    constructor(configuration?: GenomeBrowserConfiguration, dataSource?: IDataSource | string){
+    constructor(configuration?: GenomeVisualizerConfiguration, dataSource?: IDataSource | string){
         this.trackViewer = new TrackViewer();
 
         this.setDataSource(dataSource);
@@ -82,7 +82,7 @@ export class GenomeBrowser {
         this.trackViewer.setDataSource(this.internalDataSource);
     }
 
-    setConfiguration(configuration: GenomeBrowserConfiguration) {
+    setConfiguration(configuration: GenomeVisualizerConfiguration) {
         this.trackViewer.setConfiguration(configuration);
     }
 
@@ -112,11 +112,11 @@ export class GenomeBrowser {
         }
     }
 
-    render(props: GenomeBrowserRenderProps, container: HTMLElement) {
+    render(props: GenomeVisualizerRenderProps, container: HTMLElement) {
         ReactDOM.render(this.reactRender(props), container);
     }
 
-    reactRender(props: GenomeBrowserRenderProps) {
+    reactRender(props: GenomeVisualizerRenderProps) {
         return (
             <AppCanvas
                 ref={(v) => {
@@ -186,11 +186,11 @@ export class GenomeBrowser {
 }
 
 // register track types
-GenomeBrowser.registerTrackType('annotation', AnnotationTileLoader, AnnotationTrack);
-GenomeBrowser.registerTrackType('macro-annotation', MacroAnnotationTileLoader, AnnotationTrack);
-GenomeBrowser.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
-GenomeBrowser.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
-GenomeBrowser.registerTrackType('variant', VariantTileLoader, VariantTrack);
-GenomeBrowser.registerTrackType('signal', SignalTileLoader, SignalTrack);
+GenomeVisualizer.registerTrackType('annotation', AnnotationTileLoader, AnnotationTrack);
+GenomeVisualizer.registerTrackType('macro-annotation', MacroAnnotationTileLoader, AnnotationTrack);
+GenomeVisualizer.registerTrackType('interval', IntervalTileLoader, IntervalTrack);
+GenomeVisualizer.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
+GenomeVisualizer.registerTrackType('variant', VariantTileLoader, VariantTrack);
+GenomeVisualizer.registerTrackType('signal', SignalTileLoader, SignalTrack);
 
-export default GenomeBrowser;
+export default GenomeVisualizer;

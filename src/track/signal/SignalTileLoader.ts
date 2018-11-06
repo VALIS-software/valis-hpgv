@@ -44,17 +44,14 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         super(2048, 32);
 
         // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
+        let requestIndex = 0;
         let loader = {
-            load: function(start: number, size?: number): Promise<ArrayBuffer> {
+            load: (start: number, size?: number) => {
                 return new Promise((resolve, reject) => {
                     let request = new XMLHttpRequest();
-                    request.open('GET', model.path, true);
-
-                    request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
                     // disable caching (because of common browser bugs)
-                    request.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-                    // request.setRequestHeader('Pragma', 'no-cache');
-                    request.setRequestHeader('Expires', '0');
+                    request.open('GET', model.path + '?cacheAvoid=' + requestIndex++, true);
+                    request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
 
                     request.responseType = 'arraybuffer';
                     request.onloadend = () => {

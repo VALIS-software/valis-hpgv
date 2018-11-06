@@ -1,7 +1,7 @@
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
 import { SignalTrackModel } from "./SignalTrackModel";
 
-import { AxiosDataLoader, BigWigReader, HeaderData } from  "bigwig-reader";
+import { BigWigReader, HeaderData } from  "bigwig-reader";
 import { TileLoader, Tile } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
 
@@ -30,7 +30,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     protected lodMap: Array<number>;
     protected lodZoomIndexMap: Array<number | null>;
 
-    protected bigWigLoader: AxiosDataLoader;
     protected bigWigReader: BigWigReader;
 
     static cacheKey(model: SignalTrackModel) {
@@ -44,8 +43,35 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     ) {
         super(2048, 32);
 
-        this.bigWigLoader = new AxiosDataLoader(model.path);
-        this.bigWigReader = new BigWigReader(this.bigWigLoader);
+        // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
+        let loader = {
+            load: function(start: number, size?: number): Promise<ArrayBuffer> {
+                return new Promise((resolve, reject) => {
+                    let request = new XMLHttpRequest();
+                    request.open('GET', model.path, true);
+
+                    request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
+                    // disable caching (because of common browser bugs)
+                    request.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+                    request.setRequestHeader('Pragma', 'no-cache');
+                    request.setRequestHeader('Expires', '0');
+
+                    request.responseType = 'arraybuffer';
+                    request.onloadend = () => {
+                        if (request.status >= 200 && request.status < 300) {
+                            // success-like response
+                            resolve(request.response);
+                        } else {
+                            // error-like response
+                            reject(`HTTP request error: ${request.statusText} (${request.status})`);
+                        }
+                    }
+                    request.send();
+                });
+            }
+        }
+
+        this.bigWigReader = new BigWigReader(loader);
         this.bigWigReader.getHeader().then((header) => {
             this.header = header;
             console.log('Header loaded', header);

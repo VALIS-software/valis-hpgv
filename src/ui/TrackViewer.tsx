@@ -31,6 +31,7 @@ export class TrackViewer extends Object2D {
     // layout settings
     readonly trackHeaderWidth: number = 180;
     readonly panelHeaderHeight: number = 50;
+    readonly trackButtonWidth: number = 50;
 
     readonly spacing = {
         x: 5,
@@ -74,7 +75,7 @@ export class TrackViewer extends Object2D {
                 this.addPanel({ contig: 'chr1', x0: 0, x1: 249e6}, true);
             }} />,
             this.panelHeaderHeight,
-            this.panelHeaderHeight,
+            this.trackButtonWidth,
         );
         this.addPanelButton.x =  this.spacing.x * 0.5;
         this.addPanelButton.containerStyle = {
@@ -627,9 +628,7 @@ export class TrackViewer extends Object2D {
 
     protected layoutGridContainer() {
         this.grid.x = this.trackHeaderWidth + this.spacing.x * 0.5;
-        this.grid.w =
-            -this.trackHeaderWidth - this.spacing.x
-            + (this.allowNewPanels ? -this.addPanelButton.w : 0);
+        this.grid.w = -this.trackHeaderWidth - this.spacing.x - this.trackButtonWidth;
         this.grid.relativeW = 1;
         this.grid.y = this.panelHeaderHeight + this.spacing.y * 0.5 + this.xAxisHeight;
 

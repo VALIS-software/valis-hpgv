@@ -53,7 +53,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
                     // disable caching (because of common browser bugs)
                     request.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-                    request.setRequestHeader('Pragma', 'no-cache');
+                    // request.setRequestHeader('Pragma', 'no-cache');
                     request.setRequestHeader('Expires', '0');
 
                     request.responseType = 'arraybuffer';

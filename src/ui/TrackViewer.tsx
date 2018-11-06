@@ -40,6 +40,7 @@ export class TrackViewer extends Object2D {
     readonly minPanelWidth = 35;
     readonly minTrackHeight = 35;
 
+    protected allowNewPanels = true;
     protected panels = new Set<Panel>();
     protected tracks = new Array<Track>();
 
@@ -110,9 +111,13 @@ export class TrackViewer extends Object2D {
         rightTrackMask.x = -this.panelHeaderHeight - 1.5 * this.spacing.x;
         this.add(rightTrackMask);
 
-        this.layoutGridContainer();
-
         window.addEventListener('resize', this.onResize);
+
+        // initialize with empty configuration
+        this.setConfiguration({
+            panels: [],
+            tracks: [],
+        });
     }
 
     // track-viewer state deltas
@@ -350,12 +355,26 @@ export class TrackViewer extends Object2D {
         }
 
         return {
+            allowNewPanels: this.allowNewPanels,
             panels: panels,
             tracks: tracks,
         }
     }
 
     setConfiguration(state: TrackViewerConfiguration) {
+        this.allowNewPanels = state.allowNewPanels === undefined ? false : state.allowNewPanels;
+        
+        // hide/show add panel button
+        if (this.allowNewPanels) {
+            if (!this.grid.has(this.addPanelButton)) {
+                this.grid.add(this.addPanelButton);
+            }
+        } else {
+            if (this.grid.has(this.addPanelButton)) {
+                this.grid.remove(this.addPanelButton);
+            }
+        }
+
         // Panels
         // clear current panels
         let currentPanels = new Set(this.panels);
@@ -409,6 +428,8 @@ export class TrackViewer extends Object2D {
         }
 
         this.layoutTrackRows(false);
+
+        this.layoutGridContainer();
     }
 
     getTracks() {
@@ -608,7 +629,7 @@ export class TrackViewer extends Object2D {
         this.grid.x = this.trackHeaderWidth + this.spacing.x * 0.5;
         this.grid.w =
             -this.trackHeaderWidth - this.spacing.x
-            - this.addPanelButton.w;
+            + (this.allowNewPanels ? -this.addPanelButton.w : 0);
         this.grid.relativeW = 1;
         this.grid.y = this.panelHeaderHeight + this.spacing.y * 0.5 + this.xAxisHeight;
 

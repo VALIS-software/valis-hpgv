@@ -7,6 +7,9 @@ export interface TrackViewerConfiguration {
         width?: number
     }>,
     tracks: Array<TrackModel>,
+    
+    // defaults to false
+    allowNewPanels?: boolean,
 }
 
 export default TrackViewerConfiguration;

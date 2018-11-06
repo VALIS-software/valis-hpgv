@@ -11,6 +11,7 @@ import TrackViewerConfiguration from "./TrackViewerConfiguration";
 export declare class TrackViewer extends Object2D {
     readonly trackHeaderWidth: number;
     readonly panelHeaderHeight: number;
+    readonly trackButtonWidth: number;
     readonly spacing: {
         x: number;
         y: number;

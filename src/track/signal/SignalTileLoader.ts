@@ -48,7 +48,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
         let loader = {
             load: (start: number, size?: number) => {
-                return new Promise((resolve, reject) => {
+                return new Promise<ArrayBuffer>((resolve, reject) => {
                     let request = new XMLHttpRequest();
                     // disable caching (because of common browser bugs)
                     request.open('GET', model.path + '?cacheAvoid=' + SignalTileLoader.requestIndex++, true);

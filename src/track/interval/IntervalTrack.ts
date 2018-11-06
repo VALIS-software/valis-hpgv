@@ -4,10 +4,8 @@ import { Object2D } from "engine/ui/Object2D";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { Tile, TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
-import IntervalTileLoader from "./IntervalTileLoader";
+import IntervalTileLoader, { IntervalTilePayload } from "./IntervalTileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
-
-type TilePayload = Float32Array;
 
 export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileLoader> {
 
@@ -58,7 +56,7 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         this.toggleLoadingIndicator(this._pendingTiles.count > 0, true);
     }
 
-    protected displayTileNode(tile: Tile<TilePayload>, z: number, x0: number, span: number, continuousLodLevel: number) {
+    protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, x0: number, span: number, continuousLodLevel: number) {
         let tileKey = this.contig + ':' + z + ':' + tile.key;
 
         let node = this._intervalTileCache.get(tileKey, () => {
@@ -82,31 +80,19 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         return node;
     }
     
-    protected createTileNode(tile: Tile<TilePayload>) {
-        let nIntervals = tile.payload.length * 0.5;
+    protected createTileNode(tile: Tile<IntervalTilePayload>) {
+        let nIntervals = tile.payload.intervals.length * 0.5;
 
         let instanceData = new Array<IntervalInstance>(nIntervals);
 
-        let yPadding = 5;
 
         for (let i = 0; i < nIntervals; i++) {
-            let intervalStartIndex = tile.payload[i * 2 + 0];
-            let intervalSpan = tile.payload[i * 2 + 1];
-
-            let fractionX = (intervalStartIndex - tile.x) / tile.span
-            let wFractional = intervalSpan / tile.span;
-            instanceData[i] = {
-                x: 0,
-                y: yPadding,
-                z: 0,
-                w: 0,
-                h: - 2 * yPadding,
-                relativeX: fractionX,
-                relativeY: 0,
-                relativeW: wFractional,
-                relativeH: 1.0,
-                color: [74/0xff, 52/0xff, 226/0xff, 0.66],
-            };
+            let intervalStartIndex = tile.payload.intervals[i * 2 + 0];
+            let intervalSpan = tile.payload.intervals[i * 2 + 1];
+            instanceData[i] = this.createInstance(
+                (intervalStartIndex - tile.x) / tile.span,
+                intervalSpan / tile.span,
+            );
         }
 
         let instancesTile = new IntervalInstances(instanceData);
@@ -117,6 +103,23 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         instancesTile.relativeH = 1;
 
         return instancesTile;
+    }
+
+    protected createInstance(relativeX: number, relativeW: number): IntervalInstance {
+        const yPadding = 5;
+
+        return {
+            x: 0,
+            y: yPadding,
+            z: 0,
+            w: 0,
+            h: - 2 * yPadding,
+            relativeX: relativeX,
+            relativeY: 0,
+            relativeW: relativeW,
+            relativeH: 1.0,
+            color: [74 / 0xff, 52 / 0xff, 226 / 0xff, 0.66],
+        };
     }
 
     protected removeTile = (tile: IntervalInstances) => {

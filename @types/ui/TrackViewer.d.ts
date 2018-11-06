@@ -18,6 +18,7 @@ export declare class TrackViewer extends Object2D {
     readonly xAxisHeight: number;
     readonly minPanelWidth: number;
     readonly minTrackHeight: number;
+    protected allowNewPanels: boolean;
     protected panels: Set<Panel>;
     protected tracks: Track[];
     protected panelEdges: number[];

@@ -4,5 +4,5 @@ export * from './track';
 export * from './ui';
 export * from './Animator';
 export * from './Engine';
-export * from './GenomeBrowser';
-export * from './GenomeBrowserConfiguration';
+export * from './GenomeVisualizer';
+export * from './GenomeVisualizerConfiguration';

@@ -6,5 +6,6 @@ export interface TrackViewerConfiguration {
         width?: number;
     }>;
     tracks: Array<TrackModel>;
+    allowNewPanels?: boolean;
 }
 export default TrackViewerConfiguration;

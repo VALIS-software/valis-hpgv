@@ -1,6 +1,6 @@
 import GPUDevice, { GPUTexture } from "engine/rendering/GPUDevice";
 import { SignalTrackModel } from "./SignalTrackModel";
-import { AxiosDataLoader, BigWigReader, HeaderData } from "bigwig-reader";
+import { BigWigReader, HeaderData } from "bigwig-reader";
 import { TileLoader, Tile } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
 export declare type SignalTilePayload = {
@@ -25,9 +25,9 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected header: HeaderData;
     protected lodMap: Array<number>;
     protected lodZoomIndexMap: Array<number | null>;
-    protected bigWigLoader: AxiosDataLoader;
     protected bigWigReader: BigWigReader;
     static cacheKey(model: SignalTrackModel): string;
+    static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
     protected onReady(): void;
     protected generateLodLookups(bigWigHeader: HeaderData): {

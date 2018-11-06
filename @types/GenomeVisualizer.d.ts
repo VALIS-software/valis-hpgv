@@ -1,13 +1,13 @@
 import * as React from "react";
 import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
-import { GenomeBrowserConfiguration } from "./GenomeBrowserConfiguration";
+import { GenomeVisualizerConfiguration } from "./GenomeVisualizerConfiguration";
 import { TrackModel } from "./track/TrackModel";
 import { AppCanvas } from "./ui/core/AppCanvas";
 import { TrackViewer, Track } from "./ui/TrackViewer";
 import { TileLoader } from "./track/TileLoader";
 import { TrackObject } from "./track/TrackObject";
-export interface GenomeBrowserRenderProps {
+export interface GenomeVisualizerRenderProps {
     width: number;
     height: number;
     pixelRatio?: number;
@@ -20,21 +20,21 @@ interface CustomTileLoader<ModelType> {
 interface CustomTrackObject {
     new (model: TrackModel): TrackObject<TrackModel, any>;
 }
-export declare class GenomeBrowser {
+export declare class GenomeVisualizer {
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
-    constructor(configuration?: GenomeBrowserConfiguration, dataSource?: IDataSource | string);
+    constructor(configuration?: GenomeVisualizerConfiguration, dataSource?: IDataSource | string);
     setDataSource(dataSourceArg: IDataSource | string | undefined): void;
-    setConfiguration(configuration: GenomeBrowserConfiguration): void;
+    setConfiguration(configuration: GenomeVisualizerConfiguration): void;
     getConfiguration(): import("./ui/TrackViewerConfiguration").TrackViewerConfiguration;
     addTrack(model: TrackModel, animateIn?: boolean): Track;
     closeTrack(track: Track, animateOut: boolean, onComplete: () => void): void;
     getTracks(): Track[];
     getPanels(): Set<import("./ui/Panel").Panel>;
     clearCaches(): void;
-    render(props: GenomeBrowserRenderProps, container: HTMLElement): void;
-    reactRender(props: GenomeBrowserRenderProps): JSX.Element;
+    render(props: GenomeVisualizerRenderProps, container: HTMLElement): void;
+    reactRender(props: GenomeVisualizerRenderProps): JSX.Element;
     private _frameLoopHandle;
     protected startFrameLoop(): void;
     protected stopFrameLoop(): void;
@@ -46,4 +46,4 @@ export declare class GenomeBrowser {
     };
     private static trackTypes;
 }
-export default GenomeBrowser;
+export default GenomeVisualizer;

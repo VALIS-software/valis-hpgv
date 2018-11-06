@@ -9,8 +9,13 @@ import { IntervalTrackModel } from "./IntervalTrackModel";
 
 export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileLoader> {
 
+    readonly intervalColor = [74 / 0xff, 52 / 0xff, 226 / 0xff, 0.66];
+
     constructor(model: IntervalTrackModel) {
         super(model);
+        if (model.color != null) {
+            this.intervalColor = model.color;
+        }
     }
 
     protected _pendingTiles = new UsageCache<Tile<any>>();
@@ -120,7 +125,7 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
             relativeY: 0,
             relativeW: relativeW,
             relativeH: 1.0,
-            color: [74 / 0xff, 52 / 0xff, 226 / 0xff, 0.66],
+            color: this.intervalColor,
         };
     }
 

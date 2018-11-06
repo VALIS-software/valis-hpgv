@@ -10,6 +10,8 @@ export type TrackModel = {
     name: string,
     heightPx?: number,
 
+    color?: Array<number>,
+
     [field: string]: any,
 };
 

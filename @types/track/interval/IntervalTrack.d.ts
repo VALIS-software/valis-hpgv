@@ -13,7 +13,7 @@ export declare class IntervalTrack extends TrackObject<IntervalTrackModel, Inter
     protected updateDisplay(): void;
     protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, x0: number, span: number, continuousLodLevel: number): IntervalInstances;
     protected createTileNode(tile: Tile<IntervalTilePayload>): IntervalInstances;
-    protected createInstance(relativeX: number, relativeW: number): IntervalInstance;
+    protected createInstance(tilePayload: IntervalTilePayload, intervalIndex: number, relativeX: number, relativeW: number): IntervalInstance;
     protected removeTile: (tile: IntervalInstances) => void;
 }
 export default IntervalTrack;

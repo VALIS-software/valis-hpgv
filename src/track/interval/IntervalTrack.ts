@@ -90,6 +90,8 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
             let intervalStartIndex = tile.payload.intervals[i * 2 + 0];
             let intervalSpan = tile.payload.intervals[i * 2 + 1];
             instanceData[i] = this.createInstance(
+                tile.payload,
+                i,
                 (intervalStartIndex - tile.x) / tile.span,
                 intervalSpan / tile.span,
             );
@@ -105,7 +107,7 @@ export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileL
         return instancesTile;
     }
 
-    protected createInstance(relativeX: number, relativeW: number): IntervalInstance {
+    protected createInstance(tilePayload: IntervalTilePayload, intervalIndex: number, relativeX: number, relativeW: number): IntervalInstance {
         const yPadding = 5;
 
         return {

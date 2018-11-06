@@ -6,6 +6,7 @@ import TrackObject from "../TrackObject";
 import IntervalTileLoader, { IntervalTilePayload } from "./IntervalTileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
 export declare class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileLoader> {
+    readonly intervalColor: number[];
     constructor(model: IntervalTrackModel);
     protected _pendingTiles: UsageCache<Tile<any>>;
     protected _intervalTileCache: UsageCache<IntervalInstances>;

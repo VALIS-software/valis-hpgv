@@ -7,6 +7,7 @@ export declare type TrackModel = {
     type: string;
     name: string;
     heightPx?: number;
+    color?: Array<number>;
     [field: string]: any;
 };
 export default TrackModel;

@@ -36,6 +36,8 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         return model.path;
     }
 
+    static requestIndex = 0;
+
     constructor(
         protected readonly dataSource: IDataSource,
         protected readonly model: SignalTrackModel,
@@ -44,13 +46,12 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         super(2048, 32);
 
         // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
-        let requestIndex = 0;
         let loader = {
             load: (start: number, size?: number) => {
                 return new Promise((resolve, reject) => {
                     let request = new XMLHttpRequest();
                     // disable caching (because of common browser bugs)
-                    request.open('GET', model.path + '?cacheAvoid=' + requestIndex++, true);
+                    request.open('GET', model.path + '?cacheAvoid=' + SignalTileLoader.requestIndex++, true);
                     request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
 
                     request.responseType = 'arraybuffer';

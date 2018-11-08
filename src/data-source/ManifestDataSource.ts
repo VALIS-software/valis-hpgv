@@ -2,7 +2,7 @@ import { Contig } from "../model/Contig";
 import { IDataSource } from "./IDataSource";
 import { GenomeFeature } from "../track/annotation/AnnotationTypes";
 
-type Manifest = {
+export type Manifest = {
     contigs: Array<Contig>
 }
 
@@ -17,9 +17,9 @@ export class ManifestDataSource implements IDataSource {
         this.manifestPromise = new Promise((resolve, reject) => {
             // if there's no manifest then return an empty manifest
             if (this.manifest == null) {
-                return {
+                return resolve({
                     contigs: [],
-                };
+                });
             } else if (typeof manifest === 'string' || (manifest instanceof String)) {
                 let request = new XMLHttpRequest();
                 request.addEventListener('loadend', (e) => {
@@ -38,7 +38,7 @@ export class ManifestDataSource implements IDataSource {
                 request.open('GET', this.manifest as string);
                 request.send();
             } else {
-                return manifest;
+                return resolve(manifest);
             }
         });
     }

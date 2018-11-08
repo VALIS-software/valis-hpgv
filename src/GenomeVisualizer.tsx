@@ -77,7 +77,12 @@ export class GenomeVisualizer {
                                 contigs: []
                             }
 
-                            for (let contigId of header.chromTree.idToChrom) {
+                            let availableChromosomes = header.chromTree.idToChrom;
+                            availableChromosomes.sort((a, b) => {
+                                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+                            });
+
+                            for (let contigId of availableChromosomes) {
                                 let id = header.chromTree.chromToId[contigId];
                                 manifest.contigs.push({
                                     id: contigId,

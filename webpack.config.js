@@ -1,6 +1,9 @@
 const path = require('path');
 const webpack = require("webpack");
 
+// output settings
+const buildName = 'valis-hpgv';
+
 module.exports = (env, argv) => {
     env = env || {};
 
@@ -14,7 +17,7 @@ module.exports = (env, argv) => {
         entry: "./index",
         output: {
             path: path.join(__dirname, "dist"),
-            filename: env.includeReact ? 'hpgv.js' : 'hpgv.react-peer.js',
+            filename: env.includeReact ? `${buildName}.js` : `${buildName}.react-peer.js`,
             library: '',
             libraryTarget: 'umd',
         },

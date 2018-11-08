@@ -2,7 +2,7 @@
   "name": "genome-visualizer",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/hpgv.react-peer.js",
+  "main": "./dist/valis-hpgv.react-peer.js",
   "types": "./@types/index.d.ts",
   "scripts": {
     "clean": "rimraf ./@types ./dist",

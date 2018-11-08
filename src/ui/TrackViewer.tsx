@@ -107,13 +107,14 @@ export class TrackViewer extends Object2D {
         this.masks = [leftTrackMask, rightTrackMask];
 
         // nothing to display text
-        this.nothingToDisplay = new Text(OpenSansRegular, 'Nothing to display', 20, [0.6, 0.6, 0.6, 1.0]);
+        this.nothingToDisplay = new Text(OpenSansRegular, '', 20, [0.6, 0.6, 0.6, 1.0]);
         this.nothingToDisplay.z = 10;
         // center
         this.nothingToDisplay.originX = -0.5;
         this.nothingToDisplay.originY = -0.5;
         this.nothingToDisplay.relativeX = 0.5;
         this.nothingToDisplay.relativeY = 0.5;
+        this.resetNothingToDisplayText();
 
         window.addEventListener('resize', this.onResize);
 
@@ -436,6 +437,14 @@ export class TrackViewer extends Object2D {
 
     getPanels() {
         return new Set(this.panels);
+    }
+
+    setNothingToDisplayText(string: string) {
+        this.nothingToDisplay.string = string;
+    }
+
+    resetNothingToDisplayText() {
+        this.nothingToDisplay.string = 'Nothing to display';
     }
 
     protected onPanelsChanged() {

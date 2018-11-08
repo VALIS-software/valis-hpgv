@@ -1,4 +1,4 @@
-# High Performance Genome Visualizer
+# VALIS High Performance Genome Visualizer
 
 ## Getting Started
 

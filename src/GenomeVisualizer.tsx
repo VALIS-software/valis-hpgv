@@ -70,8 +70,10 @@ export class GenomeVisualizer {
 
                 switch (fileType) {
                     case 'bigwig': {
+                        this.trackViewer.setNothingToDisplayText('Loading');
                         let bigwigReader = new BigWigReader(new AxiosDataLoader(firstFilePath));
                         bigwigReader.getHeader().then((header) => {
+                            this.trackViewer.resetNothingToDisplayText();
                             // create a manifest that lists the available contigs
                             let manifest: Manifest = {
                                 contigs: []
@@ -94,6 +96,9 @@ export class GenomeVisualizer {
                                 this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
                                 this.setDataSource(new ManifestDataSource(manifest));
                             }
+                        }).catch((reason) => {
+                            this.trackViewer.resetNothingToDisplayText();
+                            console.error(`Error loading bigwig header: ${reason}`);
                         });
                         break;
                     }

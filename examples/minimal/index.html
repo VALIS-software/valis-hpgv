@@ -1,11 +1,10 @@
 <style>
     body {
         margin: 0;
-        font-family: sans-serif;
     }
 </style>
 
-<div id="root"></div>
+<div id="container"></div>
 
 <script src="../../dist/valis-hpgv.js"></script>
 
@@ -26,16 +25,16 @@
         }],
     };
 
+    // get state from URL
     if (window.location.hash) {
         config = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
     }
 
     let visualizer = new GenomeVisualizer(config, './manifest.json');
-    let container = document.getElementById('root');
-
-    window.addEventListener('resize', update);
+    let container = document.getElementById('container');
 
     update();
+    window.addEventListener('resize', update);
 
     function update() {
         visualizer.render({
@@ -44,8 +43,7 @@
         }, container);
     }
 
-    function saveState() {
+    function saveStateInURL() {
         window.history.replaceState(null, null, '#' + JSON.stringify(browser.getConfiguration()));
     }
-
 </script>

@@ -116,15 +116,23 @@ export class GenomeVisualizer {
         ReactDOM.render(this.reactRender(props), container);
     }
 
-    reactRender(props: GenomeVisualizerRenderProps) {
+    reactRender(props: GenomeVisualizerRenderProps = {
+        width: null,
+        height: null,
+    }) {
+        if (props == null) {
+            ;
+        }
+        let width = props.width == null ? 800 : props.width;
+        let height = props.height == null ? 600 : props.height;
         return (
             <AppCanvas
                 ref={(v) => {
                     this.appCanvasRef = v;
                     this.startFrameLoop();
                 }}
-                width={props.width}
-                height={props.height}
+                width={width}
+                height={height}
                 content={this.trackViewer}
                 pixelRatio={props.pixelRatio || window.devicePixelRatio || 1}
                 style={props.style}

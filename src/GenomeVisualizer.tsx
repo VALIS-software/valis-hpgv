@@ -135,7 +135,11 @@ export class GenomeVisualizer {
                 height={height}
                 content={this.trackViewer}
                 pixelRatio={props.pixelRatio || window.devicePixelRatio || 1}
-                style={props.style}
+                style={{
+                    // default style
+                    fontFamily: 'sans-serif',
+                    ...props.style
+                }}
                 onWillUnmount={() => {
                     this.stopFrameLoop();
                 }}

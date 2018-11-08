@@ -12,11 +12,11 @@ import { ShaderTrack, ShaderTile } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
 
-export class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileLoader> {
+export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel> extends ShaderTrack<Model, SequenceTileLoader> {
 
     protected densityMultiplier = 2.0;
  
-    constructor(model: SequenceTrackModel) {
+    constructor(model: Model) {
         super(model, SequenceTile);
         this.color.set([0, 0, 0, 1]);
     }

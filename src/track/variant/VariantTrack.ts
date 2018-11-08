@@ -13,7 +13,7 @@ import TrackObject from "../TrackObject";
 import { VariantTileLoader } from "./VariantTileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
 
-export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoader> {
+export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> extends TrackObject<Model, VariantTileLoader> {
 
     protected readonly macroLodBlendRange = 1;
     protected readonly macroLodThresholdLow = 8;
@@ -21,7 +21,7 @@ export class VariantTrack extends TrackObject<VariantTrackModel, VariantTileLoad
 
     protected pointerOverTrack = false;
 
-    constructor(model: VariantTrackModel) {
+    constructor(model: Model) {
         super(model);
 
         this.addInteractionListener('pointerenter', (e) => {

@@ -8,11 +8,11 @@ import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice
 import { DrawMode, DrawContext } from "engine/rendering/Renderer";
 import { Tile } from "../TileLoader";
 
-export class SignalTrack extends ShaderTrack<SignalTrackModel, SignalTileLoader> {
+export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader> {
 
     protected yAxis: Axis;
 
-    constructor(model: SignalTrackModel) {
+    constructor(model: Model) {
         super(model, SignalTile);
 
         this.yAxis = new Axis({

@@ -83,16 +83,15 @@ export class GenomeVisualizer {
                             });
 
                             for (let contigId of availableChromosomes) {
-                                let id = header.chromTree.chromToId[contigId];
                                 manifest.contigs.push({
                                     id: contigId,
                                     startIndex: 0,
-                                    span: header.chromTree.chromSize[id] || header.chromTree.chromSize[contigId]
+                                    span: header.chromTree.chromSize[contigId]
                                 });
                             }
 
                             if (this.getPanels().size === 0) {
-                                this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span - 1 }, false);
+                                this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
                                 this.setDataSource(new ManifestDataSource(manifest));
                             }
                         });

@@ -641,8 +641,22 @@ export class Panel extends Object2D {
             onEditCancel = { () => this.finishEditing() }
             onEditSave = { (rangeSpecifier: string) => this.finishEditing(rangeSpecifier) }
             onEditStart = { () => this.startEditing() }
-            onNextContig = { () =>  this.setContig(this.availableContigAtOffset(this.contig, 1)) }
-            onPreviousContig={() => this.setContig(this.availableContigAtOffset(this.contig, -1)) }
+            onNextContig = { () => {
+                let contig = this.availableContigAtOffset(this.contig, 1);
+                this.setContig(contig);
+                const idx = this.availableContigs.findIndex(c => c.id === contig);
+                if (idx !== -1) {
+                    this.setRange(this.availableContigs[idx].startIndex, this.availableContigs[idx].span);
+                }
+            }}
+            onPreviousContig={() => {
+                let contig = this.availableContigAtOffset(this.contig, -1);
+                this.setContig(contig);
+                const idx = this.availableContigs.findIndex(c => c.id === contig);
+                if (idx !== -1) {
+                    this.setRange(this.availableContigs[idx].startIndex, this.availableContigs[idx].span);
+                }
+            }}
         />;
     }
 

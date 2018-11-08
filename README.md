@@ -12,7 +12,7 @@ The quickest way to get started is to use [`valis-hpgv.js`](https://raw.githubus
 <script src="valis-hpgv.js"></script>
 ```
 
-- The visualizer can then be initialized with a list of files (bigwig, BAM, VCF, FASTA):
+- The visualizer can then be initialized with a list of files (supported types include bigwig, BAM, VCF, FASTA, gff3):
 ```javascript
 let browser = new GenomeBrowser([
     // pass a list of files to visualize in an array, the viewer will determine the best visualization to use

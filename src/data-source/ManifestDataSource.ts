@@ -10,31 +10,36 @@ export class ManifestDataSource implements IDataSource {
 
     protected manifestPromise: Promise<Manifest>;
 
-    constructor(readonly manifestPath: string | undefined) {
+    /**
+     * @param manifest Manifest object or path to remote manifest
+     */
+    constructor(readonly manifest: Manifest | (string | undefined)) {
         this.manifestPromise = new Promise((resolve, reject) => {
             // if there's no manifest then return an empty manifest
-            if (this.manifestPath == null) {
+            if (this.manifest == null) {
                 return {
                     contigs: [],
                 };
-            }
-
-            let request = new XMLHttpRequest();
-            request.addEventListener('loadend', (e) => {
-                // assume success if in 2xx range
-                if (request.status >= 200 && request.status < 300) {
-                    try {
-                        let manifest = JSON.parse(request.responseText);
-                        resolve(manifest);
-                    } catch (e) {
-                        reject(`Error parsing manifest: ${e}`)
+            } else if (typeof manifest === 'string' || (manifest instanceof String)) {
+                let request = new XMLHttpRequest();
+                request.addEventListener('loadend', (e) => {
+                    // assume success if in 2xx range
+                    if (request.status >= 200 && request.status < 300) {
+                        try {
+                            let manifest = JSON.parse(request.responseText);
+                            resolve(manifest);
+                        } catch (e) {
+                            reject(`Error parsing manifest: ${e}`)
+                        }
+                    } else {
+                        reject(`Could not load manifest: (${request.status}) ${request.statusText}`);
                     }
-                } else {
-                    reject(`Could not load manifest: (${request.status}) ${request.statusText}`);
-                }
-            });
-            request.open('GET', this.manifestPath);
-            request.send();
+                });
+                request.open('GET', this.manifest as string);
+                request.send();
+            } else {
+                return manifest;
+            }
         });
     }
 

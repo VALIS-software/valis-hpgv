@@ -4,14 +4,41 @@
 
 The genome visualizer can be used to explore individual genomic files (such as bigwig or BAM) or a collection of files via the [preprocessing script](#Using-the-Preprocessing-Script)
 
-The quickest way to get started is to use [`hpgv.js`](https://raw.githubusercontent.com/VALIS-software/High-Performance-Genome-Visualizer/master/dist/hpgv.js?token=ADkdENDxMTYiHKUCsbbAxUHGeMXPJD8qks5b6czowA%3D%3D) available in the `/dist` folder of this repository
-- Download a copy of [hpgv.js](https://raw.githubusercontent.com/VALIS-software/High-Performance-Genome-Visualizer/master/dist/hpgv.js?token=ADkdENDxMTYiHKUCsbbAxUHGeMXPJD8qks5b6czowA%3D%3D) from this repository
-- Create a HTML file, inside it load `hpgv.js` and create an element to contain the app
+The quickest way to get started is to use [`valis-hpgv.js`](https://raw.githubusercontent.com/VALIS-software/High-Performance-Genome-Visualizer/master/dist/valis-hpgv.js?token=ADkdENDxMTYiHKUCsbbAxUHGeMXPJD8qks5b6czowA%3D%3D) available in the `/dist` folder of this repository
+- Download a copy of [valis-hpgv.js](https://raw.githubusercontent.com/VALIS-software/High-Performance-Genome-Visualizer/master/dist/valis-hpgv.js?token=ADkdENDxMTYiHKUCsbbAxUHGeMXPJD8qks5b6czowA%3D%3D) from this repository
+- Create a HTML file, inside it load `valis-hpgv.js` and create an element to contain the app
 ```html
 <div id="container"></div>
-<script src="hpgv.js"></script>
+<script src="valis-hpgv.js"></script>
 ```
-- The visualizer can then be initialized:
+
+- The visualizer can then be initialized with a list of files (bigwig, BAM, VCF, FASTA):
+```javascript
+let browser = new GenomeBrowser([
+    // pass a list of files to visualize in an array, the viewer will determine the best visualization to use
+    'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
+]);
+```
+
+- Once initialized, the visualizer can be then displayed by calling its `render(props, container)` method:
+```javascript
+browser.render(
+    {
+        width: window.innerWidth,
+        height: window.innerHeight
+    },
+    document.getElementById('container')
+);
+```
+
+Opening the HTML you created should now show
+
+<img alt="VALIS Genome Visualizer Demo" src="https://user-images.githubusercontent.com/3742992/48023087-bd94e180-e134-11e8-931c-e9b946dfc1f4.png">
+
+See [examples/minimal/index.html](examples/minimal/index.html) for a complete example
+
+### Advanced Configuration
+For more control, you can configure panels and track properties on initialization:
 ```javascript
 let browser = new GenomeBrowser({
     // set the view to display chr1 covering bases 0 to 249 million
@@ -23,26 +50,12 @@ let browser = new GenomeBrowser({
         type: 'signal',
         name: 'Bigwig',
         path: 'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
+        heightPx: 250
     }],
 });
 ```
-- The visualizer can be displayed by calling its `render(props, container)` method:
-```javascript
-browser.render(
-    {
-        width: window.innerWidth,
-        height: window.innerHeight
-    },
-    document.getElementById('container')
-);
-```
 
-Opening the HTML you created should show
-
-<img alt="Genome Visualizer Demo" src="https://user-images.githubusercontent.com/3742992/48023087-bd94e180-e134-11e8-931c-e9b946dfc1f4.png">
-
-
-## Using the Preprocessing Script
+## Using the Preprocessing Script to Visualize a Collection of Files
 *todo*
 
 ## Getting Started with TypeScript
@@ -51,5 +64,4 @@ Opening the HTML you created should show
 *todo*
 
 ## Creating a Custom Track
-
-**todo**
+*todo*

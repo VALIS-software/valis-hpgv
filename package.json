@@ -17,7 +17,7 @@
   "dependencies": {
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
-    "bigwig-reader": "^1.0.6",
+    "bigwig-reader": "^1.0.9",
     "engine": "github:VALIS-software/Engine",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",
     "react": "16.x",

@@ -1,13 +1,16 @@
 import { Contig } from "../model/Contig";
 import { IDataSource } from "./IDataSource";
 import { GenomeFeature } from "../track/annotation/AnnotationTypes";
-declare type Manifest = {
+export declare type Manifest = {
     contigs: Array<Contig>;
 };
 export declare class ManifestDataSource implements IDataSource {
-    readonly manifestPath: string | undefined;
+    readonly manifest: Manifest | (string | undefined);
     protected manifestPromise: Promise<Manifest>;
-    constructor(manifestPath: string | undefined);
+    /**
+     * @param manifest Manifest object or path to remote manifest
+     */
+    constructor(manifest: Manifest | (string | undefined));
     getContigs(): Promise<Array<Contig>>;
     loadACGTSequence(contig: string, lodLevel: number, startBaseIndex: number, span: number): Promise<{
         array: Uint8Array;

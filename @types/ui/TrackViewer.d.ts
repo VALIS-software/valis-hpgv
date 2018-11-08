@@ -1,6 +1,7 @@
 /// <reference types="react" />
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
+import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
 import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../track/TrackModel";
@@ -28,16 +29,21 @@ export declare class TrackViewer extends Object2D {
     protected grid: Object2D;
     protected addPanelButton: ReactObject;
     protected dataSource: InternalDataSource;
+    protected masks: Object2D[];
+    protected nothingToDisplay: Text;
     constructor();
+    setConfiguration(state: TrackViewerConfiguration): void;
+    getConfiguration(): TrackViewerConfiguration;
+    setDataSource(dataSource: InternalDataSource): void;
     addTrack(model: TrackModel, animate?: boolean): Track;
     closeTrack(track: Track, animate?: boolean, onComplete?: () => void): void;
     addPanel(location: GenomicLocation, animate?: boolean): void;
     closePanel(panel: Panel, animate?: boolean, onComplete?: () => void): void;
-    setDataSource(dataSource: InternalDataSource): void;
-    getConfiguration(): TrackViewerConfiguration;
-    setConfiguration(state: TrackViewerConfiguration): void;
     getTracks(): Track[];
     getPanels(): Set<Panel>;
+    setNothingToDisplayText(string: string): void;
+    resetNothingToDisplayText(): void;
+    protected onPanelsChanged(): void;
     /**
      * Removes the row from the scene and cleans up resources
      *

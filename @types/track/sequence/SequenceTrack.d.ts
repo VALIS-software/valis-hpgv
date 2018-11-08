@@ -1,8 +1,8 @@
 import SequenceTileLoader from "./SequenceTileLoader";
 import { ShaderTrack } from "../ShaderTrack";
 import { SequenceTrackModel } from './SequenceTrackModel';
-export declare class SequenceTrack extends ShaderTrack<SequenceTrackModel, SequenceTileLoader> {
+export declare class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel> extends ShaderTrack<Model, SequenceTileLoader> {
     protected densityMultiplier: number;
-    constructor(model: SequenceTrackModel);
+    constructor(model: Model);
 }
 export default SequenceTrack;

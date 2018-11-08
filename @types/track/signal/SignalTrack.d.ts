@@ -2,8 +2,8 @@ import { SignalTrackModel } from "./SignalTrackModel";
 import { SignalTileLoader } from "./SignalTileLoader";
 import { ShaderTrack } from "../ShaderTrack";
 import { Axis } from "../../ui/Axis";
-export declare class SignalTrack extends ShaderTrack<SignalTrackModel, SignalTileLoader> {
+export declare class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader> {
     protected yAxis: Axis;
-    constructor(model: SignalTrackModel);
+    constructor(model: Model);
     protected updateDisplay(): void;
 }

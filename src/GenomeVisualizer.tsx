@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import { Animator } from "./Animator";
 import { IDataSource } from "./data-source/IDataSource";
 import { InternalDataSource } from "./data-source/InternalDataSource";
-import { ManifestDataSource } from "./data-source/ManifestDataSource";
+import { ManifestDataSource, Manifest } from "./data-source/ManifestDataSource";
 import { GenomeVisualizerConfiguration } from "./GenomeVisualizerConfiguration";
 import { TrackModel } from "./track/TrackModel";
 import { AppCanvas } from "./ui/core/AppCanvas";
@@ -20,6 +20,10 @@ import { VariantTrack } from "./track/variant/VariantTrack";
 import { TrackObject } from "./track/TrackObject";
 import { SignalTileLoader } from "./track/signal/SignalTileLoader";
 import { SignalTrack } from "./track/signal/SignalTrack";
+import { BigWigReader, AxiosDataLoader } from "bigwig-reader";
+import { SignalTrackModel } from "./track";
+import { GenomicLocation } from "./model";
+import { Panel } from "./ui";
 
 export interface GenomeVisualizerRenderProps {
     width: number,
@@ -45,20 +49,73 @@ export class GenomeVisualizer {
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
 
-    constructor(configuration?: GenomeVisualizerConfiguration, dataSource?: IDataSource | string){
+    constructor(configuration?: GenomeVisualizerConfiguration | Array<string>, dataSource?: IDataSource | string){
         this.trackViewer = new TrackViewer();
 
         this.setDataSource(dataSource);
 
-        if (configuration != null) {
-            // default panel if none is set
-            if (configuration.panels == null) {
-                configuration.panels = [{
-                    location: { contig: 'chr1', x0: 0, x1: 249e6 }
-                }];
-            }
+        if (Array.isArray(configuration)) {
+            if (configuration.length > 0) {
 
-            this.setConfiguration(configuration);
+                // add tracks from path list
+                for (let path of configuration) {
+                    this.addTrackFromFilePath(path, false);
+                }
+
+                // we determine a GenomeVisualizerConfiguration by inspecting the files in the list
+                let firstFilePath = configuration[0];
+
+                // we don't know what contigs are available so we must read the first file for this
+                let fileType = firstFilePath.substr(firstFilePath.lastIndexOf('.') + 1).toLowerCase();
+
+                switch (fileType) {
+                    case 'bigwig': {
+                        let bigwigReader = new BigWigReader(new AxiosDataLoader(firstFilePath));
+                        bigwigReader.getHeader().then((header) => {
+                            // create a manifest that lists the available contigs
+                            let manifest: Manifest = {
+                                contigs: []
+                            }
+
+                            for (let contigId of header.chromTree.idToChrom) {
+                                let id = header.chromTree.chromToId[contigId];
+                                manifest.contigs.push({
+                                    id: contigId,
+                                    startIndex: 0,
+                                    span: header.chromTree.chromSize[id] || header.chromTree.chromSize[contigId]
+                                });
+                            }
+
+                            if (this.getPanels().size === 0) {
+                                this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span - 1 }, false);
+                                this.setDataSource(new ManifestDataSource(manifest));
+                            }
+                        });
+                        break;
+                    }
+                    // case 'bam': { break; }
+                    // case 'vcf': { break; }
+                    // case 'fasta': { break; }
+                    // case 'gff3': { break; }
+                    default: {
+                        console.error(`Unsupported fileType "${fileType}"`);
+                        // add a human chromosome 1 panel and _hope_ that matches the available data
+                        this.addPanel({ contig: 'chr1', x0: 0, x1: 249e9 }, false);
+                        break;
+                    }
+                }
+            }
+        } else {
+            if (configuration != null) {
+                // default panel if none is set
+                if (configuration.panels == null) {
+                    configuration.panels = [{
+                        location: { contig: 'chr1', x0: 0, x1: 249e6 }
+                    }];
+                }
+
+                this.setConfiguration(configuration);
+            }
         }
     }
 
@@ -94,8 +151,45 @@ export class GenomeVisualizer {
         return this.trackViewer.addTrack(model, animateIn);
     }
 
-    closeTrack(track: Track, animateOut: boolean = true, onComplete: () => void) {
+    addTrackFromFilePath(path: string, animateIn: boolean) {
+        // we don't know what contigs are available so we must read the first file for this
+        let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
+        let fileName = path.split('/').pop().split('\\').pop();
+
+        switch (fileType) {
+            case 'bigwig': {
+                let model: SignalTrackModel = {
+                    type: 'signal',
+                    name: fileName,
+                    path: path,
+                };
+                return this.addTrack(model, animateIn);
+            }
+            /*
+            case 'bam': { break; }
+            case 'vcf': { break; }
+            case 'fasta': { break; }
+            case 'gff3': { break; }
+            */
+            default: {
+                console.error(`Error adding track: Unsupported fileType "${fileType}"`);
+                break;
+            }
+        }
+
+        return null;
+    }
+
+    addPanel(location: GenomicLocation, animateIn: boolean) {
+        return this.trackViewer.addPanel(location, animateIn);
+    }
+
+    closeTrack(track: Track, animateOut: boolean = true, onComplete?: () => void) {
         return this.trackViewer.closeTrack(track, animateOut, onComplete);
+    }
+
+    closePanel(panel: Panel, animateOut: boolean, onComplete?: () => void) {
+        return this.trackViewer.closePanel(panel, animateOut, onComplete);
     }
 
     getTracks() {

@@ -16,6 +16,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Animator from "../Animator";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
+import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
 import GenomeVisualizer from "../GenomeVisualizer";
 import { GenomicLocation } from "../model/GenomicLocation";
@@ -25,6 +26,7 @@ import ReactObject from "./core/ReactObject";
 import Panel, { PanelInternal } from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
 import { DEFAULT_SPRING } from "./UIConstants";
+import { OpenSansRegular } from "./font";
 
 export class TrackViewer extends Object2D {
 
@@ -53,6 +55,9 @@ export class TrackViewer extends Object2D {
     protected addPanelButton: ReactObject;
 
     protected dataSource: InternalDataSource;
+
+    protected masks = new Array<Object2D>();
+    protected nothingToDisplay: Text;
 
     constructor() {
         super();
@@ -86,31 +91,29 @@ export class TrackViewer extends Object2D {
         this.addPanelButton.y = -this.xAxisHeight - this.spacing.x * 0.5;
         this.grid.add(this.addPanelButton);
 
-        const leftTrackMask = new ReactObject(<div 
-            style={
-                {
-                    backgroundColor: '#fff',
-                    zIndex: 2,
-                    width: '100%',
-                    height: '100%',
-                }
-            }
-        />, this.trackHeaderWidth  + this.spacing.x, this.panelHeaderHeight + this.xAxisHeight - 0.5 * this.spacing.y);
-        this.add(leftTrackMask);
+        const maskStyle = {
+            backgroundColor: '#fff',
+            zIndex: 2,
+            width: '100%',
+            height: '100%',
+        }
 
-        const rightTrackMask = new ReactObject(<div 
-            style={
-                {
-                    backgroundColor: '#fff',
-                    zIndex: 2,
-                    width: '100%',
-                    height: '100%',
-                }
-            }
-        />, this.panelHeaderHeight + 1.5 * this.spacing.x, this.panelHeaderHeight + this.xAxisHeight - 0.5 * this.spacing.y);
+        const leftTrackMask = new ReactObject(<div style={maskStyle}/>, this.trackHeaderWidth  + this.spacing.x, this.panelHeaderHeight + this.xAxisHeight - 0.5 * this.spacing.y);
+
+        const rightTrackMask = new ReactObject(<div style={maskStyle} />, this.panelHeaderHeight + 1.5 * this.spacing.x, this.panelHeaderHeight + this.xAxisHeight - 0.5 * this.spacing.y);
         rightTrackMask.relativeX = 1;
-        rightTrackMask.x = -this.panelHeaderHeight - 1.5 * this.spacing.x;
-        this.add(rightTrackMask);
+        rightTrackMask.originX = -1;
+
+        this.masks = [leftTrackMask, rightTrackMask];
+
+        // nothing to display text
+        this.nothingToDisplay = new Text(OpenSansRegular, 'Nothing to display', 20, [0.6, 0.6, 0.6, 1.0]);
+        this.nothingToDisplay.z = 10;
+        // center
+        this.nothingToDisplay.originX = -0.5;
+        this.nothingToDisplay.originY = -0.5;
+        this.nothingToDisplay.relativeX = 0.5;
+        this.nothingToDisplay.relativeY = 0.5;
 
         window.addEventListener('resize', this.onResize);
 
@@ -119,6 +122,106 @@ export class TrackViewer extends Object2D {
             panels: [],
             tracks: [],
         });
+    }
+
+    setConfiguration(state: TrackViewerConfiguration) {
+        // hide/show add panel button
+        this.allowNewPanels = state.allowNewPanels === undefined ? false : state.allowNewPanels;
+        this.grid.toggleChild(this.addPanelButton, this.allowNewPanels);
+
+        // Panels
+        // clear current panels
+        let currentPanels = new Set(this.panels);
+        for (let panel of currentPanels) {
+            this.closePanel(panel, false);
+        }
+
+        // clear current tracks
+        let currentTracks = new Set(this.tracks);
+        for (let track of currentTracks) {
+            this.closeTrack(track, false);
+        }
+
+        // create panels
+        for (let i = 0; i < state.panels.length; i++) {
+            let panelState = state.panels[i];
+            this.addPanel(panelState.location, false);
+        }
+
+        // determine what width to set panels that have no width specified
+        let unassignedWidthRemaining = 1;
+        let unassignedWidthCount = 0;
+        for (let i = 0; i < state.panels.length; i++) {
+            let panelState = state.panels[i];
+            if (panelState.width != null) {
+                unassignedWidthRemaining -= panelState.width;
+            } else {
+                unassignedWidthCount++;
+            }
+        }
+        let unassignedWidthPanel = unassignedWidthRemaining / unassignedWidthCount;
+
+        // set panel edges from state widths
+        let e = 0;
+        for (let i = 0; i < state.panels.length; i++) {
+            let panelState = state.panels[i];
+            this.panelEdges[i] = e;
+
+            if (panelState.width != null) {
+                e += panelState.width;
+            } else {
+                e += unassignedWidthPanel;
+            }
+        }
+
+        this.layoutPanels(false);
+
+        // create rows
+        for (let track of state.tracks) {
+            this.addTrack(track, false);
+        }
+
+        this.layoutTrackRows(false);
+
+        this.layoutGridContainer();
+
+        this.onPanelsChanged();
+    }
+
+    getConfiguration(): TrackViewerConfiguration {
+        let panels: TrackViewerConfiguration['panels'] = new Array();
+        for (let panel of this.panels) {
+            let width = this.panelEdges[panel.column + 1] - this.panelEdges[panel.column];
+            panels.push({
+                location: {
+                    contig: panel.contig,
+                    x0: panel.x0,
+                    x1: panel.x1,
+                },
+                width: width,
+            });
+        }
+
+        let tracks: TrackViewerConfiguration['tracks'] = new Array();
+        for (let track of this.tracks) {
+            tracks.push({
+                ...track.model,
+                heightPx: track.heightPx,
+            });
+        }
+
+        return {
+            allowNewPanels: this.allowNewPanels,
+            panels: panels,
+            tracks: tracks,
+        }
+    }
+
+    setDataSource(dataSource: InternalDataSource) {
+        this.dataSource = dataSource;
+        for (let panel of this.panels) {
+            panel.setDataSource(dataSource);
+        }
     }
 
     // track-viewer state deltas
@@ -250,6 +353,7 @@ export class TrackViewer extends Object2D {
        }
 
         this.panels.add(panel);
+        this.onPanelsChanged();
 
         panel.resizeHandle.addInteractionListener('dragstart', (e) => {
             if (e.isPrimary && e.buttonState === 1) {
@@ -326,119 +430,25 @@ export class TrackViewer extends Object2D {
         }
     }
 
-    setDataSource(dataSource: InternalDataSource) {
-        this.dataSource = dataSource;
-        for (let panel of this.panels) {
-            panel.setDataSource(dataSource);
-        }
-    }
-
-    getConfiguration(): TrackViewerConfiguration {
-        let panels: TrackViewerConfiguration['panels'] = new Array();
-        for (let panel of this.panels) {
-            let width = this.panelEdges[panel.column + 1] - this.panelEdges[panel.column];
-            panels.push({
-                location: {
-                    contig: panel.contig,
-                    x0: panel.x0,
-                    x1: panel.x1,
-                },
-                width: width,
-            });
-        }
-
-        let tracks: TrackViewerConfiguration['tracks'] = new Array();
-        for (let track of this.tracks) {
-            tracks.push({
-                ...track.model,
-                heightPx: track.heightPx,
-            });
-        }
-
-        return {
-            allowNewPanels: this.allowNewPanels,
-            panels: panels,
-            tracks: tracks,
-        }
-    }
-
-    setConfiguration(state: TrackViewerConfiguration) {
-        this.allowNewPanels = state.allowNewPanels === undefined ? false : state.allowNewPanels;
-        
-        // hide/show add panel button
-        if (this.allowNewPanels) {
-            if (!this.grid.has(this.addPanelButton)) {
-                this.grid.add(this.addPanelButton);
-            }
-        } else {
-            if (this.grid.has(this.addPanelButton)) {
-                this.grid.remove(this.addPanelButton);
-            }
-        }
-
-        // Panels
-        // clear current panels
-        let currentPanels = new Set(this.panels);
-        for (let panel of currentPanels) {
-            this.closePanel(panel, false);
-        }
-
-        // clear current tracks
-        let currentTracks = new Set(this.tracks);
-        for (let track of currentTracks) {
-            this.closeTrack(track, false);
-        }
-
-        // create panels
-        for (let i = 0; i < state.panels.length; i++) {
-            let panelState = state.panels[i];
-            this.addPanel(panelState.location, false);
-        }
-
-        // determine what width to set panels that have no width specified
-        let unassignedWidthRemaining = 1;
-        let unassignedWidthCount = 0;
-        for (let i = 0; i < state.panels.length; i++) {
-            let panelState = state.panels[i];
-            if (panelState.width != null) {
-                unassignedWidthRemaining -= panelState.width;
-            } else {
-                unassignedWidthCount++;
-            }
-        }
-        let unassignedWidthPanel = unassignedWidthRemaining / unassignedWidthCount;
-
-        // set panel edges from state widths
-        let e = 0;
-        for (let i = 0; i < state.panels.length; i++) {
-            let panelState = state.panels[i];
-            this.panelEdges[i] = e;
-
-            if (panelState.width != null) {
-                e += panelState.width;
-            } else {
-                e += unassignedWidthPanel;
-            }
-        }
-
-        this.layoutPanels(false);
-
-        // create rows
-        for (let track of state.tracks) {
-            this.addTrack(track, false);
-        }
-
-        this.layoutTrackRows(false);
-
-        this.layoutGridContainer();
-    }
-
     getTracks() {
         return this.tracks.slice();
     }
 
     getPanels() {
         return new Set(this.panels);
+    }
+
+    protected onPanelsChanged() {
+        // hide/show masks & nothing to display message
+        let nothingToDisplay = this.panels.size === 0;
+
+        this.toggleChild(this.nothingToDisplay, nothingToDisplay);
+
+        // only show tracks and masks when showing panels and content
+        this.toggleChild(this.grid, !nothingToDisplay);
+        for (let mask of this.masks) {
+            this.toggleChild(mask, !nothingToDisplay);
+        }
     }
 
     /**
@@ -492,6 +502,7 @@ export class TrackViewer extends Object2D {
         }
 
         this.panels.delete(panel);
+        this.onPanelsChanged();
 
         // stop any active animations on the panel
         Animator.stop(panel);

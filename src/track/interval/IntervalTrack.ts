@@ -7,11 +7,11 @@ import TrackObject from "../TrackObject";
 import IntervalTileLoader, { IntervalTilePayload } from "./IntervalTileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
 
-export class IntervalTrack extends TrackObject<IntervalTrackModel, IntervalTileLoader> {
+export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel> extends TrackObject<Model, IntervalTileLoader> {
 
     readonly intervalColor = [74 / 0xff, 52 / 0xff, 226 / 0xff, 0.66];
 
-    constructor(model: IntervalTrackModel) {
+    constructor(model: Model) {
         super(model);
         if (model.color != null) {
             this.intervalColor = model.color;

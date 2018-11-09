@@ -23,6 +23,7 @@ interface Props {
     height: number;
     content: Object2D;
     pixelRatio?: number;
+    className?: string;
     style?: React.CSSProperties;
     canvasStyle?: React.CSSProperties;
     onWillUnmount?: () => void,
@@ -149,7 +150,7 @@ export class AppCanvas extends React.Component<Props, State> {
             ...(this.props.style || {})
         };
         return (
-            <div className="app-canvas" style={style}>
+            <div className={('app-canvas' + ((' ' + this.props.className) || '')).trimRight()} style={style}>
                 <canvas
                     ref={(v) => this.canvas = v}
                     width={canvasWidth}

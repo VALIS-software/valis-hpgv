@@ -236,6 +236,7 @@ export class GenomeVisualizer {
                 }}
                 width={width}
                 height={height}
+                className={'valis-genome-visualizer'}
                 content={this.trackViewer}
                 pixelRatio={props.pixelRatio || window.devicePixelRatio || 1}
                 style={{

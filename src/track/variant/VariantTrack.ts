@@ -64,6 +64,10 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
             // micro-scale details
             if (microOpacity > 0) {
                 tileLoader.forEachTile(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+                    if (tile.state !== TileState.Complete) {
+                        return;
+                    }
+
                     const altHeightPx = 25;
                     const tileY = 15;
 

@@ -148,6 +148,10 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
         this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
+            if (tile.state !== TileState.Complete) {
+                return;
+            }
+
             for (let gene of tile.payload) {
                 // @! temp performance hack, only use node when visible
                 // (don't need to do this when using instancing)

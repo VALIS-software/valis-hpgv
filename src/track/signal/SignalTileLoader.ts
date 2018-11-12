@@ -25,6 +25,13 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
     ready : boolean = false;
 
+    get scaleFactor() {
+        return this._scaleFactor;
+    }
+
+    protected _scaleFactor: number = 1;
+    protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
+
     protected header: HeaderData;
 
     protected lodMap: Array<number>;
@@ -78,9 +85,46 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
             this.lodMap = lookupTables.lodMap;
             this.lodZoomIndexMap = lookupTables.lodZoomIndexMap;
 
-            this.ready = true;
+            // determine scale factor
+            let maxLod = this.lodMap[this.lodMap.length - 1];
+            let maxZoomIndex = this.lodZoomIndexMap[maxLod];
 
-            this.onReady();
+            this.bigWigReader.readZoomData(
+                this.contig,
+                0,
+                this.contig,
+                this.header.chromTree.chromSize[this.contig], // @! needs checking,
+                maxZoomIndex,
+            ).then((entries) => {
+                console.log('maxZoom', entries);
+
+                let maxValue = -Infinity;
+                let maxAvg = -Infinity;
+                for (let entry of entries) {
+                    let avg = entry.sumData / entry.validCount;
+                    maxAvg = Math.max(avg, maxAvg);
+                    maxValue = Math.max(entry.maxVal, entry.maxVal);
+                }
+
+                let maxValueWeight = 0.0;
+                let maxAverageWeight = 1 - maxValueWeight;
+
+                let weightedAveraged = maxValue * maxValueWeight + maxAvg * maxAverageWeight;
+
+                let maxDisparity = maxValue / maxAvg;
+
+                // this._logarithmicDisplay = maxDisparity > 10;
+                this._logarithmicDisplay = false;
+
+                console.log(maxValue, maxAvg, weightedAveraged);
+
+                // @! hacky
+                this._scaleFactor = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
+
+                this.ready = true;
+
+                this.onReady();
+            });
         });
     }
 
@@ -91,7 +135,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
             if (contigInfo != null) {
                 let maxX = contigInfo.span - 1;
                 let minSpan = 512;
-                this.getTiles(0, maxX, contigInfo.span / minSpan, true, () => { });
+                this.forEachTile(0, maxX, contigInfo.span / minSpan, true, () => { });
             }
         });
     }
@@ -171,7 +215,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         let lodDensity = Math.pow(2, tile.lodLevel);
 
         // @! use for normalization
-        let dataMultiplier = 0.1;
+        let dataMultiplier = this._scaleFactor;
         // @! review floor in i0, i1
 
         let dataPromise: Promise<Float32Array>;

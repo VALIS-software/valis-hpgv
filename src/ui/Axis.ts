@@ -180,6 +180,10 @@ export class Axis extends Object2D {
         super.applyTransformToSubNodes(root);
     }
 
+    releaseGPUResources() {
+        this.resetLabels();
+    }
+
     protected resetLabels() {
         if (this.labelCache === undefined) return;
 

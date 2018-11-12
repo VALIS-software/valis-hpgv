@@ -27,7 +27,7 @@ module.exports = (env, argv) => {
         },
 
         // Enable sourcemaps for debugging webpack's output.
-        devtool: releaseMode ? false : "source-map",
+        devtool: releaseMode ? "source-map" : "source-map",
 
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx"]

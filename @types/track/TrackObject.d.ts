@@ -6,6 +6,9 @@ import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>> extends Rect {
     protected readonly model: ModelType;
+    protected displayLoadingIndicator: boolean;
+    protected _pixelRatio: number;
+    pixelRatio: number;
     protected dataSource: InternalDataSource;
     protected contig: string | undefined;
     protected x0: number;
@@ -31,7 +34,11 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     private _lastComputedWidth;
     applyTransformToSubNodes(root?: boolean): void;
     protected getTileLoader(): TileLoaderType;
-    protected _pendingTiles: UsageCache<Tile<any>>;
+    protected _loadingTiles: UsageCache<Tile<any>>;
+    protected triggerDisplayUpdate(): void;
+    /**
+     * Override to handle drawing
+     */
     protected updateDisplay(): void;
     /**
      * Show or hide the loading indicator via animation

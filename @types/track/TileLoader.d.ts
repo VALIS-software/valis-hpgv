@@ -19,11 +19,20 @@ export declare class TileLoader<TilePayload, BlockPayload> {
     protected readonly blockSize: number;
     protected requestManager: TileRequestManager;
     constructor(tileWidth?: number, tilesPerBlock?: number, maximumX?: number);
-    getTiles(x0: number, x1: number, samplingDensity: number, requestData: boolean, callback: (tile: Tile<TilePayload>) => void): void;
-    getTile(x: number, samplingDensity: number, requestData: boolean): Tile<TilePayload>;
+    /**
+     * Callback is executed synchronously
+     */
+    forEachTile(x0: number, x1: number, samplingDensity: number, loadEmptyTiles: boolean, callback: (tile: Tile<TilePayload>) => void): void;
+    /**
+     * Callback is executed synchronously
+     */
+    forEachTileAtLod(x0: number, x1: number, lodLevel: number, loadEmptyTiles: boolean, callback: (tile: Tile<TilePayload>) => void): void;
+    getTile(x: number, samplingDensity: number, loadEmptyTiles: boolean): Tile<TilePayload>;
+    getTileAtLod(x: number, lodLevel: number, loadEmptyTiles: boolean): Tile<TilePayload>;
     isWithinInitializedLodRange(samplingDensity: number): boolean;
     getBlockPayload(tile: Tile<TilePayload>): BlockPayload;
     clear(): void;
+    topTouchedLod(): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
     protected createBlockPayload(lodLevel: number, lodX: number, lodSpan: number, rows: number): BlockPayload;
     protected releaseBlockPayload(block: BlockPayload): void;

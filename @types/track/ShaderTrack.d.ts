@@ -8,9 +8,7 @@ interface CustomTileNode<Payload> {
 }
 export declare class ShaderTrack<Model extends TrackModel, Loader extends TileLoader<TilePayload, any>, TilePayload = any> extends TrackObject<Model, Loader> {
     protected customTileNodeClass: CustomTileNode<TilePayload>;
-    pixelRatio: number;
     protected densityMultiplier: number;
-    protected _pixelRatio: number;
     constructor(model: Model, customTileNodeClass: CustomTileNode<TilePayload>);
     protected _tileNodeCache: UsageCache<ShaderTile<TilePayload>>;
     protected updateDisplay(): void;

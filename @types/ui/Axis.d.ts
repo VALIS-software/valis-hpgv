@@ -49,6 +49,7 @@ export declare class Axis extends Object2D {
     constructor(options?: Partial<AxisConfig>);
     setRange(x0: number, x1: number): void;
     applyTransformToSubNodes(root?: boolean): void;
+    releaseGPUResources(): void;
     protected resetLabels(): void;
     protected updateLabels(): void;
     protected touchLabel(x: number, alpha: number, span: number, yMode: boolean): void;

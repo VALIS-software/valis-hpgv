@@ -2,7 +2,6 @@ import { SignalTrackModel } from "./SignalTrackModel";
 import { SignalTilePayload, SignalTileLoader } from "./SignalTileLoader";
 import { ShaderTrack, ShaderTile } from "../ShaderTrack";
 import { Axis } from "../../ui/Axis";
-import { Rect } from "engine/ui/Rect";
 import { SharedResources } from "engine/SharedResources";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawMode, DrawContext } from "engine/rendering/Renderer";
@@ -38,21 +37,23 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         // bg.relativeH = 1;
         // bg.z = -0.5;
         // yAxis.add(bg);
+        this.displayLoadingIndicator = true;
     }
 
     protected updateDisplay() {
         let tileLoader = this.getTileLoader();
+
         if (tileLoader.ready) {
-            this.toggleLoadingIndicator(false, true);
+            this.yAxis.setRange(0, 1 / tileLoader.scaleFactor);
+            this.displayLoadingIndicator = false;
             super.updateDisplay();
         } else {
-            this.toggleLoadingIndicator(true, true);
-
-            this._tileNodeCache.markAllUnused();
-            this._tileNodeCache.removeUnused(this.deleteTileNode);
-            // this.displayNeedUpdate = false;
+            if (this._tileNodeCache.count > 0) {
+                this._tileNodeCache.removeAll(this.deleteTileNode);
+            }
+            // keep updating display until tileLoader is complete
+            this.displayNeedUpdate = true;
         }
-
     }
 
 }
@@ -159,14 +160,12 @@ class SignalTile extends ShaderTile<SignalTilePayload> {
             vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y); // * vec3( 1., 0., 0. );
             #endif
             
+            #ifdef debug
             float debug = step((1.0 - vUv.y) * size.y, 5.);
+            col = mix( col, vec3( 0., vUv.xy ), debug);
+            #endif
             
-            gl_FragColor = vec4(
-                mix(
-                    col,
-                    vec3( 0., vUv.xy ),
-                    debug
-                ), 1.0) * opacity;
+            gl_FragColor = vec4(col, 1.0) * opacity;
         }
     `;
 

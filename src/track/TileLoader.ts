@@ -26,12 +26,31 @@ export class TileLoader<TilePayload, BlockPayload> {
     ) {
         this.blockSize = tileWidth * tilesPerBlock;
     }
-
-    getTiles(
+    
+    /**
+     * Callback is executed synchronously
+     */
+    forEachTile(
         x0: number,
         x1: number,
         samplingDensity: number,
-        requestData: boolean,
+        loadEmptyTiles: boolean,
+        callback: (tile: Tile<TilePayload>) => void
+    ) {
+        let lodLevelFractional = Scalar.log2(Math.max(samplingDensity, 1));
+        let lodLevel = Math.floor(lodLevelFractional);
+
+        return this.forEachTileAtLod(x0, x1, lodLevel, loadEmptyTiles, callback);
+    }
+    
+    /**
+     * Callback is executed synchronously
+     */
+    forEachTileAtLod(
+        x0: number,
+        x1: number,
+        lodLevel: number,
+        loadEmptyTiles: boolean,
         callback: (tile: Tile<TilePayload>) => void
     ) {
         // clamp to positive numbers
@@ -44,9 +63,6 @@ export class TileLoader<TilePayload, BlockPayload> {
 
         // guard illegal span
         if (x1 <= x0) return;
-
-        let lodLevelFractional = Scalar.log2(Math.max(samplingDensity, 1));
-        let lodLevel = Math.floor(lodLevelFractional);
 
         lodLevel = this.mapLodLevel(lodLevel);
 
@@ -74,7 +90,7 @@ export class TileLoader<TilePayload, BlockPayload> {
             for (let rowIndex = firstRowIndex; rowIndex <= lastRowIndex; rowIndex++) {
                 let tile = block.rows[rowIndex];
 
-                if (requestData) {
+                if (loadEmptyTiles) {
                     this.touchTileRequest(tile);
                 }
 
@@ -86,22 +102,30 @@ export class TileLoader<TilePayload, BlockPayload> {
     getTile(
         x: number,
         samplingDensity: number,
-        requestData: boolean
+        loadEmptyTiles: boolean
     ): Tile<TilePayload> {
-        x = Math.max(x, 0);
-        x = Math.min(x, this.maximumX);
-
         let lodLevelFractional = Scalar.log2(Math.max(samplingDensity, 1));
         let lodLevel = Math.floor(lodLevelFractional);
 
+        return this.getTileAtLod(x, lodLevel, loadEmptyTiles);
+    }
+
+    getTileAtLod(
+        x: number,
+        lodLevel: number,
+        loadEmptyTiles: boolean
+    ): Tile<TilePayload> {
+        x = Math.max(x, 0);
+        x = Math.min(x, this.maximumX);
+        
         lodLevel = this.mapLodLevel(lodLevel);
 
         let lodDensity = Math.pow(2, lodLevel);
         let x_lodSpace = Math.floor(x / lodDensity);
 
-        let tile = this.getTileFromLodX(lodLevel, x_lodSpace, requestData);
+        let tile = this.getTileFromLodX(lodLevel, x_lodSpace, loadEmptyTiles);
 
-        if (requestData) {
+        if (loadEmptyTiles) {
             this.touchTileRequest(tile);
         }
 
@@ -137,6 +161,10 @@ export class TileLoader<TilePayload, BlockPayload> {
         }
         // release tiles to GC
         this.lods = new Array();
+    }
+
+    topTouchedLod() {
+        return this.lods.length - 1;
     }
 
     // user-overridden methods

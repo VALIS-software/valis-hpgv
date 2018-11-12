@@ -4,13 +4,23 @@ import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
 import { OpenSansRegular } from "../ui/font/Fonts";
-import { Tile, TileLoader } from "./TileLoader";
+import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
+import { Scalar } from "engine/math/Scalar";
 
 export class TrackObject<
     ModelType extends TrackModel = TrackModel,
     TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>
 > extends Rect {
+
+    protected displayLoadingIndicator = false;
+
+    protected _pixelRatio: number = window.devicePixelRatio || 1;
+    get pixelRatio() { return this._pixelRatio; }
+    set pixelRatio(v: number) {
+        this._pixelRatio = v;
+        this.displayNeedUpdate = true;
+    }
 
     protected dataSource: InternalDataSource;
     protected contig: string | undefined;
@@ -42,8 +52,10 @@ export class TrackObject<
         this.loadingIndicator = new LoadingIndicator();
         this.loadingIndicator.cursorStyle = 'pointer';
         this.loadingIndicator.originY = -1;
+        this.loadingIndicator.originX = -1;
+        this.loadingIndicator.relativeX = 1;
         this.loadingIndicator.relativeY = 1;
-        this.loadingIndicator.x = 10;
+        this.loadingIndicator.x = -10;
         this.loadingIndicator.y = -10;
         this.loadingIndicator.mask = this;
         this.add(this.loadingIndicator);
@@ -137,7 +149,7 @@ export class TrackObject<
     applyTransformToSubNodes(root?: boolean) {
         // update tiles if we need to
         if ((this._lastComputedWidth !== this.getComputedWidth()) || this.displayNeedUpdate) {
-            this.updateDisplay();
+            this.triggerDisplayUpdate();
             this._lastComputedWidth = this.getComputedWidth();
         }
 
@@ -148,15 +160,48 @@ export class TrackObject<
         return this.dataSource.getTileLoader(this.model, this.contig) as any;
     }
 
-    protected _pendingTiles = new UsageCache<Tile<any>>();
-    protected updateDisplay() {
-        this._pendingTiles.markAllUnused();
-
-        // fetch and display data
-
+    protected _loadingTiles = new UsageCache<Tile<any>>();
+    protected triggerDisplayUpdate() {
+        this._loadingTiles.markAllUnused();
         this.displayNeedUpdate = false;
-        this._pendingTiles.removeUnused(this.removeTileLoadingDependency);
-        this.toggleLoadingIndicator(this._pendingTiles.count > 0, true);
+
+        this.updateDisplay();
+
+        // display loading indicator if any tiles in the current range are loading
+        const x0 = this.x0;
+        const x1 = this.x1;
+        const span = x1 - x0;
+        const widthPx = this.getComputedWidth();
+        let basePairsPerDOMPixel = (span / widthPx);
+        let samplingDensity = basePairsPerDOMPixel / this.pixelRatio;
+        let displayLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
+        let lodLevel = Math.floor(displayLodLevel);
+
+        let tileLoader = this.getTileLoader();
+        let topLod = tileLoader.topTouchedLod();
+        for (let l = lodLevel; l <= topLod; l++) {
+            let lodLevelCovered = true;
+
+            tileLoader.forEachTileAtLod(this.x0, this.x1, l, false, (tile) => {
+                if (tile.state === TileState.Loading) {
+                    this._loadingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
+                    lodLevelCovered = false;
+                }
+            });
+
+            // if a level has been covered complete we assume we don't care about the higher lods
+            if (lodLevelCovered) break;
+        }
+
+        this._loadingTiles.removeUnused(this.removeTileLoadingDependency);
+
+        this.toggleLoadingIndicator((this._loadingTiles.count > 0) || this.displayLoadingIndicator , true);
+    }
+
+    /**
+     * Override to handle drawing
+     */
+    protected updateDisplay() {
     }
 
     /**
@@ -165,7 +210,7 @@ export class TrackObject<
      */
     protected toggleLoadingIndicator(visible: boolean, animate: boolean) {
         // we want a little bit of delay before the animation, for this we use a negative opacity when invisible
-        let targetOpacity = visible ? 1 : -0.1;
+        let targetOpacity = visible ? 1.0 : -0.1;
 
         if (animate) {
             Animator.springTo(this.loadingIndicator, { 'opacity': targetOpacity }, 50);
@@ -186,7 +231,7 @@ export class TrackObject<
     }
 
     protected onDependentTileComplete = () => {
-        this.updateDisplay();
+        this.triggerDisplayUpdate();
     }
 
 }

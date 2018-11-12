@@ -17,15 +17,7 @@ export class ShaderTrack<
     TilePayload = any
 > extends TrackObject<Model, Loader> {
 
-    get pixelRatio() { return this._pixelRatio; }
-
-    set pixelRatio(v: number) {
-        this._pixelRatio = v;
-        this.displayNeedUpdate = true;
-    }
-
     protected densityMultiplier = 1.0;
-    protected _pixelRatio: number = window.devicePixelRatio || 1;
 
     constructor(model: Model, protected customTileNodeClass: CustomTileNode<TilePayload>) {
         super(model);
@@ -49,7 +41,7 @@ export class ShaderTrack<
             let displayLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
             let lodLevel = Math.floor(displayLodLevel);
 
-            tileLoader.getTiles(x0, x1, samplingDensity, true, (tile) => {
+            tileLoader.forEachTile(x0, x1, samplingDensity, true, (tile) => {
                 let tileNode = this._tileNodeCache.get(this.contig + ':' + tile.key, this.createTileNode);
                 this.updateTileNode(tileNode, tile, x0, span, displayLodLevel);
 
@@ -118,7 +110,6 @@ export class ShaderTrack<
         }
 
         this._tileNodeCache.removeUnused(this.deleteTileNode);
-        this.displayNeedUpdate = false;
     }
 
     protected createTileNode = (): ShaderTile<TilePayload> => {

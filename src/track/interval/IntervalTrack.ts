@@ -18,11 +18,9 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
         }
     }
 
-    protected _pendingTiles = new UsageCache<Tile<any>>();
     protected _intervalTileCache = new UsageCache<IntervalInstances>();
     protected _onStage = new UsageCache<Object2D>();
     protected updateDisplay() {
-        this._pendingTiles.markAllUnused();
         this._onStage.markAllUnused();
 
         const x0 = this.x0;
@@ -36,13 +34,10 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
 
             let tileLoader = this.getTileLoader();
 
-            tileLoader.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+            tileLoader.forEachTile(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                 if (tile.state === TileState.Complete) {
                     this.displayTileNode(tile, 0.9, x0, span, continuousLodLevel);
                 } else {
-                    // if the tile is incomplete then wait until complete and call updateAnnotations() again
-                    this._pendingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
-
                     // display a fallback tile if one is loaded at this location
                     let gapCenterX = tile.x + tile.span * 0.5;
                     let fallbackTile = tileLoader.getTile(gapCenterX, 1 << tileLoader.macroLodLevel, false);
@@ -55,10 +50,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
             });
         }
 
-        this.displayNeedUpdate = false;
-        this._pendingTiles.removeUnused(this.removeTileLoadingDependency);
         this._onStage.removeUnused(this.removeTile);
-        this.toggleLoadingIndicator(this._pendingTiles.count > 0, true);
     }
 
     protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, x0: number, span: number, continuousLodLevel: number) {

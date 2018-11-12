@@ -39,7 +39,6 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
         root: Object2D, textParent: Object2D, text: TextClone,
     }>();
     protected updateDisplay() {
-        this._pendingTiles.markAllUnused();
         this._onStageAnnotations.markAllUnused();
         this._sequenceLabelCache.markAllUnused();
 
@@ -64,12 +63,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
             // micro-scale details
             if (microOpacity > 0) {
-                tileLoader.getTiles(x0, x1, basePairsPerDOMPixel, true, (tile) => {
-                    if (tile.state !== TileState.Complete) {
-                        this._pendingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
-                        return;
-                    }
-
+                tileLoader.forEachTile(x0, x1, basePairsPerDOMPixel, true, (tile) => {
                     const altHeightPx = 25;
                     const tileY = 15;
 
@@ -273,11 +267,8 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
         }
 
-        this._pendingTiles.removeUnused(this.removeTileLoadingDependency);
         this._onStageAnnotations.removeUnused((t) => this.remove(t));
         this._sequenceLabelCache.removeUnused(this.deleteBaseLabel);
-        this.toggleLoadingIndicator(this._pendingTiles.count > 0, true);
-        this.displayNeedUpdate = false;
     }
 
     protected displayLabel(

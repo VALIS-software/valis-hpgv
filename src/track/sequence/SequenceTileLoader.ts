@@ -37,7 +37,7 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
             if (contigInfo != null) {
                 let maxX = contigInfo.span - 1;
                 let minSpan = 512;
-                this.getTiles(0, maxX, contigInfo.span / minSpan, true, () => { });
+                this.forEachTile(0, maxX, contigInfo.span / minSpan, true, () => { });
             }
         });
     }

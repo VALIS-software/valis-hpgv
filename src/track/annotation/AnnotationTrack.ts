@@ -61,7 +61,6 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected _annotationCache = new UsageCache<Object2D>();
     protected _onStageAnnotations = new UsageCache<Object2D>();
     protected updateDisplay() {
-        this._pendingTiles.markAllUnused();
         this._onStageAnnotations.markAllUnused();
 
         const x0 = this.x0;
@@ -85,18 +84,14 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
             }
         }
 
-        this._pendingTiles.removeUnused(this.removeTileLoadingDependency);
         this._onStageAnnotations.removeUnused(this.removeAnnotation);
-
-        this.toggleLoadingIndicator(this._pendingTiles.count > 0, true);
-        this.displayNeedUpdate = false;
     }
 
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
-        (this.dataSource.getTileLoader(this.macroModel, this.contig) as MacroAnnotationTileLoader).getTiles(x0, x1, samplingDensity, true, (tile) => {
+        (this.dataSource.getTileLoader(this.macroModel, this.contig) as MacroAnnotationTileLoader).forEachTile(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 // if the tile is incomplete then wait until complete and call updateAnnotations() again
-                this._pendingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
+                this._loadingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
                 return;
             }
 
@@ -152,13 +147,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number,  opacity: number) {
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
-        this.getTileLoader().getTiles(x0, x1, samplingDensity, true, (tile) => {
-            if (tile.state !== TileState.Complete) {
-                // if the tile is incomplete then wait until complete and call updateAnnotations() again
-                this._pendingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
-                return;
-            }
-
+        this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
             for (let gene of tile.payload) {
                 // @! temp performance hack, only use node when visible
                 // (don't need to do this when using instancing)

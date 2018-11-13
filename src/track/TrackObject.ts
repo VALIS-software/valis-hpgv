@@ -181,21 +181,30 @@ export class TrackObject<
 
         let tileLoader = this.getTileLoader();
         let topLod = tileLoader.topTouchedLod();
-        for (let l = lodLevel; l <= topLod; l++) {
-            let lodLevelCovered = true;
+        let visibleLod = tileLoader.mapLodLevel(lodLevel);
 
-            tileLoader.forEachTileAtLod(this.x0, this.x1, l, false, (tile) => {
-                if (tile.state === TileState.Loading) {
-                    this._loadingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
-                }
+        let _lastMappedLod = -1;
+        for (let l = visibleLod; l <= topLod; l++) {
+            let mappedLod = tileLoader.mapLodLevel(l);
 
-                if (tile.state !== TileState.Complete) {
-                    lodLevelCovered = false;
-                }
-            });
+            if (_lastMappedLod != mappedLod) {
+                let lodLevelCovered = true;
 
-            // if a level has been covered complete we assume we don't care about the higher lods
-            if (lodLevelCovered) break;
+                tileLoader.forEachTileAtLod(this.x0, this.x1, mappedLod, false, (tile) => {
+                    if (tile.state === TileState.Loading) {
+                        this._loadingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
+                    }
+
+                    if (tile.state !== TileState.Complete) {
+                        lodLevelCovered = false;
+                    }
+                });
+
+                // if a level has been covered complete we assume we don't care about the higher lods
+                if (lodLevelCovered) break;
+            }
+
+            _lastMappedLod = mappedLod;
         }
 
         this._loadingTiles.removeUnused(this.removeTileLoadingDependency);

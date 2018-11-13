@@ -19,6 +19,7 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
     constructor(model: Model) {
         super(model, SequenceTile);
         this.color.set([0, 0, 0, 1]);
+        this.loadingIndicatorPadding = 0.5; // make it slower to appear then normal
     }
 
 }

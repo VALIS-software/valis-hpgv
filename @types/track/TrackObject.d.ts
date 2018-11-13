@@ -23,6 +23,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     protected focusRegionRectRight: Rect;
     protected loadingIndicator: LoadingIndicator;
     protected displayNeedUpdate: boolean;
+    protected loadingIndicatorPadding: number;
     constructor(model: ModelType);
     setDataSource(dataSource: InternalDataSource): void;
     setContig(contig: string): void;

@@ -13,7 +13,7 @@ export declare class VariantTileLoader extends TileLoader<VariantTilePayload, vo
     protected readonly contig: string;
     static cacheKey(model: VariantTrackModel): string;
     constructor(dataSource: IDataSource, model: VariantTrackModel, contig: string);
-    protected mapLodLevel(l: number): number;
+    mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<VariantTilePayload>): Promise<VariantTilePayload> | VariantTilePayload;
 }
 export default VariantTileLoader;

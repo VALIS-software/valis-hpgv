@@ -22,7 +22,7 @@ export declare class SequenceTileLoader extends TileLoader<TilePayload, BlockPay
     protected readonly contig: string;
     static cacheKey(model: SequenceTrackModel): string;
     constructor(dataSource: IDataSource, model: SequenceTrackModel, contig: string);
-    protected mapLodLevel(l: number): number;
+    mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<{
         dataUploaded: boolean;
         getTexture(device: GPUDevice): GPUTexture;

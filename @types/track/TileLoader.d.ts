@@ -33,10 +33,10 @@ export declare class TileLoader<TilePayload, BlockPayload> {
     getBlockPayload(tile: Tile<TilePayload>): BlockPayload;
     clear(): void;
     topTouchedLod(): number;
+    mapLodLevel(selectedLodLevel: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
     protected createBlockPayload(lodLevel: number, lodX: number, lodSpan: number, rows: number): BlockPayload;
     protected releaseBlockPayload(block: BlockPayload): void;
-    protected mapLodLevel(selectedLodLevel: number): number;
     /**
      * Request tile if not requested, if tile loading then bump priority
      */

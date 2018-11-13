@@ -19,7 +19,7 @@ export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> 
     protected macro: boolean;
     static cacheKey(model: AnnotationTrackModel): string;
     constructor(dataSource: IDataSource, model: AnnotationTrackModel, contig: string, tileSize?: number);
-    protected mapLodLevel(l: number): number;
+    mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }
 export declare class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
@@ -29,7 +29,7 @@ export declare class MacroAnnotationTileLoader extends TileLoader<TilePayload, v
     protected annotationCache: AnnotationTileLoader;
     static cacheKey(model: MacroAnnotationTrackModel): string;
     constructor(dataSource: IDataSource, model: MacroAnnotationTrackModel, contig: string, tileSize?: number);
-    protected mapLodLevel(l: number): number;
+    mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
 }
 export default AnnotationTileLoader;

@@ -32,12 +32,12 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     static cacheKey(model: SignalTrackModel): string;
     static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
+    mapLodLevel(l: number): number;
     protected onReady(): void;
     protected generateLodLookups(bigWigHeader: HeaderData): {
         lodMap: Array<number>;
         lodZoomIndexMap: Array<number>;
     };
-    protected mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload>;
     protected createBlockPayload(lodLevel: number, lodX: number, tileWidth: number, rows: number): BlockPayload;
     protected releaseBlockPayload(payload: BlockPayload): void;

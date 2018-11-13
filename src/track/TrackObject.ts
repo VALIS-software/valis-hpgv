@@ -56,7 +56,7 @@ export class TrackObject<
         this.loadingIndicator.originX = -1;
         this.loadingIndicator.relativeX = 1;
         this.loadingIndicator.relativeY = 1;
-        this.loadingIndicator.x = -10;
+        this.loadingIndicator.x = -20;
         this.loadingIndicator.y = -10;
         this.loadingIndicator.mask = this;
         this.add(this.loadingIndicator);

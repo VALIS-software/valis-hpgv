@@ -40,13 +40,13 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.displayLoadingIndicator = true;
     }
 
-    protected updateDisplay() {
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         let tileLoader = this.getTileLoader();
 
         if (tileLoader.ready) {
             this.yAxis.setRange(0, 1 / tileLoader.scaleFactor);
             this.displayLoadingIndicator = false;
-            super.updateDisplay();
+            super.updateDisplay(samplingDensity, continuousLodLevel, span, widthPx);
         } else {
             if (this._tileNodeCache.count > 0) {
                 this._tileNodeCache.removeAll(this.deleteTileNode);

@@ -39,6 +39,7 @@ export class TrackObject<
     protected loadingIndicator: LoadingIndicator;
 
     protected displayNeedUpdate = true;
+    protected loadingIndicatorPadding = 0.1;
 
     constructor(protected readonly model: ModelType) {
         super(0, 0, [0.1, 0.1, 0.1, 1]);
@@ -165,17 +166,18 @@ export class TrackObject<
         this._loadingTiles.markAllUnused();
         this.displayNeedUpdate = false;
 
-        this.updateDisplay();
-
-        // display loading indicator if any tiles in the current range are loading
         const x0 = this.x0;
         const x1 = this.x1;
         const span = x1 - x0;
         const widthPx = this.getComputedWidth();
         let basePairsPerDOMPixel = (span / widthPx);
         let samplingDensity = basePairsPerDOMPixel / this.pixelRatio;
-        let displayLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
-        let lodLevel = Math.floor(displayLodLevel);
+        let continuousLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
+        let lodLevel = Math.floor(continuousLodLevel);
+
+        this.updateDisplay(samplingDensity, continuousLodLevel, span, widthPx);
+
+        // display loading indicator if any tiles in the current range are loading
 
         let tileLoader = this.getTileLoader();
         let topLod = tileLoader.topTouchedLod();
@@ -185,6 +187,9 @@ export class TrackObject<
             tileLoader.forEachTileAtLod(this.x0, this.x1, l, false, (tile) => {
                 if (tile.state === TileState.Loading) {
                     this._loadingTiles.get(tile.key, () => this.createTileLoadingDependency(tile));
+                }
+
+                if (tile.state !== TileState.Complete) {
                     lodLevelCovered = false;
                 }
             });
@@ -201,7 +206,7 @@ export class TrackObject<
     /**
      * Override to handle drawing
      */
-    protected updateDisplay() {
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
     }
 
     /**
@@ -210,7 +215,7 @@ export class TrackObject<
      */
     protected toggleLoadingIndicator(visible: boolean, animate: boolean) {
         // we want a little bit of delay before the animation, for this we use a negative opacity when invisible
-        let targetOpacity = visible ? 1.0 : -0.1;
+        let targetOpacity = visible ? 1.0 : -this.loadingIndicatorPadding;
 
         if (animate) {
             Animator.springTo(this.loadingIndicator, { 'opacity': targetOpacity }, 50);

@@ -38,19 +38,14 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
     protected _sequenceLabelCache = new UsageCache<{
         root: Object2D, textParent: Object2D, text: TextClone,
     }>();
-    protected updateDisplay() {
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
         this._sequenceLabelCache.markAllUnused();
 
-        const x0 = this.x0;
-        const x1 = this.x1;
-        const span = x1 - x0;
-        const widthPx = this.getComputedWidth();
         if (widthPx > 0) {
             let tileLoader = this.getTileLoader();
 
             let basePairsPerDOMPixel = (span / widthPx);
-            let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
 
             let macroOpacity: number = Scalar.linstep(this.macroLodThresholdLow, this.macroLodThresholdHigh, continuousLodLevel);
             let microOpacity: number = 1.0 - macroOpacity;
@@ -63,7 +58,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
             // micro-scale details
             if (microOpacity > 0) {
-                tileLoader.forEachTile(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+                tileLoader.forEachTile(this.x0, this.x1, basePairsPerDOMPixel, true, (tile) => {
                     if (tile.state !== TileState.Complete) {
                         return;
                     }
@@ -110,7 +105,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
                                 for (let i = 0; i < altSpan; i++) {
                                     let baseCharacter = altSequence[i];
-                                    let relativeX = ((startIndex + i) - x0) / span;
+                                    let relativeX = ((startIndex + i) - this.x0) / span;
 
                                     // skip text outside visible range
                                     if ((relativeX + baseLayoutW) < 0 || relativeX > 1) {
@@ -138,7 +133,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
                             // no alts were drawn so there's no handle to click, create an empty one to make them clickable
                             if (altIndex === 0) {
-                                let relativeX = ((startIndex + 0) - x0) / span;
+                                let relativeX = ((startIndex + 0) - this.x0) / span;
 
                                 // skip text outside visible range
                                 if ((relativeX + baseLayoutW) < 0 || relativeX > 1) {
@@ -258,7 +253,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
                         return instancesTile;
                     });
 
-                    tileObject.relativeX = (tile.x - x0) / span;
+                    tileObject.relativeX = (tile.x - this.x0) / span;
                     tileObject.relativeW = tile.span / span;
                     tileObject.opacity = microOpacity;
 

@@ -20,23 +20,17 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
 
     protected _intervalTileCache = new UsageCache<IntervalInstances>();
     protected _onStage = new UsageCache<Object2D>();
-    protected updateDisplay() {
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStage.markAllUnused();
-
-        const x0 = this.x0;
-        const x1 = this.x1;
-        const span = x1 - x0;
-        const widthPx = this.getComputedWidth();
 
         if (widthPx > 0) {
             let basePairsPerDOMPixel = (span / widthPx);
-            let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
 
             let tileLoader = this.getTileLoader();
 
-            tileLoader.forEachTile(x0, x1, basePairsPerDOMPixel, true, (tile) => {
+            tileLoader.forEachTile(this.x0, this.x1, basePairsPerDOMPixel, true, (tile) => {
                 if (tile.state === TileState.Complete) {
-                    this.displayTileNode(tile, 0.9, x0, span, continuousLodLevel);
+                    this.displayTileNode(tile, 0.9, this.x0, span, continuousLodLevel);
                 } else {
                     // display a fallback tile if one is loaded at this location
                     let gapCenterX = tile.x + tile.span * 0.5;
@@ -44,7 +38,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
 
                     if (fallbackTile.state === TileState.Complete) {
                         // display fallback tile behind other tiles
-                        this.displayTileNode(fallbackTile, 0.3, x0, span, continuousLodLevel);
+                        this.displayTileNode(fallbackTile, 0.3, this.x0, span, continuousLodLevel);
                     }
                 }
             });

@@ -60,27 +60,21 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected _macroTileCache = new UsageCache<IntervalInstances>();
     protected _annotationCache = new UsageCache<Object2D>();
     protected _onStageAnnotations = new UsageCache<Object2D>();
-    protected updateDisplay() {
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
-
-        const x0 = this.x0;
-        const x1 = this.x1;
-        const span = x1 - x0;
-        const widthPx = this.getComputedWidth();
 
         if (widthPx > 0) {
             let basePairsPerDOMPixel = (span / widthPx);
-            let continuousLodLevel = Scalar.log2(Math.max(basePairsPerDOMPixel, 1));
 
             let macroOpacity: number = Scalar.linstep(this.macroLodThresholdLow, this.macroLodThresholdHigh, continuousLodLevel);
             let microOpacity: number = 1.0 - macroOpacity;
 
             if (microOpacity > 0) {
-                this.updateMicroAnnotations(x0, x1, span, basePairsPerDOMPixel, continuousLodLevel, microOpacity);
+                this.updateMicroAnnotations(this.x0, this.x1, span, basePairsPerDOMPixel, continuousLodLevel, microOpacity);
             }
 
             if (macroOpacity > 0) {
-                this.updateMacroAnnotations(x0, x1, span, basePairsPerDOMPixel, macroOpacity);
+                this.updateMacroAnnotations(this.x0, this.x1, span, basePairsPerDOMPixel, macroOpacity);
             }
         }
 

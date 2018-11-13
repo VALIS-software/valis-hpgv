@@ -25,25 +25,15 @@ export class ShaderTrack<
 
     protected _tileNodeCache = new UsageCache<ShaderTile<TilePayload>>();
 
-    protected updateDisplay() {
-        const x0 = this.x0;
-        const x1 = this.x1;
-        const span = x1 - x0;
-        const widthPx = this.getComputedWidth();
-
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._tileNodeCache.markAllUnused();
 
         if (widthPx > 0) {
             let tileLoader = this.getTileLoader();
 
-            let basePairsPerDOMPixel = (span / widthPx);
-            let samplingDensity = this.densityMultiplier * basePairsPerDOMPixel / this.pixelRatio;
-            let displayLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
-            let lodLevel = Math.floor(displayLodLevel);
-
-            tileLoader.forEachTile(x0, x1, samplingDensity, true, (tile) => {
+            tileLoader.forEachTile(this.x0, this.x1, samplingDensity, true, (tile) => {
                 let tileNode = this._tileNodeCache.get(this.contig + ':' + tile.key, this.createTileNode);
-                this.updateTileNode(tileNode, tile, x0, span, displayLodLevel);
+                this.updateTileNode(tileNode, tile, this.x0, span, continuousLodLevel);
 
                 // main tiles are positioned front-most so they appear above any fallback tiles
                 tileNode.z = 1.0;
@@ -79,7 +69,7 @@ export class ShaderTrack<
                             }
 
                             let fallbackNode = this._tileNodeCache.get(this.contig + ':' + fallbackTile.key, this.createTileNode);
-                            this.updateTileNode(fallbackNode, fallbackTile, x0, span, displayLodLevel);
+                            this.updateTileNode(fallbackNode, fallbackTile, this.x0, span, continuousLodLevel);
 
                             // z-position tile so that better lods are front-most
                             fallbackNode.z = (1.0 - fallbackTile.lodLevel / 50) - 0.1;

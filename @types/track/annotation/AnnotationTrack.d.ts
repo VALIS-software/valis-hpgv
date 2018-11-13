@@ -27,7 +27,7 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     protected _macroTileCache: UsageCache<IntervalInstances>;
     protected _annotationCache: UsageCache<Object2D>;
     protected _onStageAnnotations: UsageCache<Object2D>;
-    protected updateDisplay(): void;
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number): void;
     protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number, opacity: number): void;
     protected addAnnotation: (annotation: Object2D) => void;

@@ -5,5 +5,5 @@ import { Axis } from "../../ui/Axis";
 export declare class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader> {
     protected yAxis: Axis;
     constructor(model: Model);
-    protected updateDisplay(): void;
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
 }

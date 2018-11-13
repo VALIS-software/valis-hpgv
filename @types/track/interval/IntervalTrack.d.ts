@@ -10,7 +10,7 @@ export declare class IntervalTrack<Model extends IntervalTrackModel = IntervalTr
     constructor(model: Model);
     protected _intervalTileCache: UsageCache<IntervalInstances>;
     protected _onStage: UsageCache<Object2D>;
-    protected updateDisplay(): void;
+    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
     protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, x0: number, span: number, continuousLodLevel: number): IntervalInstances;
     protected createTileNode(tile: Tile<IntervalTilePayload>): IntervalInstances;
     protected createInstance(tilePayload: IntervalTilePayload, intervalIndex: number, relativeX: number, relativeW: number): IntervalInstance;

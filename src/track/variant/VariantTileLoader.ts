@@ -26,7 +26,7 @@ export class VariantTileLoader extends TileLoader<VariantTilePayload, void> {
         );
     }
 
-    protected mapLodLevel(l: number) {
+    mapLodLevel(l: number) {
         if (this.model.query == null) {
             return 0;
         }

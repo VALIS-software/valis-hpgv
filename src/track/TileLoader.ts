@@ -168,6 +168,10 @@ export class TileLoader<TilePayload, BlockPayload> {
     }
 
     // user-overridden methods
+    mapLodLevel(selectedLodLevel: number): number {
+        return selectedLodLevel;
+    }
+
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
         return null;
     }
@@ -178,10 +182,6 @@ export class TileLoader<TilePayload, BlockPayload> {
 
     protected releaseBlockPayload(block: BlockPayload): void {
 
-    }
-
-    protected mapLodLevel(selectedLodLevel: number): number {
-        return selectedLodLevel;
     }
 
     /**

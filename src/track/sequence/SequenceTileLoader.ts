@@ -43,7 +43,7 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
     }
 
     // skip odd lod levels to trade visual fidelity for improved load time and performance
-    protected mapLodLevel(l: number) {
+    mapLodLevel(l: number) {
         return Math.floor(l / 2) * 2;
     }
 

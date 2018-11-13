@@ -40,7 +40,7 @@ export class IntervalTileLoader extends TileLoader<IntervalTilePayload, void> {
         );
     }
 
-    protected mapLodLevel(l: number) {
+    mapLodLevel(l: number) {
         if (l <= this.microLodThreshold) {
             return 0;
         } else {

@@ -123,7 +123,7 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
         super(tileSize, 1);
     }
 
-    protected mapLodLevel(l: number) {
+    mapLodLevel(l: number) {
         return 0;
     }
 
@@ -148,7 +148,7 @@ export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
         super(tileSize, 1);
     }
 
-    protected mapLodLevel(l: number) {
+    mapLodLevel(l: number) {
         return 0;
     }
 

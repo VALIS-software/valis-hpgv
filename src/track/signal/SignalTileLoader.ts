@@ -129,11 +129,15 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     }
 
     mapLodLevel(l: number) {
-        if (l >= this.lodMap.length) {
-            // l is out of range of lookup table, return the top lod
-            return this.lodMap[this.lodMap.length - 1];
+        if (this.ready) {
+            if (l >= this.lodMap.length) {
+                // l is out of range of lookup table, return the top lod
+                return this.lodMap[this.lodMap.length - 1];
+            }
+            return this.lodMap[l];
+        } else {
+            return l;
         }
-        return this.lodMap[l];
     }
 
     protected onReady() {

@@ -45,36 +45,27 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         // yAxis.add(bg);
         this.displayLoadingIndicator = true;
 
-        this.signalReading = new Text(OpenSansRegular, 'hello world', 13, [1, 1, 1, 1]);
+        this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
+        this.signalReading.render = false;
         this.signalReading.x = -20;
         this.signalReading.y = 10;
         this.signalReading.originX = -1;
         this.signalReading.relativeX = 1;
         this.signalReading.z = 3;
-        this.signalReading.opacity = 0.25;
+        this.signalReading.opacity = 0.4;
         this.add(this.signalReading);
 
-        let yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
-        this.yAxisPointer = yAxisPointer;
-        yAxisPointer.x = 0;
-        yAxisPointer.y = 0;
-        yAxisPointer.z = 2;
-        yAxisPointer.opacity = 0.5;
-        this.add(yAxisPointer);
-
-        /*
-        this.addInteractionListener('pointermove', (e) => {
-            yAxisPointer.y = e.localY;
-            yAxisPointer.render = e.fractionY >= 0 && e.fractionY <= 1;
-        });
-        
-        this.addInteractionListener('pointerenter', () => {
-            yAxisPointer.render = true;
-        });
-        */
+        this.yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
+        this.yAxisPointer.render = false;
+        this.yAxisPointer.x = 0;
+        this.yAxisPointer.y = 0;
+        this.yAxisPointer.z = 2;
+        this.yAxisPointer.opacity = 0.5;
+        this.add(this.yAxisPointer);
 
         this.addInteractionListener('pointerleave', () => {
-            yAxisPointer.render = false;
+            this.yAxisPointer.render = false;
+            this.signalReading.render = false;
         });
     }
 
@@ -83,6 +74,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
 
         this.yAxisPointer.relativeY = 1 - value;
         this.yAxisPointer.render = true;
+        this.signalReading.render = true;
     }
 
     protected _currentReadingLod: number = Infinity;

@@ -5,11 +5,17 @@ import { Axis } from "../../ui/Axis";
 import { SharedResources } from "engine/SharedResources";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawMode, DrawContext } from "engine/rendering/Renderer";
-import { Tile } from "../TileLoader";
+import { Tile, TileState } from "../TileLoader";
+import { AxisPointer, AxisPointerStyle } from "../TrackObject";
+import { Text } from "engine";
+import { OpenSansRegular } from "../../ui";
 
-export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader> {
+export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
     protected yAxis: Axis;
+
+    protected signalReading: Text;
+    protected yAxisPointer: AxisPointer;
 
     constructor(model: Model) {
         super(model, SignalTile);
@@ -38,6 +44,64 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         // bg.z = -0.5;
         // yAxis.add(bg);
         this.displayLoadingIndicator = true;
+
+        this.signalReading = new Text(OpenSansRegular, 'hello world', 13, [1, 1, 1, 1]);
+        this.signalReading.x = -20;
+        this.signalReading.y = 10;
+        this.signalReading.originX = -1;
+        this.signalReading.relativeX = 1;
+        this.signalReading.z = 3;
+        this.signalReading.opacity = 0.5;
+        this.add(this.signalReading);
+
+        let yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
+        this.yAxisPointer = yAxisPointer;
+        yAxisPointer.x = 0;
+        yAxisPointer.y = 0;
+        yAxisPointer.z = 2;
+        yAxisPointer.opacity = 0.5;
+        this.add(yAxisPointer);
+
+        /*
+        this.addInteractionListener('pointermove', (e) => {
+            yAxisPointer.y = e.localY;
+            yAxisPointer.render = e.fractionY >= 0 && e.fractionY <= 1;
+        });
+        
+        this.addInteractionListener('pointerenter', () => {
+            yAxisPointer.render = true;
+        });
+        */
+
+        this.addInteractionListener('pointerleave', () => {
+            yAxisPointer.render = false;
+        });
+    }
+
+    protected setSignalReading(value: number) {
+        this.signalReading.string = value.toFixed(3);
+
+        this.yAxisPointer.relativeY = 1 - value;
+        this.yAxisPointer.render = true;
+    }
+
+    protected _currentReadingLod: number = Infinity;
+    protected createTileNode(): ShaderTile<SignalTilePayload> {
+        let tileNode = super.createTileNode();
+
+        tileNode.addInteractionListener('pointermove', (e) => {
+            let tile = tileNode.getTile();
+
+            if (tile.lodLevel <= this._currentReadingLod) {
+
+                if (tile.state === TileState.Complete) {
+                    this.setSignalReading(tile.payload.getReading(e.fractionX));
+                    this._currentReadingLod = tile.lodLevel;
+                }
+                
+            }
+        });
+        return tileNode;
     }
 
     protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
@@ -54,6 +118,8 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
             // keep updating display until tileLoader is complete
             this.displayNeedUpdate = true;
         }
+
+        this._currentReadingLod = Infinity;
     }
 
 }

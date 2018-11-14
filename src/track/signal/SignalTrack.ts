@@ -51,7 +51,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading.originX = -1;
         this.signalReading.relativeX = 1;
         this.signalReading.z = 3;
-        this.signalReading.opacity = 0.5;
+        this.signalReading.opacity = 0.25;
         this.add(this.signalReading);
 
         let yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
@@ -79,7 +79,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
     }
 
     protected setSignalReading(value: number) {
-        this.signalReading.string = value.toFixed(3);
+        this.signalReading.string = value != null ? value.toFixed(3) : 'error';
 
         this.yAxisPointer.relativeY = 1 - value;
         this.yAxisPointer.render = true;
@@ -223,10 +223,10 @@ class SignalTile extends ShaderTile<SignalTilePayload> {
             #if 0
             vec3 col = viridis(texRaw.r);
             #else
-            vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y); // * vec3( 1., 0., 0. );
+            vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y);
             #endif
-            
-            #ifdef debug
+
+            #if 0
             float debug = step((1.0 - vUv.y) * size.y, 5.);
             col = mix( col, vec3( 0., vUv.xy ), debug);
             #endif

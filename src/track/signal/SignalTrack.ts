@@ -39,6 +39,9 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.yAxis.mask = this;
         this.add(this.yAxis);
 
+        // when true, the signal reading text sticks to the x-axis cursor
+        const signalReadingSnapX = true;
+
         this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
         this.signalReading.render = false;
         this.signalReading.x = -20;
@@ -48,6 +51,15 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading.relativeX = 1;
         this.signalReading.z = 3;
         this.signalReading.opacity = 0.6;
+
+        if (signalReadingSnapX) {
+            this.signalReading.originX = 0;
+            this.signalReading.x = 10;
+            this.addInteractionListener('pointermove', (e) => {
+                let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();
+                this.signalReading.relativeX = Math.min(e.fractionX, 1 - signalReadingRelativeWidth);
+            });
+        }
         // y-positioning handled in setSignalReading
         this.add(this.signalReading);
 

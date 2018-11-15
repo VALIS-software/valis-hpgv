@@ -9,6 +9,7 @@ import { Tile, TileState } from "../TileLoader";
 import { AxisPointer, AxisPointerStyle } from "../TrackObject";
 import { Text } from "engine";
 import { OpenSansRegular } from "../../ui";
+import Animator from "../../Animator";
 
 export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
@@ -48,7 +49,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
         this.signalReading.render = false;
         this.signalReading.x = -20;
-        this.signalReading.y = -10;
+        this.signalReading.y = -5;
         this.signalReading.originX = -1;
         this.signalReading.originY = -1;
         this.signalReading.relativeX = 1;
@@ -75,7 +76,15 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
     protected setSignalReading(value: number) {
         this.signalReading.string = value != null ? value.toFixed(3) : 'error';
 
-        this.yAxisPointer.relativeY = 1 - value;
+        let makingVisible = this.yAxisPointer.render === false;
+
+        if (makingVisible) {
+            Animator.stop(this.yAxisPointer, ['relativeY']);
+            this.yAxisPointer.relativeY = 1 - value;
+        } else {
+            Animator.springTo(this.yAxisPointer, {'relativeY': 1 - value}, 5000);
+        }
+
         this.yAxisPointer.render = true;
         this.signalReading.render = true;
     }

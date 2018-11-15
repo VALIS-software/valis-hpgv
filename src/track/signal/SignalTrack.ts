@@ -39,13 +39,6 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.yAxis.mask = this;
         this.add(this.yAxis);
 
-        // let bg = new Rect(0, 0, [1, 0, 0, 1]);
-        // bg.relativeW = 1;
-        // bg.relativeH = 1;
-        // bg.z = -0.5;
-        // yAxis.add(bg);
-        this.displayLoadingIndicator = true;
-
         this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
         this.signalReading.render = false;
         this.signalReading.x = -20;
@@ -123,6 +116,9 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
             this.displayLoadingIndicator = false;
             super.updateDisplay(samplingDensity, continuousLodLevel, span, widthPx);
         } else {
+            // show loading indicator until tileLoader is ready
+            this.displayLoadingIndicator = true;
+
             if (this._tileNodeCache.count > 0) {
                 this._tileNodeCache.removeAll(this.deleteTileNode);
             }

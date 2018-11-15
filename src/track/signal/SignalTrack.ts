@@ -87,14 +87,16 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         let relativeYOfSignalReading = (this.signalReading.getComputedHeight() + Math.abs(this.signalReading.y)*2) / this.getComputedHeight();
         let signalReadingRelativeY = Math.min(Math.max(relativeY, relativeYOfSignalReading), 1);
 
+        const springStrength = 4000;
+
         if (makingVisible) {
             Animator.stop(this.yAxisPointer, ['relativeY']);
             Animator.stop(this.signalReading, ['relativeY']);
             this.yAxisPointer.relativeY = relativeY;
             this.signalReading.relativeY = signalReadingRelativeY;
         } else {
-            Animator.springTo(this.yAxisPointer, { 'relativeY': relativeY}, 5000);
-            Animator.springTo(this.signalReading, { 'relativeY': signalReadingRelativeY}, 5000);
+            Animator.springTo(this.yAxisPointer, { 'relativeY': relativeY}, springStrength);
+            Animator.springTo(this.signalReading, { 'relativeY': signalReadingRelativeY}, springStrength);
         }
 
         this.yAxisPointer.render = true;

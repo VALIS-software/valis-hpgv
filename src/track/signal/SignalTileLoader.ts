@@ -97,7 +97,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 this.header.chromTree.chromSize[this.contig], // @! needs checking,
                 maxZoomIndex,
             ).then((entries) => {
-                console.log('maxZoom', entries);
+                // console.log('maxZoom', entries);
 
                 let maxValue = -Infinity;
                 let maxAvg = -Infinity;
@@ -117,7 +117,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 // this._logarithmicDisplay = maxDisparity > 10;
                 this._logarithmicDisplay = false;
 
-                console.log(maxValue, maxAvg, weightedAveraged);
+                // console.log(maxValue, maxAvg, weightedAveraged);
 
                 // @! hacky
                 this._scaleFactor = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));

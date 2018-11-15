@@ -334,20 +334,17 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     let payload: SignalTilePayload = this;
                     
                     let nEntries = tile.lodSpan;
-                    let p = x * nEntries;
-                    let linearFiltering = tile.lodLevel > 0 && false;
-
-                    // @! fix linear filtering
+                    let linearFiltering = tile.lodLevel > 0;
 
                     if (linearFiltering) {
+                        let p = Math.max(x * nEntries - 0.5, 0);
                         let low = payload.array[Math.floor(p) * nChannels];
                         let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * nChannels];
                         let alpha = p - Math.floor(p);
-                        console.log(alpha);
 
                         return low * (1 - alpha) + high * alpha;
                     } else {
-                        let i = Math.floor(p);
+                        let i = Math.floor(x * nEntries);
                         return payload.array[i * nChannels]; // red channel
                     }
                 }

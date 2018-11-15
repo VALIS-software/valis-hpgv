@@ -209,7 +209,7 @@ export class TrackObject<
 
         this._loadingTiles.removeUnused(this.removeTileLoadingDependency);
 
-        this.toggleLoadingIndicator((this._loadingTiles.count > 0) || this.displayLoadingIndicator , true);
+        this.toggleLoadingIndicator((this._loadingTiles.count > 0) || this.displayLoadingIndicator, true);
     }
 
     /**

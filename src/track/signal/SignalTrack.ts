@@ -49,13 +49,11 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
         this.signalReading.render = false;
         this.signalReading.x = -20;
-        this.signalReading.y = -5;
         this.signalReading.originX = -1;
-        this.signalReading.originY = -1;
         this.signalReading.relativeX = 1;
         this.signalReading.z = 3;
         this.signalReading.opacity = 0.6;
-        // this.add(this.signalReading);
+        // y-positioning handled in setSignalReading
 
         this.yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
         this.yAxisPointer.render = false;
@@ -78,12 +76,28 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
 
         let makingVisible = this.yAxisPointer.render === false;
 
+        let relativeY = 1 - value;
+
         if (makingVisible) {
             Animator.stop(this.yAxisPointer, ['relativeY']);
-            this.yAxisPointer.relativeY = 1 - value;
+            this.yAxisPointer.relativeY = relativeY;
         } else {
-            Animator.springTo(this.yAxisPointer, {'relativeY': 1 - value}, 5000);
+            Animator.springTo(this.yAxisPointer, { 'relativeY': relativeY}, 5000);
         }
+
+        let signalTextTopYPos = 5;
+        let signalTextTop = (relativeY * this.getComputedHeight()) - signalTextTopYPos * 2 - this.signalReading.getComputedHeight();
+
+        let below = signalTextTop < 0;
+
+        if (below) {
+            this.signalReading.originY = 0;
+            this.signalReading.y = signalTextTopYPos;
+        } else {
+            this.signalReading.originY = -1;
+            this.signalReading.y = -signalTextTopYPos;
+        }
+
 
         this.yAxisPointer.render = true;
         this.signalReading.render = true;
@@ -100,6 +114,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
 
                 if (tile.state === TileState.Complete) {
                     this.setSignalReading(tile.payload.getReading(e.fractionX));
+                    // this.setSignalReading(1 - e.fractionY);
                     this._currentReadingLod = tile.lodLevel;
                 }
                 

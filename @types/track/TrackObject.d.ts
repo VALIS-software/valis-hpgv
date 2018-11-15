@@ -54,11 +54,11 @@ export declare enum AxisPointerStyle {
     Active = 0,
     Secondary = 1
 }
-declare class AxisPointer extends Rect {
+export declare class AxisPointer extends Rect {
     readonly activeColor: ArrayLike<number>;
     readonly secondaryColor: ArrayLike<number>;
     readonly style: AxisPointerStyle;
-    constructor(style: AxisPointerStyle, activeColor: ArrayLike<number>, secondaryColor: ArrayLike<number>);
+    constructor(style: AxisPointerStyle, activeColor: ArrayLike<number>, secondaryColor: ArrayLike<number>, axis: 'x' | 'y');
     setStyle(style: AxisPointerStyle): void;
 }
 declare class LoadingIndicator extends Text {

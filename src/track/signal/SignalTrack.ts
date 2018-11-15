@@ -5,11 +5,18 @@ import { Axis } from "../../ui/Axis";
 import { SharedResources } from "engine/SharedResources";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawMode, DrawContext } from "engine/rendering/Renderer";
-import { Tile } from "../TileLoader";
+import { Tile, TileState } from "../TileLoader";
+import { AxisPointer, AxisPointerStyle } from "../TrackObject";
+import { Text } from "engine";
+import { OpenSansRegular } from "../../ui";
+import Animator from "../../Animator";
 
-export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader> {
+export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
     protected yAxis: Axis;
+
+    protected signalReading: Text;
+    protected yAxisPointer: AxisPointer;
 
     constructor(model: Model) {
         super(model, SignalTile);
@@ -38,6 +45,67 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         // bg.z = -0.5;
         // yAxis.add(bg);
         this.displayLoadingIndicator = true;
+
+        this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
+        this.signalReading.render = false;
+        this.signalReading.x = -20;
+        this.signalReading.y = -5;
+        this.signalReading.originX = -1;
+        this.signalReading.originY = -1;
+        this.signalReading.relativeX = 1;
+        this.signalReading.z = 3;
+        this.signalReading.opacity = 0.6;
+        // this.add(this.signalReading);
+
+        this.yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
+        this.yAxisPointer.render = false;
+        this.yAxisPointer.x = 0;
+        this.yAxisPointer.y = 0;
+        this.yAxisPointer.z = 2;
+        this.yAxisPointer.opacity = 0.3;
+        this.add(this.yAxisPointer);
+
+        this.yAxisPointer.add(this.signalReading);
+
+        this.addInteractionListener('pointerleave', () => {
+            this.yAxisPointer.render = false;
+            this.signalReading.render = false;
+        });
+    }
+
+    protected setSignalReading(value: number) {
+        this.signalReading.string = value != null ? value.toFixed(3) : 'error';
+
+        let makingVisible = this.yAxisPointer.render === false;
+
+        if (makingVisible) {
+            Animator.stop(this.yAxisPointer, ['relativeY']);
+            this.yAxisPointer.relativeY = 1 - value;
+        } else {
+            Animator.springTo(this.yAxisPointer, {'relativeY': 1 - value}, 5000);
+        }
+
+        this.yAxisPointer.render = true;
+        this.signalReading.render = true;
+    }
+
+    protected _currentReadingLod: number = Infinity;
+    protected createTileNode(): ShaderTile<SignalTilePayload> {
+        let tileNode = super.createTileNode();
+
+        tileNode.addInteractionListener('pointermove', (e) => {
+            let tile = tileNode.getTile();
+
+            if (tile.lodLevel <= this._currentReadingLod) {
+
+                if (tile.state === TileState.Complete) {
+                    this.setSignalReading(tile.payload.getReading(e.fractionX));
+                    this._currentReadingLod = tile.lodLevel;
+                }
+                
+            }
+        });
+        return tileNode;
     }
 
     protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
@@ -54,6 +122,8 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
             // keep updating display until tileLoader is complete
             this.displayNeedUpdate = true;
         }
+
+        this._currentReadingLod = Infinity;
     }
 
 }
@@ -157,10 +227,10 @@ class SignalTile extends ShaderTile<SignalTilePayload> {
             #if 0
             vec3 col = viridis(texRaw.r);
             #else
-            vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y); // * vec3( 1., 0., 0. );
+            vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y);
             #endif
-            
-            #ifdef debug
+
+            #if 0
             float debug = step((1.0 - vUv.y) * size.y, 5.);
             col = mix( col, vec3( 0., vUv.xy ), debug);
             #endif

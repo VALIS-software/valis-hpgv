@@ -103,7 +103,7 @@ export class TrackObject<
             // !withinBounds means do not draw, so we don't need to create the object
             if (!withinBounds) return;
             // create axis pointer
-            axisPointer = new AxisPointer(style, this.activeAxisPointerColor, this.secondaryAxisPointerColor);
+            axisPointer = new AxisPointer(style, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'x');
             axisPointer.z = 2;
             this.add(axisPointer);
             this.axisPointers[id] = axisPointer;
@@ -255,15 +255,23 @@ export enum AxisPointerStyle {
     Secondary = 1,
 }
 
-class AxisPointer extends Rect {
+export class AxisPointer extends Rect {
 
     readonly style: AxisPointerStyle;
 
-    constructor(style: AxisPointerStyle, readonly activeColor: ArrayLike<number>, readonly secondaryColor: ArrayLike<number>) {
+    constructor(style: AxisPointerStyle, readonly activeColor: ArrayLike<number>, readonly secondaryColor: ArrayLike<number>, axis: 'x' | 'y') {
         super(0, 0);
-        this.originX = -0.5;
-        this.relativeH = 1;
-        this.w = 1;
+
+        if (axis === 'y') {
+            this.originY = -0.5;
+            this.relativeW = 1;
+            this.h = 1;
+        } else {
+            this.originX = -0.5;
+            this.relativeH = 1;
+            this.w = 1;
+        }
+
         this.setStyle(style);
     }
     

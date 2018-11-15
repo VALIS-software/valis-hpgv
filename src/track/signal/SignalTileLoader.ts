@@ -13,6 +13,7 @@ export type SignalTilePayload = {
     };
     dataUploaded: boolean,
     getTexture(device: GPUDevice): GPUTexture;
+    getReading(fractionalX: number): number;
 }
 
 type BlockPayload = {
@@ -215,6 +216,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     }
 
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
+        const nChannels = 4;
         let zoomIndex = this.lodZoomIndexMap[tile.lodLevel];
         let lodDensity = Math.pow(2, tile.lodLevel);
 
@@ -262,7 +264,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 tile.x + tile.span, // @! needs checking,
             ).then((rawData) => {
                 // fill float array with zoom data regions
-                let nChannels = 4;
                 let floatArray = new Float32Array(tile.lodSpan * nChannels);
 
                 for (let entry of rawData) {
@@ -328,6 +329,24 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     }
 
                     return gpuTexture;
+                },
+                getReading(x: number) {
+                    let payload: SignalTilePayload = this;
+                    
+                    let nEntries = tile.lodSpan;
+                    let linearFiltering = tile.lodLevel > 0;
+
+                    if (linearFiltering) {
+                        let p = Math.max(x * nEntries - 0.5, 0);
+                        let low = payload.array[Math.floor(p) * nChannels];
+                        let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * nChannels];
+                        let alpha = p - Math.floor(p);
+
+                        return low * (1 - alpha) + high * alpha;
+                    } else {
+                        let i = Math.floor(x * nEntries);
+                        return payload.array[i * nChannels]; // red channel
+                    }
                 }
             }
         });

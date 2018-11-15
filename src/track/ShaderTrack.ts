@@ -32,7 +32,7 @@ export class ShaderTrack<
             let tileLoader = this.getTileLoader();
 
             tileLoader.forEachTile(this.x0, this.x1, samplingDensity, true, (tile) => {
-                let tileNode = this._tileNodeCache.get(this.contig + ':' + tile.key, this.createTileNode);
+                let tileNode = this._tileNodeCache.get(this.contig + ':' + tile.key, () => this.createTileNode());
                 this.updateTileNode(tileNode, tile, this.x0, span, continuousLodLevel);
 
                 // main tiles are positioned front-most so they appear above any fallback tiles
@@ -68,7 +68,7 @@ export class ShaderTrack<
                                 loadingTilesAllowed--;
                             }
 
-                            let fallbackNode = this._tileNodeCache.get(this.contig + ':' + fallbackTile.key, this.createTileNode);
+                            let fallbackNode = this._tileNodeCache.get(this.contig + ':' + fallbackTile.key, () => this.createTileNode());
                             this.updateTileNode(fallbackNode, fallbackTile, this.x0, span, continuousLodLevel);
 
                             // z-position tile so that better lods are front-most
@@ -99,10 +99,10 @@ export class ShaderTrack<
 
         }
 
-        this._tileNodeCache.removeUnused(this.deleteTileNode);
+        this._tileNodeCache.removeUnused((t) => this.deleteTileNode(t));
     }
 
-    protected createTileNode = (): ShaderTile<TilePayload> => {
+    protected createTileNode(): ShaderTile<TilePayload> {
         // create empty tile node
         let tileNode = new this.customTileNodeClass();
         tileNode.mask = this;
@@ -110,7 +110,7 @@ export class ShaderTrack<
         return tileNode;
     }
 
-    protected deleteTileNode = (tileNode: ShaderTile<TilePayload>) => {
+    protected deleteTileNode(tileNode: ShaderTile<TilePayload>) {
         tileNode.setTile(null); // ensure cleanup is performed
         tileNode.releaseGPUResources();
         this.remove(tileNode);

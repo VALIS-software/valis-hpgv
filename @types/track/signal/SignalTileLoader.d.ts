@@ -11,6 +11,7 @@ export declare type SignalTilePayload = {
     };
     dataUploaded: boolean;
     getTexture(device: GPUDevice): GPUTexture;
+    getReading(fractionalX: number): number;
 };
 declare type BlockPayload = {
     _gpuTexture: GPUTexture;

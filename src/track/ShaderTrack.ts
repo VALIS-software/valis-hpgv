@@ -1,6 +1,5 @@
 import Animator from "../Animator";
 import UsageCache from "engine/ds/UsageCache";
-import Scalar from "engine/math/Scalar";
 import Object2D from "engine/ui/Object2D";
 import { DEFAULT_SPRING } from "../ui/UIConstants";
 import { Tile, TileLoader, TileState } from "./TileLoader";

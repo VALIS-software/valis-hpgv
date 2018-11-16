@@ -323,7 +323,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                             Math.min(gpuTexture.w, dataWidthPixels), 1, // w, h
                         );
 
-                        console.log(`%cupload row: ${tile.blockRowIndex}, key: ${tile.key}`, 'color: green');
+                        // console.log(`%cupload row: ${tile.blockRowIndex}, key: ${tile.key}`, 'color: green');
 
                         payload.dataUploaded = true;
                     }

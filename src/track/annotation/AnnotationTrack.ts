@@ -84,6 +84,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number, opacity: number) {
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
+        const compact = this.model.compact === true;
+
         this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 return;
@@ -101,12 +103,21 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create
-                    let object = new GeneAnnotation(this.model.compact === true, gene, this.pointerState, this.onAnnotationClicked);
-                    object.y = 40;
-                    object.relativeH = 0;
+                    let object = new GeneAnnotation(compact, gene, this.pointerState, this.onAnnotationClicked);
                     object.z = 1 / 4;
+                    object.relativeH = 0;
+
+                    if (compact) {
+                        object.y = 0;
+                        object.relativeY = 0.5;
+                        object.originY = -0.5;
+                    } else {
+                        object.y = 40;
+                    }
+
                     object.mask = this;
                     object.forEachSubNode((sub) => sub.mask = this);
+
                     return object;
                 });
 
@@ -269,14 +280,23 @@ class GeneAnnotation extends Object2D {
     ) {
         super();
 
+        const transcriptOffset = 5;
+        const transcriptHeight = 20;
+        const transcriptSpacing = 10;
+        this.h = compact ? transcriptHeight : 0;
+
         this.name = new Text(OpenSansRegular, gene.name, compact ? 11 : 16, [1, 1, 1, 1]);
-        this.name.originY = -1;
-        this.name.y = -5;
+        this.name.z = 5.0;
+        if (compact) {
+            this.name.originY = -0.5;
+            this.name.y = transcriptHeight * 0.5;
+            this.name.x = 5;
+        } else {
+            this.name.originY = -1;
+            this.name.y = -5;
+        }
         this.add(this.name);
 
-        let transcriptOffset = 5;
-        let transcriptHeight = 20;
-        let transcriptSpacing = 10;
 
         for (let i = 0; i < gene.transcripts.length; i++) {
             let transcript = gene.transcripts[i];

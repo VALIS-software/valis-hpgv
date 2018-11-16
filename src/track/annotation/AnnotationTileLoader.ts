@@ -108,6 +108,32 @@ function transformAnnotations(flatFeatures: Array<GenomeFeature>) {
     return payload;
 }
 
+function jsonRequest(
+    path: string,
+    contig: string,
+    startBaseIndex: number,
+    span: number,
+    macro: boolean,
+): Promise<TilePayload> {
+    let jsonPath = `${path}/${contig}${macro ? '-macro' : ''}/${startBaseIndex},${span}.json`;
+    return new Promise<TilePayload>((resolve, reject) => {
+        let request = new XMLHttpRequest();
+        // disable caching (because of common browser bugs)
+        request.open('GET', jsonPath, true);
+        request.responseType = 'json';
+        request.onloadend = () => {
+            if (request.status >= 200 && request.status < 300) {
+                // success-like response
+                resolve(request.response);
+            } else {
+                // error-like response
+                reject(`HTTP request error: ${request.statusText} (${request.status})`);
+            }
+        }
+        request.send();
+    });
+}
+
 export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected macro: boolean = false;
@@ -128,7 +154,12 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
-        return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, false).then(transformAnnotations);
+        if (this.model.path != null) {
+            // using path override
+            return jsonRequest(this.model.path, this.contig, tile.x, tile.span, false).then(transformAnnotations);
+        } else {
+            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, false).then(transformAnnotations);
+        }
     }
 
 }
@@ -153,7 +184,12 @@ export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
-        return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, true).then(transformAnnotations);
+        if (this.model.path != null) {
+            // using path override
+            return jsonRequest(this.model.path, this.contig, tile.x, tile.span, true).then(transformAnnotations);
+        } else {
+            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, true).then(transformAnnotations);
+        }
     }
 
 }

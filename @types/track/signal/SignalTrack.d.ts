@@ -1,16 +1,19 @@
 import { SignalTrackModel } from "./SignalTrackModel";
 import { SignalTilePayload, SignalTileLoader } from "./SignalTileLoader";
-import { ShaderTrack, ShaderTile } from "../ShaderTrack";
+import { ShaderTrack } from "../ShaderTrack";
 import { Axis } from "../../ui/Axis";
-import { AxisPointer } from "../TrackObject";
+import { AxisPointer, AxisPointerStyle } from "../TrackObject";
 import { Text } from "engine";
 export declare class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
     protected yAxis: Axis;
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;
+    readonly signalReadingSnapX: boolean;
     constructor(model: Model);
-    protected setSignalReading(value: number): void;
+    setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle): void;
+    removeAxisPointer(id: string): void;
     protected _currentReadingLod: number;
-    protected createTileNode(): ShaderTile<SignalTilePayload>;
+    protected updateAxisPointerSample(): void;
+    protected setSignalReading(value: number): void;
     protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
 }

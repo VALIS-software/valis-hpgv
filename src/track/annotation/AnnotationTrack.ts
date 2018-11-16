@@ -81,6 +81,49 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         this._onStageAnnotations.removeUnused(this.removeAnnotation);
     }
 
+    protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number, opacity: number) {
+        let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
+
+        this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
+            if (tile.state !== TileState.Complete) {
+                return;
+            }
+
+            for (let gene of tile.payload) {
+                // @! temp performance hack, only use node when visible
+                // (don't need to do this when using instancing)
+                { if (!(gene.startIndex <= x1 && (gene.startIndex + gene.length) >= x0)) continue; }
+
+                // apply gene filter
+                if (this.model.strand != null && gene.strand !== this.model.strand) continue;
+
+                let annotationKey = this.contig + ':' + this.annotationKey(gene);
+
+                let annotation = this._annotationCache.get(annotationKey, () => {
+                    // create
+                    let object = new GeneAnnotation(this.model.compact === true, gene, this.pointerState, this.onAnnotationClicked);
+                    object.y = 40;
+                    object.relativeH = 0;
+                    object.z = 1 / 4;
+                    object.mask = this;
+                    object.forEachSubNode((sub) => sub.mask = this);
+                    return object;
+                });
+
+                (annotation as GeneAnnotation).nameOpacity = namesOpacity;
+
+                this._onStageAnnotations.get(annotationKey, () => {
+                    this.addAnnotation(annotation);
+                    return annotation;
+                });
+
+                annotation.relativeX = (gene.startIndex - x0) / span;
+                annotation.relativeW = (gene.length) / span;
+                annotation.opacity = opacity;
+            }
+        });
+    }
+
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
         (this.dataSource.getTileLoader(this.macroModel, this.contig) as MacroAnnotationTileLoader).forEachTile(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
@@ -156,49 +199,6 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 this.addAnnotation(tileObject);
                 return tileObject;
             });
-        });
-    }
-
-    protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number,  opacity: number) {
-        let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
-
-        this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
-            if (tile.state !== TileState.Complete) {
-                return;
-            }
-
-            for (let gene of tile.payload) {
-                // @! temp performance hack, only use node when visible
-                // (don't need to do this when using instancing)
-                { if (!(gene.startIndex <= x1 && (gene.startIndex + gene.length) >= x0)) continue; }
-
-                // apply gene filter
-                if (this.model.strand != null && gene.strand !== this.model.strand) continue;
-
-                let annotationKey =  this.contig + ':' + this.annotationKey(gene);
-
-                let annotation = this._annotationCache.get(annotationKey, () => {
-                    // create
-                    let object = new GeneAnnotation(this.model.compact === true, gene, this.pointerState, this.onAnnotationClicked);
-                    object.y = 40;
-                    object.relativeH = 0;
-                    object.z = 1 / 4;
-                    object.mask = this;
-                    object.forEachSubNode((sub) => sub.mask = this);
-                    return object;
-                });
-
-                (annotation as GeneAnnotation).nameOpacity = namesOpacity;
-
-                this._onStageAnnotations.get(annotationKey, () => {
-                    this.addAnnotation(annotation);
-                    return annotation;
-                });
-
-                annotation.relativeX = (gene.startIndex - x0) / span;
-                annotation.relativeW = (gene.length) / span;
-                annotation.opacity = opacity;
-            }
         });
     }
 

@@ -18,6 +18,8 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;
 
+    readonly signalReadingSnapX = true;
+
     constructor(model: Model) {
         super(model, SignalTile);
 
@@ -39,9 +41,6 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.yAxis.mask = this;
         this.add(this.yAxis);
 
-        // when true, the signal reading text sticks to the x-axis cursor
-        const signalReadingSnapX = true;
-
         this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
         this.signalReading.render = false;
         this.signalReading.x = -20;
@@ -52,14 +51,11 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading.z = 3;
         this.signalReading.opacity = 0.6;
 
-        if (signalReadingSnapX) {
+        if (this.signalReadingSnapX) {
             this.signalReading.originX = 0;
             this.signalReading.x = 10;
-            this.addInteractionListener('pointermove', (e) => {
-                let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();
-                this.signalReading.relativeX = Math.min(e.fractionX, 1 - signalReadingRelativeWidth);
-            });
         }
+
         // y-positioning handled in setSignalReading
         this.add(this.signalReading);
 
@@ -69,12 +65,61 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.yAxisPointer.y = 0;
         this.yAxisPointer.z = 2;
         this.yAxisPointer.opacity = 0.3;
+        this.yAxisPointer.mask = this;
         this.add(this.yAxisPointer);
+    }
 
-        this.addInteractionListener('pointerleave', () => {
+    setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle) {
+        super.setAxisPointer(id, fractionX, style);
+        this.updateAxisPointerSample();
+    }
+
+    removeAxisPointer(id: string) {
+        super.removeAxisPointer(id);
+        this.updateAxisPointerSample();
+    }
+
+    protected _currentReadingLod: number = Infinity;
+    protected updateAxisPointerSample() {
+        let primary: AxisPointer = null;
+
+        // get primary pointer
+        for (let id of Object.keys(this.axisPointers)) {
+            let axisPointer = this.axisPointers[id];
+            if (axisPointer.style === AxisPointerStyle.Active) {
+                primary = axisPointer;
+                break;
+            }
+        }
+
+        // if primary is set and visible then 
+        if (primary != null && primary.render) {
+            let pointerTrackRelativeX = primary.relativeX; 
+            for (let node of this.children) {
+                if (node instanceof SignalTile) {
+                    // hit-test node
+                    if (pointerTrackRelativeX >= node.relativeX && pointerTrackRelativeX < (node.relativeX + node.relativeW)) {
+                        // within tile x-bounds
+                        let tile = node.getTile();
+                        let tileRelativeX = (pointerTrackRelativeX - node.relativeX) / node.relativeW;
+
+                        if (tile.lodLevel <= this._currentReadingLod && tile.state === TileState.Complete) {
+                            this.setSignalReading(tile.payload.getReading(tileRelativeX));
+
+                            if (this.signalReadingSnapX) {
+                                let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();
+                                this.signalReading.relativeX = Math.min(pointerTrackRelativeX, 1 - signalReadingRelativeWidth);
+                            }
+
+                            this._currentReadingLod = tile.lodLevel;
+                        }
+                    }
+                }
+            }
+        } else {
             this.yAxisPointer.render = false;
             this.signalReading.render = false;
-        });
+        }
     }
 
     protected setSignalReading(value: number) {
@@ -103,25 +148,6 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading.render = true;
     }
 
-    protected _currentReadingLod: number = Infinity;
-    protected createTileNode(): ShaderTile<SignalTilePayload> {
-        let tileNode = super.createTileNode();
-
-        tileNode.addInteractionListener('pointermove', (e) => {
-            let tile = tileNode.getTile();
-
-            if (tile.lodLevel <= this._currentReadingLod) {
-
-                if (tile.state === TileState.Complete) {
-                    this.setSignalReading(tile.payload.getReading(e.fractionX));
-                    this._currentReadingLod = tile.lodLevel;
-                }
-                
-            }
-        });
-        return tileNode;
-    }
-
     protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         let tileLoader = this.getTileLoader();
 
@@ -129,6 +155,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
             this.yAxis.setRange(0, 1 / tileLoader.scaleFactor);
             this.displayLoadingIndicator = false;
             super.updateDisplay(samplingDensity, continuousLodLevel, span, widthPx);
+            this.updateAxisPointerSample();
         } else {
             // show loading indicator until tileLoader is ready
             this.displayLoadingIndicator = true;

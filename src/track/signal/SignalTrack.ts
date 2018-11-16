@@ -79,7 +79,19 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.updateAxisPointerSample();
     }
 
-    protected _currentReadingLod: number = Infinity;
+    protected tileNodes = new Set<SignalTile>();
+    protected createTileNode(): ShaderTile<SignalTilePayload> {
+        // create empty tile node
+        let tileNode = super.createTileNode() as SignalTile;
+        this.tileNodes.add(tileNode);
+        return tileNode;
+    }
+
+    protected deleteTileNode(tileNode: ShaderTile<SignalTilePayload>) {
+        super.deleteTileNode(tileNode);
+        this.tileNodes.delete(tileNode as SignalTile);
+    }
+
     protected updateAxisPointerSample() {
         let primary: AxisPointer = null;
 
@@ -94,35 +106,50 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
 
         // if primary is set and visible then 
         if (primary != null && primary.render) {
-            let pointerTrackRelativeX = primary.relativeX; 
-            for (let node of this.children) {
-                if (node instanceof SignalTile) {
-                    // hit-test node
-                    if (pointerTrackRelativeX >= node.relativeX && pointerTrackRelativeX < (node.relativeX + node.relativeW)) {
-                        // within tile x-bounds
-                        let tile = node.getTile();
-                        let tileRelativeX = (pointerTrackRelativeX - node.relativeX) / node.relativeW;
+            let pointerTrackRelativeX = primary.relativeX;
 
-                        if (tile.lodLevel <= this._currentReadingLod && tile.state === TileState.Complete) {
-                            this.setSignalReading(tile.payload.getReading(tileRelativeX));
+            let currentReadingLod: number = Infinity;
+            // find the signal tile with the lowest LOD
+            let tileNode: SignalTile = null;
+            
+            for (let node of this.tileNodes) {
+                // hit-test node
+                if (pointerTrackRelativeX >= node.relativeX && pointerTrackRelativeX < (node.relativeX + node.relativeW)) {
+                    // within tile x-bounds
+                    let tile = node.getTile();
 
-                            if (this.signalReadingSnapX) {
-                                let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();
-                                this.signalReading.relativeX = Math.min(pointerTrackRelativeX, 1 - signalReadingRelativeWidth);
-                            }
-
-                            this._currentReadingLod = tile.lodLevel;
-                        }
+                    if (tile.lodLevel <= currentReadingLod && tile.state === TileState.Complete) {
+                        tileNode = node;
+                        currentReadingLod = tile.lodLevel;
                     }
                 }
             }
+
+            if (tileNode != null) {
+                let tile = tileNode.getTile();
+                
+                let tileRelativeX = (pointerTrackRelativeX - tileNode.relativeX) / tileNode.relativeW;
+                this.setSignalReading(tile.payload.getReading(tileRelativeX));
+
+                if (this.signalReadingSnapX) {
+                    let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();
+                    this.signalReading.relativeX = Math.min(pointerTrackRelativeX, 1 - signalReadingRelativeWidth);
+                }
+            } else {
+                this.setSignalReading(null);
+            }
         } else {
-            this.yAxisPointer.render = false;
-            this.signalReading.render = false;
+            this.setSignalReading(null);
         }
     }
 
-    protected setSignalReading(value: number) {
+    protected setSignalReading(value: number | null) {
+        if (value === null) {
+            this.yAxisPointer.render = false;
+            this.signalReading.render = false;
+            return;
+        }
+
         this.signalReading.string = value != null ? value.toFixed(3) : 'error';
 
         let makingVisible = this.yAxisPointer.render === false;
@@ -166,8 +193,6 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
             // keep updating display until tileLoader is complete
             this.displayNeedUpdate = true;
         }
-
-        this._currentReadingLod = Infinity;
     }
 
 }

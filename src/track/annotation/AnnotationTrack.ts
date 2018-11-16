@@ -96,33 +96,54 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 let instanceData = new Array<IntervalInstance>();
                 let nonCodingColor = [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4];
                 let codingColor = [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4];
+                const yPadding = 5;
 
                 for (let gene of tile.payload) {
-                    if (gene.strand !== this.model.strand) continue;
+                    if (this.model.strand != null && gene.strand !== this.model.strand) continue;
 
                     let color = gene.class === GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
-                    let height = gene.transcriptCount * 20 + (gene.transcriptCount - 1) * 10 + 60;
 
-                    instanceData.push({
-                        x: 0,
-                        y: 0,
-                        z: 0,
-                        w: 0,
-                        h: height,
+                    if (this.model.compact === true) {
+                        instanceData.push({
+                            x: 0,
+                            y: yPadding,
+                            z: 0,
+                            w: 0,
+                            h: - 2 * yPadding,
 
-                        relativeX: (gene.startIndex - tile.x) / tile.span,
-                        relativeY: 0,
+                            relativeX: (gene.startIndex - tile.x) / tile.span,
+                            relativeY: 0,
 
-                        relativeW: gene.length / tile.span,
-                        relativeH: 0,
+                            relativeW: gene.length / tile.span,
+                            relativeH: 1.0,
 
-                        color: color,
-                    });
+                            color: color,
+                        });
+                    } else {
+                        let height = gene.transcriptCount * 20 + (gene.transcriptCount - 1) * 10 + 60;
+                        instanceData.push({
+                            x: 0,
+                            y: 0,
+                            z: 0,
+                            w: 0,
+                            h: height,
+
+                            relativeX: (gene.startIndex - tile.x) / tile.span,
+                            relativeY: 0,
+
+                            relativeW: gene.length / tile.span,
+                            relativeH: 0,
+
+                            color: color,
+                        });
+                    }
+
                 }
 
                 let geneInstances = new IntervalInstances(instanceData);
                 geneInstances.y = 0;
                 geneInstances.z = 0.75;
+                geneInstances.relativeH = 1;
                 geneInstances.mask = this;
                 return geneInstances;
             });
@@ -152,13 +173,13 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 { if (!(gene.startIndex <= x1 && (gene.startIndex + gene.length) >= x0)) continue; }
 
                 // apply gene filter
-                if (gene.strand !== this.model.strand) continue;
+                if (this.model.strand != null && gene.strand !== this.model.strand) continue;
 
                 let annotationKey =  this.contig + ':' + this.annotationKey(gene);
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create
-                    let object = new GeneAnnotation(gene, this.pointerState, this.onAnnotationClicked);
+                    let object = new GeneAnnotation(this.model.compact === true, gene, this.pointerState, this.onAnnotationClicked);
                     object.y = 40;
                     object.relativeH = 0;
                     object.z = 1 / 4;
@@ -240,24 +261,15 @@ class GeneAnnotation extends Object2D {
     protected name: Text;
     protected _opacity: number = 1;
 
-        constructor(
+    constructor(
+        protected compact: boolean,
         protected readonly gene: Gene,
         trackPointerState: TrackPointerState,
         onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void
     ) {
         super();
 
-        /**
-        let spanMarker = new TranscriptSpan(gene.strand);
-        spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.38]);
-        spanMarker.relativeW = 1;
-        spanMarker.h = 10;
-        spanMarker.transparent = true;
-        this.add(spanMarker);
-        InteractiveStyling.colorFromElement('gene', spanMarker.color);
-        /**/
-
-        this.name = new Text(OpenSansRegular, gene.name, 16, [1, 1, 1, 1]);
+        this.name = new Text(OpenSansRegular, gene.name, compact ? 11 : 16, [1, 1, 1, 1]);
         this.name.originY = -1;
         this.name.y = -5;
         this.add(this.name);
@@ -271,7 +283,8 @@ class GeneAnnotation extends Object2D {
 
             let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
             transcriptAnnotation.h = transcriptHeight;
-            transcriptAnnotation.y = i * (transcriptHeight + transcriptSpacing) + transcriptOffset;
+            
+            transcriptAnnotation.y = compact ? 0 : i * (transcriptHeight + transcriptSpacing) + transcriptOffset;
 
             transcriptAnnotation.relativeX = (transcript.startIndex - gene.startIndex) / gene.length;
             transcriptAnnotation.relativeW = transcript.length / gene.length;

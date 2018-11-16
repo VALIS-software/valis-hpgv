@@ -674,18 +674,23 @@ export class Panel extends Object2D {
     }
 
     protected setRangeUsingRangeSpecifier(specifier: string) {
-        let parts = specifier.split(':');
-        let contig = parts[0];
+        // @! this could be improved to be more robust (for example, omitting contig should use current contig, etc)
+        try {
+            let parts = specifier.split(':');
+            let contig = parts[0];
 
-        // make chrx to chrX
-        let chromosomeContigMatch = /chr(.*)$/.exec(contig);
-        if (chromosomeContigMatch) {
-            contig = 'chr' + chromosomeContigMatch[1].toUpperCase();
+            // make chrx to chrX
+            let chromosomeContigMatch = /chr(.*)$/.exec(contig);
+            if (chromosomeContigMatch) {
+                contig = 'chr' + chromosomeContigMatch[1].toUpperCase();
+            }
+
+            const ranges = parts[1].split('-');
+            this.setContig(contig);
+            this.setRange(parseFloat(ranges[0].replace(/,/g, '')), parseFloat(ranges[1].replace(/,/g, '')));
+        } catch (e) {
+            console.error(`Could not parse specifier "${specifier}"`);
         }
-
-        const ranges = parts[1].split('-');
-        this.setContig(contig);
-        this.setRange(parseFloat(ranges[0].replace(/,/g, '')), parseFloat(ranges[1].replace(/,/g, '')));
     }
 
 }

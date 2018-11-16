@@ -707,8 +707,6 @@ interface PanelProps {
 }
 
 class PanelHeader extends React.Component<PanelProps,{}> {
-    
-    rangeSpecifier: string;
 
     render() {
         let headerContents = null;
@@ -762,13 +760,14 @@ class PanelHeader extends React.Component<PanelProps,{}> {
         );
 
         if (this.props.isEditing) {
+            let userRangeSpecifier = this.props.rangeSpecifier;
             headerContents = (<div style={headerContainerStyle} >
                 <input
                     autoFocus
-                    onChange={(e) => this.rangeSpecifier = e.target.value}
+                    onChange={(e) => userRangeSpecifier = e.target.value}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                            this.props.onEditSave(this.rangeSpecifier);
+                            this.props.onEditSave(userRangeSpecifier);
                         }
                     }}
                     type="text"
@@ -788,7 +787,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 </span>
                 <span style={headerStyle}>
                     <CheckIcon 
-                        onClick={() => this.props.onEditSave(this.rangeSpecifier)} 
+                        onClick={() => this.props.onEditSave(userRangeSpecifier)} 
                         viewBox={iconViewBoxSize}
                         // color={iconColor}
                         // hoverColor={iconHoverColor} 

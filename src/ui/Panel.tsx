@@ -685,7 +685,7 @@ export class Panel extends Object2D {
 
         const ranges = parts[1].split('-');
         this.setContig(contig);
-        this.setRange(parseFloat(ranges[0]), parseFloat(ranges[1]));
+        this.setRange(parseFloat(ranges[0].replace(/,/g, '')), parseFloat(ranges[1].replace(/,/g, '')));
     }
 
 }
@@ -763,7 +763,8 @@ class PanelHeader extends React.Component<PanelProps,{}> {
 
         if (this.props.isEditing) {
             headerContents = (<div style={headerContainerStyle} >
-                <span><input
+                <input
+                    autoFocus
                     onChange={(e) => this.rangeSpecifier = e.target.value}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -771,7 +772,12 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                         }
                     }}
                     type="text"
-                    defaultValue={this.props.rangeSpecifier}></input></span>
+                    defaultValue={this.props.rangeSpecifier}
+                    style={{
+                        maxWidth: '200px',
+                        width: '100%',
+                    }}
+                />
                 <span style={headerStyle}>
                     <CancelIcon
                         onClick={() => this.props.onEditCancel()} 

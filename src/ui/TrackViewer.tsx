@@ -263,7 +263,11 @@ export class TrackViewer extends Object2D {
         rowObject.header.x = -this.trackHeaderWidth + this.spacing.x * 0.5;
         rowObject.header.w = this.trackHeaderWidth;
 
+        // position the resize handle to span the full width of the viewer 
         rowObject.resizeHandle.relativeW = 1;
+        rowObject.resizeHandle.x = -this.trackHeaderWidth;
+        rowObject.resizeHandle.w = this.trackHeaderWidth;
+
         rowObject.resizeHandle.addInteractionListener('dragstart', (e) => {
             if (e.isPrimary && e.buttonState === 1) {
                 e.preventDefault();
@@ -723,7 +727,7 @@ export class TrackViewer extends Object2D {
 
         let localY0 = 0;
 
-        this.grid.addInteractionListener('dragstart', (e) => {
+        this.addInteractionListener('dragstart', (e) => {
             let resizing = (this._resizingPanels.size + this._resizingTracks.size) > 0;
             if (resizing) {
                 e.preventDefault();
@@ -745,7 +749,7 @@ export class TrackViewer extends Object2D {
             }
         });
 
-        this.grid.addInteractionListener('dragmove', (e) => {
+        this.addInteractionListener('dragmove', (e) => {
             let resized = false;
 
             let resizing = (this._resizingPanels.size + this._resizingTracks.size) > 0;
@@ -786,7 +790,7 @@ export class TrackViewer extends Object2D {
             }
         });
 
-        this.grid.addInteractionListener('dragend', (e) => {
+        this.addInteractionListener('dragend', (e) => {
             // cleanup dragged edges state
             for (let k in draggedVEdges) {
                 let s = draggedVEdges[k];

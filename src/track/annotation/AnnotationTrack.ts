@@ -108,7 +108,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     object.relativeH = 0;
 
                     if (compact) {
-                        object.y = 0;
+                        object.y = gene.strand === Strand.Positive ? -15 : 15;
                         object.relativeY = 0.5;
                         object.originY = -0.5;
                     } else {

@@ -15,6 +15,8 @@ import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } fro
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GeneClass, GenomeFeature, TranscriptClass } from "./AnnotationTypes";
 
+const TRANSCRIPT_HEIGHT = 20; // @! temporary constant
+
 /**
  * WIP Annotation tracks:
  *
@@ -58,7 +60,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected _macroTileCache = new UsageCache<IntervalInstances>();
-    protected _annotationCache = new UsageCache<Object2D>();
+    protected _annotationCache = new UsageCache<{gene: GeneAnnotation, name: Text}>();
     protected _onStageAnnotations = new UsageCache<Object2D>();
     protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
@@ -82,6 +84,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number, opacity: number) {
+        this._annotationCache.markAllUnused();
+
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
         const compact = this.model.compact === true;
@@ -102,37 +106,95 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 let annotationKey = this.contig + ':' + this.annotationKey(gene);
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
-                    // create
-                    let object = new GeneAnnotation(compact, gene, this.pointerState, this.onAnnotationClicked);
-                    object.z = 1 / 4;
-                    object.relativeH = 0;
+                    // create gene object
+                    let geneAnnotation = new GeneAnnotation(compact, gene, this.pointerState, this.onAnnotationClicked);
+                    geneAnnotation.z = 1 / 4;
+                    geneAnnotation.relativeH = 0;
 
                     if (compact) {
-                        object.y = gene.strand === Strand.Positive ? -15 : 15;
-                        object.relativeY = 0.5;
-                        object.originY = -0.5;
+                        geneAnnotation.y = gene.strand === Strand.Positive ? -15 : 15;
+                        geneAnnotation.relativeY = 0.5;
+                        geneAnnotation.originY = -0.5;
                     } else {
-                        object.y = 40;
+                        geneAnnotation.y = 40;
                     }
 
-                    object.mask = this;
-                    object.forEachSubNode((sub) => sub.mask = this);
+                    geneAnnotation.mask = this;
+                    geneAnnotation.forEachSubNode((sub) => sub.mask = this);
 
-                    return object;
+                    // create name text
+                    let name = new Text(OpenSansRegular, gene.name, compact ? 11 : 16, [1, 1, 1, 1]);
+                    name.mask = this;
+                    name.y = geneAnnotation.y;
+                    name.relativeY = geneAnnotation.relativeY;
+                    name.z = 5.0;
+
+                    if (compact) {
+                        name.originY = -0.5;
+                    } else {
+                        name.originY = -1;
+                    }
+
+                    return {gene: geneAnnotation, name: name};
                 });
 
-                (annotation as GeneAnnotation).nameOpacity = namesOpacity;
 
+                annotation.gene.relativeW = (gene.length) / span;
+                annotation.gene.relativeX = (gene.startIndex - x0) / span;
+                annotation.gene.opacity = opacity;
+
+                annotation.name.visible = namesOpacity > 0;
+                annotation.name.opacity = namesOpacity;
+                annotation.name.x = 5
+                annotation.name.relativeX = Math.max(annotation.gene.relativeX, 0);
+
+                // add to the scene graph (auto removed when unused)
                 this._onStageAnnotations.get(annotationKey, () => {
-                    this.addAnnotation(annotation);
-                    return annotation;
+                    this.add(annotation.gene);
+                    return annotation.gene;
                 });
 
-                annotation.relativeX = (gene.startIndex - x0) / span;
-                annotation.relativeW = (gene.length) / span;
-                annotation.opacity = opacity;
+                this._onStageAnnotations.get(annotationKey + ':name', () => {
+                    this.add(annotation.name);
+                    return annotation.name;
+                });
             }
         });
+
+        // layout text
+        // @! needs work.
+        /*
+        annotations.sort((a, b) => {
+            return a.gene.relativeX - b.gene.relativeX;
+        });
+    
+        let trackWidth = this.getComputedWidth();
+
+        let cursorPositiveX = 0;
+        let cursorNegativeX = 0;
+        for (let annotation of annotations) {
+            let cursorX = annotation.gene.gene.strand === Strand.Positive ? cursorPositiveX : cursorNegativeX;
+            // annotation.name.x = 5
+            annotation.name.relativeX = annotation.gene.relativeX;
+
+            if (annotation.name.relativeX < cursorX) {
+                annotation.name.relativeX = cursorX;
+                if (annotation.name.relativeX > (annotation.gene.relativeX + annotation.gene.relativeW)) {
+                    annotation.name.visible = false;
+                }
+            }
+
+            cursorX = annotation.name.relativeX + annotation.name.getComputedWidth() / trackWidth;
+
+            if (annotation.gene.gene.strand === Strand.Positive) {
+                cursorPositiveX = cursorX;
+            } else {
+                cursorNegativeX = cursorX;
+            }
+        }
+        */
+
+        this._annotationCache.removeUnused(this.deleteAnnotation);
     }
 
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
@@ -221,11 +283,12 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         this.remove(annotation);
     }
 
-    protected deleteAnnotation = (annotation: Object2D) => {
-        annotation.releaseGPUResources();
-        annotation.forEachSubNode((sub) => {
+    protected deleteAnnotation = (annotation: {gene: Object2D, name: Text}) => {
+        annotation.gene.releaseGPUResources();
+        annotation.gene.forEachSubNode((sub) => {
             sub.releaseGPUResources();
         });
+        annotation.name.releaseGPUResources();
     }
 
     protected annotationKey = (feature: {
@@ -260,51 +323,28 @@ class GeneAnnotation extends Object2D {
         return this._opacity;
     }
 
-    set nameOpacity(v: number) {
-        this.name.color[3] = v;
-        this.name.visible = v >= 0;
-    }
-
-    get nameOpacity() {
-        return this.name.color[3];
-    }
-
-    protected name: Text;
+    // protected name: Text;
     protected _opacity: number = 1;
 
     constructor(
-        protected compact: boolean,
-        protected readonly gene: Gene,
+        readonly compact: boolean,
+        readonly gene: Gene,
         trackPointerState: TrackPointerState,
         onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void
     ) {
         super();
 
         const transcriptOffset = 5;
-        const transcriptHeight = 20;
         const transcriptSpacing = 10;
-        this.h = compact ? transcriptHeight : 0;
-
-        this.name = new Text(OpenSansRegular, gene.name, compact ? 11 : 16, [1, 1, 1, 1]);
-        this.name.z = 5.0;
-        if (compact) {
-            this.name.originY = -0.5;
-            this.name.y = transcriptHeight * 0.5;
-            this.name.x = 5;
-        } else {
-            this.name.originY = -1;
-            this.name.y = -5;
-        }
-        this.add(this.name);
-
+        this.h = compact ? TRANSCRIPT_HEIGHT : 0;
 
         for (let i = 0; i < gene.transcripts.length; i++) {
             let transcript = gene.transcripts[i];
 
             let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
-            transcriptAnnotation.h = transcriptHeight;
+            transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
             
-            transcriptAnnotation.y = compact ? 0 : i * (transcriptHeight + transcriptSpacing) + transcriptOffset;
+            transcriptAnnotation.y = compact ? 0 : i * (TRANSCRIPT_HEIGHT + transcriptSpacing) + transcriptOffset;
 
             transcriptAnnotation.relativeX = (transcript.startIndex - gene.startIndex) / gene.length;
             transcriptAnnotation.relativeW = transcript.length / gene.length;

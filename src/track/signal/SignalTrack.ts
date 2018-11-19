@@ -117,6 +117,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
                 if (pointerTrackRelativeX >= node.relativeX && pointerTrackRelativeX < (node.relativeX + node.relativeW)) {
                     // within tile x-bounds
                     let tile = node.getTile();
+                    if (tile == null) continue;
 
                     if (tile.lodLevel <= currentReadingLod && tile.state === TileState.Complete) {
                         tileNode = node;
@@ -188,7 +189,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
             this.displayLoadingIndicator = true;
 
             if (this._tileNodeCache.count > 0) {
-                this._tileNodeCache.removeAll(this.deleteTileNode);
+                this._tileNodeCache.removeAll((n) => this.deleteTileNode(n));
             }
             // keep updating display until tileLoader is complete
             this.displayNeedUpdate = true;

@@ -20,7 +20,7 @@ export type IntervalInstance = {
 export class IntervalInstances extends Object2DInstances<IntervalInstance> {
 
     minWidth: number = 0;
-    blendFactor: number = 1;
+    additiveBlending: number = 0;
     borderStrength: number = 0.3;
 
     constructor(instances: Array<IntervalInstance>) {
@@ -48,7 +48,7 @@ export class IntervalInstances extends Object2DInstances<IntervalInstance> {
 
     draw(context: DrawContext) {
         context.uniform1f('minWidth', this.minWidth);
-        context.uniform1f('blendFactor', this.blendFactor);
+        context.uniform1f('blendFactor', 1.0 - this.additiveBlending);
         context.uniform1f('borderStrength', this.borderStrength);
 
         context.uniform2f('groupSize', this.computedWidth, this.computedHeight);

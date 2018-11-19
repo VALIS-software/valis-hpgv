@@ -91,7 +91,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
 
         let instancesTile = new IntervalInstances(instanceData);
         instancesTile.minWidth = 0.5;
-        instancesTile.blendFactor = 0.2; // nearly full additive
+        instancesTile.additiveBlending = 0.8; // nearly full additive
         instancesTile.y = 0;
         instancesTile.mask = this;
         instancesTile.relativeH = 1;

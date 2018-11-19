@@ -11,7 +11,7 @@ import { Text } from "engine/ui/Text";
 export class TextClone extends Object2D {
 
     color = new Float32Array(4);
-    additiveBlendFactor: number = 0.0;
+    additiveBlending: number = 0.0;
 
     set _w(v: number) { }
     set _h(v: number) { }
@@ -55,7 +55,7 @@ export class TextClone extends Object2D {
         // override with local transform and color
         textInternal.worldTransformMat4 = this.worldTransformMat4;
         this.text.color = this.color;
-        this.text.additiveBlendFactor = this.additiveBlendFactor;
+        this.text.additiveBlending = this.additiveBlending;
 
         this.text.draw(context);
     }

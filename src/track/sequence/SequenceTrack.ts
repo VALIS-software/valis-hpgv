@@ -171,7 +171,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
     protected createLabel = (baseCharacter: string) => {
         let textClone = new TextClone(SequenceTile.baseTextInstances[baseCharacter], [1, 1, 1, 1]);
-        textClone.additiveBlendFactor = 1.0;
+        textClone.additiveBlending = 1.0;
 
         textClone.originX = -0.5;
         textClone.originY = -0.5;

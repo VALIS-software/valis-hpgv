@@ -245,7 +245,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
                         let instancesTile = new IntervalInstances(instanceData);
                         instancesTile.minWidth = 1.0;
-                        instancesTile.blendFactor = 0.0; // full additive blending
+                        instancesTile.additiveBlending = 1.0; // full additive blending
                         instancesTile.y = tileY;
                         instancesTile.z = 0.75;
                         instancesTile.mask = this;
@@ -306,7 +306,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
     protected createBaseLabel = (baseCharacter: string, color: ArrayLike<number>, onClick: (e: InteractionEvent) => void) => {
         let root = new Rect(0, 0, color);
-        root.blendFactor = 0;
+        root.additiveBlending = 1;
         root.mask = this;
         root.opacity = 0;
         root.z = 0.5;
@@ -353,7 +353,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
             }
 
             let textClone = new TextClone(textInstance, [1, 1, 1, 1]);
-            textClone.additiveBlendFactor = 1.0;
+            textClone.additiveBlending = 1.0;
             textClone.originX = -0.5;
             textClone.originY = -0.5;
             textClone.mask = this;

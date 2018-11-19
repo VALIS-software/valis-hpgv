@@ -254,7 +254,8 @@ export class Panel extends Object2D {
                 return contigId;
             }
         } else {
-            return `<Unknown contig> ${this.contig}`;
+            // unknown contig
+            return `${this.contig}`;
         }
     }
 

@@ -18,15 +18,22 @@
         ],
         tracks: [
             {
+                name: 'DNA',
+                type: 'sequence',
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data',
+            },
+            {
+                name: 'Genes',
+                type: 'annotation',
+                compact: true,
+                path: 'https://valis-tmp-data.firebaseapp.com/data/annotation'
+            },
+            {
                 type: 'signal',
                 name: 'Bigwig',
-                // path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeBroadHistone/wgEncodeBroadHistoneGm12878H3k36me3StdSig.bigWig',
-                // path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeBroadHistone/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
-                path: 'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
-                // path: "bigwig-test/ENCFF183BBE.bigWig",
-                // path: 'https://www.encodeproject.org/files/ENCFF356YES/@@download/ENCFF356YES.bigWig',
-                heightPx: 250,
-            }
+                path: "data/bigwig-test/ENCFF183BBE.bigWig",
+                heightPx: 150,
+            },
         ],
     };
 
@@ -35,7 +42,7 @@
         config = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
     }
 
-    let visualizer = new GenomeVisualizer(config, './manifest.json');
+    let visualizer = new GenomeVisualizer(config);
 
     let container = document.getElementById('container');
 

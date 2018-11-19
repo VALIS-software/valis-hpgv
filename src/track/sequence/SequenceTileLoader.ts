@@ -2,6 +2,7 @@ import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFo
 import TileLoader, { Tile } from "../TileLoader";
 import { SequenceTrackModel } from "./SequenceTrackModel";
 import { IDataSource } from "../../data-source/IDataSource";
+import axios, { CancelToken } from 'axios';
 
 type TilePayload = {
     array: Uint8Array,
@@ -48,9 +49,24 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
     }
 
     protected getTilePayload(tile: Tile<TilePayload>) {
-        let tileLoader = this;
-        return this.dataSource.loadACGTSequence(this.contig, tile.x, tile.span, tile.lodLevel)
-            .then((sequenceData) => {
+        let sequenceDataPromise: Promise<{
+            array: Uint8Array,
+            sequenceMinMax: {
+                min: number,
+                max: number,
+            },
+            indicesPerBase: number,
+        }> = null;
+
+        if (this.model.path != null) {
+            // load from path
+            sequenceDataPromise = SequenceTileLoader.loadACGTSequenceFromPath(this.model.path, this.contig, tile.x, tile.span, tile.lodLevel);
+        } else {
+            sequenceDataPromise = this.dataSource.loadACGTSequence(this.contig, tile.x, tile.span, tile.lodLevel);
+        }
+
+        const tileLoader = this;
+        return sequenceDataPromise.then((sequenceData) => {
                 return {
                     ...sequenceData,
                     dataUploaded: false,
@@ -136,7 +152,132 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
             payload._gpuTexture = null;
         }
     }
+
+    // static file loading
+    private static minMaxCache: {
+        [path: string]: Promise<{ min: number, max: number }>
+    } = {};
+
+    static loadACGTSequenceFromPath(
+        path: string,
+        contig: string,
+
+        startBaseIndex: number,
+        span: number,
+        lodLevel: number,
+
+        // lodLevel: number,
+        // lodStartBaseIndex: number,
+        // lodSpan: number,
+    ): Promise<{
+        array: Uint8Array,
+        sequenceMinMax: {
+            min: number,
+            max: number,
+        },
+        indicesPerBase: number,
+    }> {
+        let binPath = `${path}/${contig}/dna/${lodLevel}.bin`;
+        let minMaxPath = binPath + '.minmax';
+
+        let samplingDensity = (1 << lodLevel);
+        let lodSpan = span / samplingDensity;
+        let lodStartBaseIndex = startBaseIndex / samplingDensity;
+
+        // @! data format may change for certain LODs in the future	
+        let elementSize_bits = 8;
+        let dataPromise = this.loadArray(binPath, elementSize_bits, lodStartBaseIndex * 4, lodSpan * 4, ArrayFormat.UInt8);
+        let minMaxPromise = this.minMaxCache[minMaxPath];
+
+        if (minMaxPromise === undefined) {
+            minMaxPromise = axios.get(minMaxPath, { responseType: 'json' }).then((a) => {
+                let minMax: { min: number, max: number } = a.data;
+                return minMax;
+            });
+            this.minMaxCache[minMaxPath] = minMaxPromise;
+        }
+
+        return Promise.all([dataPromise, minMaxPromise])
+            .then((a) => {
+                return {
+                    array: a[0],
+                    sequenceMinMax: a[1],
+                    indicesPerBase: 4,
+                }
+            });
+    }
+
+    private static loadArray<T extends keyof ArrayFormatMap>(
+        path: string,
+        elementSize_bits: number,
+        elementIndex: number,
+        nElements: number,
+        targetFormat: T,
+        cancelToken?: CancelToken,
+    ): Promise<ArrayFormatMap[T]> {
+        let element0_bits = elementIndex * elementSize_bits;
+        let byte0 = Math.floor(element0_bits / 8);
+        let nBytes = Math.ceil(nElements * elementSize_bits / 8);
+        let offset_bits = element0_bits % 8;
+        // determine byte range from dataFormat	
+        let byteRange = {
+            start: byte0,
+            end: byte0 + nBytes - 1,
+        };
+        return axios({
+            method: 'get',
+            url: path,
+            responseType: 'arraybuffer',
+            headers: {
+                'Range': `bytes=${byteRange.start.toFixed(0)}-${byteRange.end.toFixed(0)}`,
+                'Cache-Control': 'no-cache', // @! work around chrome bug	
+            },
+            cancelToken: cancelToken
+        }).then((a) => {
+            let unpackingRequired = !((targetFormat === ArrayFormat.UInt8) && (elementSize_bits === 8));
+            if (unpackingRequired) {
+                let bytes: Uint8Array = new Uint8Array(a.data);
+                // allocate output	
+                let outputArray: ArrayFormatMap[T];
+                switch (targetFormat) {
+                    case ArrayFormat.Float32:
+                        outputArray = new Float32Array(nElements);
+                        break;
+                    case ArrayFormat.UInt8:
+                        outputArray = new Uint8Array(nElements);
+                        break;
+                }
+                for (let element = 0; element < nElements; element++) {
+                    let bitIndex0 = element * elementSize_bits + offset_bits;
+                    let bitOffset = bitIndex0 % 8;
+                    let byteIndex0 = Math.floor(bitIndex0 / 8);
+                    /*	
+                    let uint32 = composeUInt32(	
+                        bytes[byteIndex0 + 0],	
+                        bytes[byteIndex0 + 1],	
+                        bytes[byteIndex0 + 2],	
+                        bytes[byteIndex0 + 3]	
+                    );	
+                     outputArray[element] = uint32 & mask32(offset, length) <bit shift>;	
+                    */
+                }
+                throw `Unpacking data not yet supported`;
+            } else {
+                return new Uint8Array(a.data);
+            }
+        });
+    }
     
+}
+
+enum ArrayFormat {
+    Float32 = 'f32',
+    UInt8 = 'ui8',
+}
+
+interface ArrayFormatMap {
+    [ArrayFormat.Float32]: Float32Array,
+    [ArrayFormat.UInt8]: Uint8Array,
 }
 
 export default SequenceTileLoader;

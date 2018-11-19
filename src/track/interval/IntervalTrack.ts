@@ -10,6 +10,7 @@ import { IntervalTrackModel } from "./IntervalTrackModel";
 export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel> extends TrackObject<Model, IntervalTileLoader> {
 
     readonly intervalColor = [74 / 0xff, 52 / 0xff, 226 / 0xff, 0.66];
+    readonly yPadding = 5;
 
     constructor(model: Model) {
         super(model);
@@ -30,7 +31,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
 
             tileLoader.forEachTile(this.x0, this.x1, basePairsPerDOMPixel, true, (tile) => {
                 if (tile.state === TileState.Complete) {
-                    this.displayTileNode(tile, 0.9, this.x0, span, continuousLodLevel);
+                    this.displayTileNode(tile, 0.9, continuousLodLevel);
                 } else {
                     // display a fallback tile if one is loaded at this location
                     let gapCenterX = tile.x + tile.span * 0.5;
@@ -38,7 +39,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
 
                     if (fallbackTile.state === TileState.Complete) {
                         // display fallback tile behind other tiles
-                        this.displayTileNode(fallbackTile, 0.3, this.x0, span, continuousLodLevel);
+                        this.displayTileNode(fallbackTile, 0.3, continuousLodLevel);
                     }
                 }
             });
@@ -47,14 +48,15 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
         this._onStage.removeUnused(this.removeTile);
     }
 
-    protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, x0: number, span: number, continuousLodLevel: number) {
+    protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, continuousLodLevel: number) {
+        const span = this.x1 - this.x0;
         let tileKey = this.contig + ':' + z + ':' + tile.key;
 
         let node = this._intervalTileCache.get(tileKey, () => {
             return this.createTileNode(tile);
         });
 
-        node.relativeX = (tile.x - x0) / span;
+        node.relativeX = (tile.x - this.x0) / span;
         node.relativeW = tile.span / span;
         node.z = z;
 
@@ -75,7 +77,6 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
         let nIntervals = tile.payload.intervals.length * 0.5;
 
         let instanceData = new Array<IntervalInstance>(nIntervals);
-
 
         for (let i = 0; i < nIntervals; i++) {
             let intervalStartIndex = tile.payload.intervals[i * 2 + 0];
@@ -99,14 +100,12 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
     }
 
     protected createInstance(tilePayload: IntervalTilePayload, intervalIndex: number, relativeX: number, relativeW: number): IntervalInstance {
-        const yPadding = 5;
-
         return {
             x: 0,
-            y: yPadding,
+            y: this.yPadding,
             z: 0,
             w: 0,
-            h: - 2 * yPadding,
+            h: - 2 * this.yPadding,
             relativeX: relativeX,
             relativeY: 0,
             relativeW: relativeW,

@@ -227,7 +227,10 @@ export class TrackViewer extends Object2D {
 
     // track-viewer state deltas
     addTrack(model: TrackModel, animate: boolean = true): Track {
-        let heightPx = model.heightPx != null ? model.heightPx : 100;
+        const trackViewClass = GenomeVisualizer.getTrackType(model.type).trackObjectClass;
+
+        let defaultTrackHeight = trackViewClass.defaultHeightPx != null ? trackViewClass.defaultHeightPx : 100;
+        let heightPx = model.heightPx != null ? model.heightPx : defaultTrackHeight;
 
         // create a track and add the header element to the grid
         let track: Track = new Track(
@@ -250,7 +253,7 @@ export class TrackViewer extends Object2D {
 
         // add track tile to all panels
         for (let panel of this.panels) {
-            var trackView = new (GenomeVisualizer.getTrackType(model.type).trackObjectClass)(model);
+            var trackView = new trackViewClass(model);
             panel.addTrackView(trackView);
             rowObject.addTrackView(trackView);
         }

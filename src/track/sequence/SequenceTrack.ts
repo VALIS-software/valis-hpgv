@@ -14,6 +14,8 @@ import { SequenceTrackModel } from './SequenceTrackModel';
 
 export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel> extends ShaderTrack<Model, SequenceTileLoader> {
 
+    static defaultHeightPx = 40;
+
     protected densityMultiplier = 2.0;
  
     constructor(model: Model) {

@@ -42,6 +42,8 @@ interface CustomTileLoader<ModelType> {
 
 interface CustomTrackObject {
     new(model: TrackModel): TrackObject<TrackModel, any>;
+
+    defaultHeightPx?: number; // optionally override the default track height    
 }
 export class GenomeVisualizer {
 

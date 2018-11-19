@@ -165,7 +165,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
     }
 
     protected createLabel(tile: Tile<IntervalTilePayload>, index: number) {
-        let label = new IntervalTrackLabel();
+        let label = new IntervalTrackLabel('');
         label.relativeH = 1;
         label.y = this.yPadding;
         label.h = -this.yPadding;

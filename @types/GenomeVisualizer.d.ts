@@ -21,6 +21,7 @@ interface CustomTileLoader<ModelType> {
 }
 interface CustomTrackObject {
     new (model: TrackModel): TrackObject<TrackModel, any>;
+    defaultHeightPx?: number;
 }
 export declare class GenomeVisualizer {
     protected trackViewer: TrackViewer;

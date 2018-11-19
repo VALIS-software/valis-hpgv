@@ -35,5 +35,15 @@ export declare class SequenceTileLoader extends TileLoader<TilePayload, BlockPay
     }>;
     protected createBlockPayload(lodLevel: number, lodX: number, tileWidth: number, rows: number): BlockPayload;
     protected releaseBlockPayload(payload: BlockPayload): void;
+    private static minMaxCache;
+    static loadACGTSequenceFromPath(path: string, contig: string, startBaseIndex: number, span: number, lodLevel: number): Promise<{
+        array: Uint8Array;
+        sequenceMinMax: {
+            min: number;
+            max: number;
+        };
+        indicesPerBase: number;
+    }>;
+    private static loadArray;
 }
 export default SequenceTileLoader;

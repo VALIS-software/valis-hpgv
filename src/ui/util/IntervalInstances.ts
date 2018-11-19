@@ -81,6 +81,8 @@ export class IntervalInstances extends Object2DInstances<IntervalInstance> {
         return `
             #version 100
 
+            precision highp float;
+
             // for all instances
             attribute vec2 position;
             uniform float minWidth;

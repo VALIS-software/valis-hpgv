@@ -15,7 +15,7 @@ export declare type IntervalInstance = {
 };
 export declare class IntervalInstances extends Object2DInstances<IntervalInstance> {
     minWidth: number;
-    blendFactor: number;
+    additiveBlending: number;
     borderStrength: number;
     constructor(instances: Array<IntervalInstance>);
     draw(context: DrawContext): void;

@@ -10,7 +10,7 @@ import { Text } from "engine/ui/Text";
 export declare class TextClone extends Object2D {
     readonly text: Text;
     color: Float32Array;
-    additiveBlendFactor: number;
+    additiveBlending: number;
     _w: number;
     _h: number;
     render: boolean;

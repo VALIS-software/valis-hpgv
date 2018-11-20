@@ -8,13 +8,6 @@ import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GenomeFeature } from "./AnnotationTypes";
-/**
- * WIP Annotation tracks:
- *
- * Todo:
- * - Convert micro-scale annotations to use instancing (and text batching)
- * - Merge shaders where possible and clean up
- */
 export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;

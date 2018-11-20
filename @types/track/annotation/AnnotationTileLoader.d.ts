@@ -21,6 +21,7 @@ export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> 
     constructor(dataSource: IDataSource, model: AnnotationTrackModel, contig: string, tileSize?: number);
     mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
+    static loadAnnotations(path: string, contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<TilePayload>;
 }
 export declare class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly dataSource: IDataSource;

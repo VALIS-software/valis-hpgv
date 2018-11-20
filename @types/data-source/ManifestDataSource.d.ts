@@ -7,12 +7,13 @@ export declare type Manifest = {
 export declare class ManifestDataSource implements IDataSource {
     readonly manifest: Manifest | (string | undefined);
     protected manifestPromise: Promise<Manifest>;
+    protected pathRoot: string;
     /**
      * @param manifest Manifest object or path to remote manifest
      */
     constructor(manifest: Manifest | (string | undefined));
     getContigs(): Promise<Array<Contig>>;
-    loadACGTSequence(contig: string, lodLevel: number, startBaseIndex: number, span: number): Promise<{
+    loadACGTSequence(contig: string, startBaseIndex: number, span: number, lodLevel: number): Promise<{
         array: Uint8Array;
         sequenceMinMax: {
             min: number;

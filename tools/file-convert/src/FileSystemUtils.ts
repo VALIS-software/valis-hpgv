@@ -11,7 +11,7 @@ export function deleteDirectory(directory: string) {
 
     // delete output directory
     if (fs.existsSync(directory)) {
-        Terminal.log(`Deleting directory <b>${directory}</b>`);
+        // Terminal.log(`Deleting directory <b>${directory}</b>`);
 
         for (let filename of fs.readdirSync(directory)) {
             let p = directory + '/' + filename;

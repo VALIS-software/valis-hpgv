@@ -39,6 +39,14 @@ export class Terminal {
 		return format(str);
 	}
 
+	static writeLine(str: string) {
+		return this.write(str + '\n');
+	}
+
+	static writeLineFormatted(str: string) {
+		return this.writeFormatted(str + '\n');
+	}
+
 	static write(str: string) {
 		if (this.currentRewriteId !== undefined) {
 			process.stdout.write('\n');
@@ -208,44 +216,75 @@ function format(message: string) {
 	let formatPattern = /<(\/)?([^><{}\s]*|{[^}<>]*})>/g;
 
 	let activeFormatFlagStack = new Array<FormatFlag>();
-	function addFlag(flag: FormatFlag) {
+	let groupedProceedingTags = new Array<number>();
+
+	function addFlag(flag: FormatFlag, proceedingTags: number) {
 		activeFormatFlagStack.push(flag);
+		groupedProceedingTags.push(proceedingTags);
 	}
 
 	function removeFlag(flag: FormatFlag) {
 		let i = activeFormatFlagStack.indexOf(flag);
 		if (i !== -1) {
-			activeFormatFlagStack.splice(i, 1);
+			let proceedingTags = groupedProceedingTags[i];
+			// remove n tags
+			activeFormatFlagStack.splice(i - proceedingTags, proceedingTags + 1);
+			groupedProceedingTags.splice(i - proceedingTags, proceedingTags + 1);
 		}
+	}
+
+	function resetFlags() {
+		activeFormatFlagStack = [];
+		groupedProceedingTags = [];
 	}
 
 	let formatted = message.replace(formatPattern, (substr: string, closeModifier: string, tagStr: string) => {
 		let open = closeModifier == null;
-		let flag = formatFlagFromTag(tagStr);
 
-		if (flag == FormatFlag.RESET) {
-			activeFormatFlagStack = [];
-		} else {
-			if (open) {
-				if (flag != null) {
-					addFlag(flag);
-				}
+		let tags = tagStr.split(',');
+
+		// handle </> and <//>
+		if (!open && tags.length === 1) {
+			if (tags[0] == '') {
+				// we've got a shorthand to close the last tag: </>
+				let last = activeFormatFlagStack[activeFormatFlagStack.length - 1];
+				removeFlag(last);
+			} else if (formatFlagFromTag(tags[0]) == FormatFlag.RESET) {
+				resetFlags();
 			} else {
-				// close
+				// handle </*>
+				let flag = formatFlagFromTag(tags[0]);
 				if (flag != null) {
 					removeFlag(flag);
-				} else if (tagStr == '') {
-					// we've got a shorthand to close the last tag: </>
-					let last = activeFormatFlagStack[activeFormatFlagStack.length - 1];
-					removeFlag(last);
+				}
+			}
+		} else {
+			let proceedingTags = 0;
+			for (let tag of tags) {
+				let flag = formatFlagFromTag(tag);
+				if (flag == null) continue; // unhandled tag
+				if (open) {
+					addFlag(flag, proceedingTags);
+					proceedingTags++;
+				} else {
+					removeFlag(flag);
 				}
 			}
 		}
 
 		// since format flags are cumulative, we only need to add the last item if it's an open tag
 		if (open) {
-			let last = getAsciiFormat(activeFormatFlagStack[activeFormatFlagStack.length - 1]);
-			return last != null ? last : '';
+			if (activeFormatFlagStack.length > 0) {
+				let lastFlagCount = groupedProceedingTags[groupedProceedingTags.length - 1] + 1;
+				let asciiFormatString = '';
+				for (let i = 0; i < lastFlagCount; i++) {
+					let idx = groupedProceedingTags.length - 1 - i;
+					asciiFormatString += getAsciiFormat(activeFormatFlagStack[idx]);
+				}
+				return asciiFormatString;
+			} else {
+				return '';
+			}
 		} else {
 			return getAsciiFormat(FormatFlag.RESET) + activeFormatFlagStack.map((f) => getAsciiFormat(f)).filter((s) => s != null).join('');
 		}

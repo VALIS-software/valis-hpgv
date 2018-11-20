@@ -14,8 +14,8 @@ The quickest way to get started is to use [`valis-hpgv.js`](https://raw.githubus
 
 - The visualizer can then be initialized with a list of files. The current supported types are: `bigwig`, `vdna-dir`, `vgene-dir` with more types including BAM, gff3 and VCF planned in the [roadmap](#Roadmap)):
 ```javascript
+// pass a list of files to visualize in an array, the viewer will determine the best visualization to use
 let browser = new GenomeBrowser([
-    // pass a list of files to visualize in an array, the viewer will determine the best visualization to use
     // GRCh38 DNA sequence
     'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir',
     // GRCh38 genes

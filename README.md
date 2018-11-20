@@ -12,11 +12,16 @@ The quickest way to get started is to use [`valis-hpgv.js`](https://raw.githubus
 <script src="valis-hpgv.js"></script>
 ```
 
-- The visualizer can then be initialized with a list of files (supported types include bigwig, BAM, VCF, FASTA, gff3):
+- The visualizer can then be initialized with a list of files. The current supported types are: `bigwig`, `vdna-dir`, `vgene-dir` with more types including BAM, gff3 and VCF planned in the [roadmap](#Roadmap)):
 ```javascript
 let browser = new GenomeBrowser([
     // pass a list of files to visualize in an array, the viewer will determine the best visualization to use
-    'https://s3.amazonaws.com/igv.broadinstitute.org/data/hg19/encode/wgEncodeBroadHistoneGm12878H3k4me3StdSig.bigWig',
+    // GRCh38 DNA sequence
+    'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir',
+    // GRCh38 genes
+    'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vgenes-dir',
+    // Cerebellum, DNase
+    'https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig',
 ]);
 ```
 
@@ -64,4 +69,10 @@ let browser = new GenomeBrowser({
 *todo*
 
 ## Creating a Custom Track
-*todo*
+*todo - walkthrough extending the TypeScript example*
+
+## Roadmap
+Support for displaying popular file types out of the box
+- BAM
+- VCF
+- GFF3

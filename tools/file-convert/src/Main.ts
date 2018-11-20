@@ -21,7 +21,14 @@ fs.mkdirSync(outputDirectory);
 
 let filePaths = fs.readdirSync(inputPath).map((p) => `${inputPath}/${p}`);
 
-function processFile(filePath: string) {
+// build a chain of promises to convert the files
+// this ensures file conversion is sequential rather than parallel (which improves logging)
+let processAllPromise: Promise<string | null | void> = Promise.resolve();
+for (let filePath of filePaths) {
+	processAllPromise = processAllPromise.then(() => processFile(filePath));
+}
+
+function processFile(filePath: string): Promise<string | null> {
 	let ext = path.extname(filePath).toLowerCase();
 
 	switch (ext) {
@@ -31,11 +38,11 @@ function processFile(filePath: string) {
 		case '.fa':
 		case '.fasta': {
 			Terminal.warn(`FASTA not yet implemented`);
-			return null;
+			return Promise.resolve(null);
 		}
 		default: {
 			Terminal.warn(`Unknown file type "${ext}" for "${filePath}"`);
-			return null;
+			return Promise.resolve(null);
 		}
 	}
 }

@@ -8,9 +8,7 @@ const outputDirectory = '_output';
 
 let userArgs = process.argv.slice(2);
 
-let inputPath = userArgs[0];
-
-if (inputPath == null) {
+if (userArgs.length === 0) {
 	printDoc();
 	process.exit(1);
 }
@@ -19,7 +17,18 @@ if (inputPath == null) {
 deleteDirectory(outputDirectory);
 fs.mkdirSync(outputDirectory);
 
-let filePaths = fs.readdirSync(inputPath).map((p) => `${inputPath}/${p}`);
+let filePaths = new Array<string>();
+
+// get list of files to convert from user arguments
+let inputPath = userArgs[0];
+let inputStat = fs.lstatSync(inputPath);
+if (inputStat.isDirectory()) {
+	filePaths = fs.readdirSync(inputPath).map((p) => `${inputPath}/${p}`);
+} else {
+	filePaths = [inputPath];
+}
+
+Terminal.log(`Files queued for conversion:\n\t<b>${filePaths.join('\n\t')}</b>`);
 
 // build a chain of promises to convert the files
 // this ensures file conversion is sequential rather than parallel (which improves logging)
@@ -51,7 +60,9 @@ function printDoc() {
 	Terminal.writeLineFormatted(
 `<b>VALIS Genomic File Preprocessor</b>
 
-Usage: ≤dim>*todo*</>
+Generates files optimized for viewing with VALIS Genome Visualizer 
+
+<b>Usage:</b> genome-preprocess <dim,i>[path to files]</>
 
 Supports <b,i>.fasta</> and <b,i>.gff3</> files
 `

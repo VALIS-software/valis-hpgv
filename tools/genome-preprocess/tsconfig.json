@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./_built",
+        "rootDir": "../../",
         "sourceMap": false,
         "module": "commonjs",
         "target": "es6",

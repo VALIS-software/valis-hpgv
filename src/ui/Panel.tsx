@@ -27,7 +27,7 @@ export interface PanelInternal {
 
 export class Panel extends Object2D {
 
-    column: number; // @! todo: refactor to remove this
+    column: number; // @! deprecated
 
     maxRange: number = 1e10;
     minRange: number = 10;

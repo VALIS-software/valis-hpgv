@@ -1,6 +1,7 @@
 import { Contig } from "../model/Contig";
 import { IDataSource } from "./IDataSource";
 import { GenomeFeature } from "../track/annotation/AnnotationTypes";
+import { SequenceTileLoader, AnnotationTileLoader } from "../track";
 
 export type Manifest = {
     contigs: Array<Contig>
@@ -9,6 +10,7 @@ export type Manifest = {
 export class ManifestDataSource implements IDataSource {
 
     protected manifestPromise: Promise<Manifest>;
+    protected pathRoot = '';
 
     /**
      * @param manifest Manifest object or path to remote manifest
@@ -49,9 +51,9 @@ export class ManifestDataSource implements IDataSource {
 
     loadACGTSequence(
         contig: string,
-        lodLevel: number,
         startBaseIndex: number,
         span: number,
+        lodLevel: number,
     ): Promise<{
         array: Uint8Array,
         sequenceMinMax: {
@@ -60,8 +62,8 @@ export class ManifestDataSource implements IDataSource {
         },
         indicesPerBase: number,
     }> {
-        console.error(`@! TODO: support loadACGTSequence`);
-        return null;
+        let path = `${this.pathRoot}/`; // @! need to find path from manifest
+        return SequenceTileLoader.loadACGTSequenceFromPath(path, contig, startBaseIndex, span, lodLevel);;
     }
 
     loadAnnotations(
@@ -70,8 +72,8 @@ export class ManifestDataSource implements IDataSource {
         span: number,
         macro: boolean,
     ): Promise<Array<GenomeFeature>> {
-        console.error(`@! TODO: support loadAnnotations`);
-        return null;
+        let path = `${this.pathRoot}/`; // @! need to find path from manifest
+        return AnnotationTileLoader.loadAnnotations(path, contig, startBaseIndex, span, macro);
     }
 
 }

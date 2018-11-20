@@ -15,15 +15,8 @@ import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } fro
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GeneClass, GenomeFeature, TranscriptClass } from "./AnnotationTypes";
 
-const TRANSCRIPT_HEIGHT = 20; // @! temporary constant
+const TRANSCRIPT_HEIGHT = 20;
 
-/**
- * WIP Annotation tracks:
- *
- * Todo:
- * - Convert micro-scale annotations to use instancing (and text batching)
- * - Merge shaders where possible and clean up
- */
 export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
 
     protected readonly macroLodBlendRange = 2;

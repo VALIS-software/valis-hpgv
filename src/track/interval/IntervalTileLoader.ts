@@ -49,42 +49,8 @@ export class IntervalTileLoader extends TileLoader<IntervalTilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<IntervalTilePayload>): Promise<IntervalTilePayload> | IntervalTilePayload {
-        /*
-        // @! generate random interval for testing
-        let n = 100;
-        let intervals = new Float32Array(n * 2);
-        for (let i = 0; i < n; i++) {
-            let start = Math.random() * tile.span + tile.x;
-            let length = Math.random() * 1000;
-            intervals[i * 2 + 0] = start;
-            intervals[i * 2 + 1] = length;
-        }
-        return intervals;
-        */
-
-        // @! quality improvement; reduce perception of shivering when zooming in
-
-        // if lod level = 0 and a macro track exists that covers this tile then we can filter that tile to get the lod 0 tile (so no network request or promise)
-        /*
-        let startBase = tile.x + 1;
-        let endBase = startBase + tile.span;
-
-        return SiriusApi.getIntervalTrackData(this.contig, startBase, endBase, this.model.query).then((r) => {
-            // allocate interval buffer
-            let intervals = new Float32Array(r.data.length * 2);
-
-            for (let i = 0; i < r.data.length; i++) {
-                let entry = r.data[i];
-                intervals[i * 2 + 0] = entry.start - 1;
-                intervals[i * 2 + 1] = entry.length;
-            }
-            return intervals;
-        });
-        */
-       console.warn('@! todo: load intervals');
-       return {
-           intervals: new Float32Array(0)
-       }
+        console.warn('Loading intervals from static files is not yet supported');
+        return { intervals: new Float32Array(0) }
     }
 
 }

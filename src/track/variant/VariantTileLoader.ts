@@ -35,29 +35,7 @@ export class VariantTileLoader extends TileLoader<VariantTilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<VariantTilePayload>): Promise<VariantTilePayload> | VariantTilePayload {
-        /*
-        const startBase = tile.x + 1;
-        const endBase = startBase + tile.span;
-        const snpQuery = this.model.query;
-        let ApiPromise;
-        if (!snpQuery) {
-            // use special API created for the "all variants track"
-            ApiPromise = SiriusApi.getAllVariantTrackData(this.contig, startBase, endBase);
-        } else {
-            ApiPromise = SiriusApi.getVariantTrackData(this.contig, startBase, endBase, snpQuery);
-        }
-        // use general API to load other variants, the number of results should be no more than 10M.
-        return ApiPromise.then((data) => {
-            let variants: Array<VariantGenomeNode> = data.data;
-            return variants.map((v) => { return {
-                id: v.id,
-                baseIndex: v.start - 1,
-                refSequence: v.info.variant_ref ? v.info.variant_ref: '',
-                alts: v.info.variant_alt ? v.info.variant_alt.split(','): [],
-            } });
-        });
-        */
-        console.warn('@! todo: load variants');
+        console.warn('Loading variants from static files is not yet supported');
         return [];
     }
 

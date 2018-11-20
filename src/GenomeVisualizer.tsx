@@ -21,7 +21,7 @@ import { TrackObject } from "./track/TrackObject";
 import { SignalTileLoader } from "./track/signal/SignalTileLoader";
 import { SignalTrack } from "./track/signal/SignalTrack";
 import { BigWigReader, AxiosDataLoader } from "bigwig-reader";
-import { SignalTrackModel } from "./track";
+import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel } from "./track";
 import { GenomicLocation } from "./model";
 import { Panel } from "./ui";
 
@@ -64,56 +64,64 @@ export class GenomeVisualizer {
                     this.addTrackFromFilePath(path, false);
                 }
 
+                let foundContigs = false;
+
                 // we determine a GenomeVisualizerConfiguration by inspecting the files in the list
-                let firstFilePath = configuration[0];
+                for (let path of configuration) {
 
-                // we don't know what contigs are available so we must read the first file for this
-                let fileType = firstFilePath.substr(firstFilePath.lastIndexOf('.') + 1).toLowerCase();
+                    // we don't know what contigs are available so we must read the first file for this
+                    let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
 
-                switch (fileType) {
-                    case 'bigwig': {
-                        this.trackViewer.setNothingToDisplayText('Loading');
-                        let bigwigReader = new BigWigReader(new AxiosDataLoader(firstFilePath));
-                        bigwigReader.getHeader().then((header) => {
-                            this.trackViewer.resetNothingToDisplayText();
-                            // create a manifest that lists the available contigs
-                            let manifest: Manifest = {
-                                contigs: []
-                            }
+                    switch (fileType) {
+                        case 'bigwig': {
+                            this.trackViewer.setNothingToDisplayText('Loading');
+                            let bigwigReader = new BigWigReader(new AxiosDataLoader(path));
+                            bigwigReader.getHeader().then((header) => {
+                                this.trackViewer.resetNothingToDisplayText();
+                                // create a manifest that lists the available contigs
+                                let manifest: Manifest = {
+                                    contigs: []
+                                }
 
-                            let availableChromosomes = header.chromTree.idToChrom;
-                            availableChromosomes.sort((a, b) => {
-                                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-                            });
-
-                            for (let contigId of availableChromosomes) {
-                                manifest.contigs.push({
-                                    id: contigId,
-                                    startIndex: 0,
-                                    span: header.chromTree.chromSize[contigId]
+                                let availableChromosomes = header.chromTree.idToChrom;
+                                availableChromosomes.sort((a, b) => {
+                                    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
                                 });
-                            }
 
-                            if (this.getPanels().size === 0) {
-                                this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
-                                this.setDataSource(new ManifestDataSource(manifest));
-                            }
-                        }).catch((reason) => {
-                            this.trackViewer.resetNothingToDisplayText();
-                            console.error(`Error loading bigwig header: ${reason}`);
-                        });
-                        break;
+                                for (let contigId of availableChromosomes) {
+                                    manifest.contigs.push({
+                                        id: contigId,
+                                        startIndex: 0,
+                                        span: header.chromTree.chromSize[contigId]
+                                    });
+                                }
+
+                                if (this.getPanels().size === 0) {
+                                    this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
+                                    this.setDataSource(new ManifestDataSource(manifest));
+                                }
+                            }).catch((reason) => {
+                                this.trackViewer.resetNothingToDisplayText();
+                                console.error(`Error loading bigwig header: ${reason}`);
+                            });
+                            foundContigs = true;
+                            break;
+                        }
+                        // case 'vgenes-dir': { break; }
+                        // case 'vdna-dir': { break; }
+                        // case 'bam': { break; }
+                        // case 'vcf': { break; }
+                        // case 'fasta': { break; }
+                        // case 'gff3': { break; }
                     }
-                    // case 'bam': { break; }
-                    // case 'vcf': { break; }
-                    // case 'fasta': { break; }
-                    // case 'gff3': { break; }
-                    default: {
-                        console.error(`Unsupported fileType "${fileType}"`);
-                        // add a human chromosome 1 panel and _hope_ that matches the available data
-                        this.addPanel({ contig: 'chr1', x0: 0, x1: 249e9 }, false);
-                        break;
-                    }
+
+                    if (foundContigs) break;
+                }
+
+                if (!foundContigs) {
+                    console.error(`Could not determine contigs from supplied files, defaulting to human chr1`);
+                    // add a human chromosome 1 panel and _hope_ that matches the available data
+                    this.addPanel({ contig: 'chr1', x0: 0, x1: 249e9 }, false);
                 }
             }
         } else {
@@ -165,13 +173,34 @@ export class GenomeVisualizer {
     addTrackFromFilePath(path: string, animateIn: boolean) {
         // we don't know what contigs are available so we must read the first file for this
         let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
-        let fileName = path.split('/').pop().split('\\').pop();
+        let basename = path.split('/').pop().split('\\').pop();
+        let parts = basename.split('.');
+        parts.pop();
+        let filename = parts.join('.');
+
 
         switch (fileType) {
             case 'bigwig': {
                 let model: SignalTrackModel = {
                     type: 'signal',
-                    name: fileName,
+                    name: filename,
+                    path: path,
+                };
+                return this.addTrack(model, animateIn);
+            }
+            case 'vgenes-dir': {
+                let model: AnnotationTrackModel = {
+                    type: 'annotation',
+                    name: filename,
+                    path: path,
+                    compact: true,
+                };
+                return this.addTrack(model, animateIn);
+            }
+            case 'vdna-dir': {
+                let model: SequenceTrackModel = {
+                    type: 'sequence',
+                    name: filename,
                     path: path,
                 };
                 return this.addTrack(model, animateIn);

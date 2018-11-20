@@ -23,7 +23,13 @@ let filePaths = new Array<string>();
 let inputPath = userArgs[0];
 let inputStat = fs.lstatSync(inputPath);
 if (inputStat.isDirectory()) {
-	filePaths = fs.readdirSync(inputPath).map((p) => `${inputPath}/${p}`);
+	filePaths = fs.readdirSync(inputPath)
+		// skip hidden files
+		.filter((name) => name.charAt(0) !== '.')
+		// prepend to get complete relative paths
+		.map((p) => `${inputPath}/${p}`)
+		// skip directories
+		.filter((filePath) => !fs.lstatSync(filePath).isDirectory());
 } else {
 	filePaths = [inputPath];
 }

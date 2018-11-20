@@ -1,4 +1,4 @@
-import { Strand } from 'genomics-formats/dist/gff3/Strand';
+import { Strand } from 'genomics-formats/lib/gff3/Strand';
 import { TrackModel } from '../TrackModel';
 
 export type AnnotationTrackModel = TrackModel & {

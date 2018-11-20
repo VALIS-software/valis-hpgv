@@ -6,7 +6,7 @@ import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { Strand } from "genomics-formats/dist/gff3/Strand";
+import { Strand } from "genomics-formats/lib/gff3/Strand";
 import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { TileState } from "../TileLoader";

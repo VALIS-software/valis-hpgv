@@ -66,6 +66,7 @@ let browser = new GenomeBrowser({
 The preprocessing script is used to prepare common genomics formats for optimal visualation with HPGV
 
 Put the files you want to convert and visualize together in a directory
+
 `npx genome-preprocess <path to your directory>`
 
 This will generate a new directory named `_output` which contains the converted files ready for viewing in HPGV

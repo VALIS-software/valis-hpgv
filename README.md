@@ -38,7 +38,7 @@ browser.render(
 
 Opening the HTML you created should now show
 
-<img alt="VALIS Genome Visualizer Demo" src="https://user-images.githubusercontent.com/3742992/48023087-bd94e180-e134-11e8-931c-e9b946dfc1f4.png">
+<img alt="VALIS Genome Visualizer Demo" src="https://user-images.githubusercontent.com/3742992/48793189-1300ef00-ecee-11e8-898e-a599d538b2a4.png">
 
 See [examples/minimal/index.html](examples/minimal/index.html) for a complete example
 

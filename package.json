@@ -12,6 +12,9 @@
     "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
     "build": "npm run prod"
   },
+  "bin": {
+    "genome-preprocess": "./tools/genome-preprocess/index.js"
+  },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
   "dependencies": {

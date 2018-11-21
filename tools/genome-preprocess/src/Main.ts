@@ -4,7 +4,7 @@ import * as path from "path";
 import { deleteDirectory } from "./FileSystemUtils";
 import { gff3Convert } from "./gff3/Convert";
 
-const outputDirectory = '_output';
+const outputDirectory = 'hpgv-files';
 
 let userArgs = process.argv.slice(2);
 

@@ -71,8 +71,6 @@ Put the files you want to convert and visualize together in a directory
 
 This will generate a new directory named `_output` which contains the converted files ready for viewing in HPGV
 
-**todo: Flesh out worked example**
-
 ## Getting Started with TypeScript
 (see examples/typescript)
 *todo*

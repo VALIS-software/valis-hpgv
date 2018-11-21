@@ -68,7 +68,7 @@ The available track types are
 - `annotation`
 
 ## Using the Preprocessing Script to Visualize a Collection of Files
-The preprocessing script is used to prepare common genomics formats for optimal visualization with HPGV
+The preprocessing script is used to prepare common genomics formats for optimal visualization with HPGV. Currently this preprocessing is required for sequence and annotation tracks but not signal tracks.
 
 Put the files you want to convert and visualize together in a directory
 

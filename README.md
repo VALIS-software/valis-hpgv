@@ -62,14 +62,19 @@ let browser = new GenomeBrowser({
 });
 ```
 
+The available track types are
+- `sequence`
+- `signal`
+- `annotation`
+
 ## Using the Preprocessing Script to Visualize a Collection of Files
-The preprocessing script is used to prepare common genomics formats for optimal visualation with HPGV
+The preprocessing script is used to prepare common genomics formats for optimal visualization with HPGV
 
 Put the files you want to convert and visualize together in a directory
 
 `npx genome-preprocess <path to your directory>`
 
-This will generate a new directory named `_output` which contains the converted files ready for viewing in HPGV
+This will generate a new directory named `hpgv-files` which contains the converted files ready for viewing in HPGV
 
 ## Getting Started with TypeScript
 (see examples/typescript)
@@ -83,3 +88,7 @@ Support for displaying popular file types out of the box
 - BAM
 - VCF
 - GFF3
+
+Support for new track types
+- `interval`
+- `variant`

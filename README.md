@@ -43,7 +43,7 @@ Opening the HTML you created should now show
 See [examples/minimal/index.html](examples/minimal/index.html) for a complete example
 
 ### Advanced Configuration
-See [examples/advanced/index.html](examples/minimal/index.html)
+See [examples/advanced/index.html](examples/advanced/index.html)
 
 For more control, you can configure panels and track properties on initialization:
 ```javascript

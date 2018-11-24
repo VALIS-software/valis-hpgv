@@ -213,7 +213,7 @@ function getAsciiFormat(flag: FormatFlag): string {
 }
 
 function format(message: string) {
-	let formatPattern = /<(\/)?([^><{}\s]*|{[^}<>]*})>/g;
+	let formatPattern = /<(\/)?([^><{}]*|{[^}<>]*})>/g;
 
 	let activeFormatFlagStack = new Array<FormatFlag>();
 	let groupedProceedingTags = new Array<number>();
@@ -241,7 +241,7 @@ function format(message: string) {
 	let formatted = message.replace(formatPattern, (substr: string, closeModifier: string, tagStr: string) => {
 		let open = closeModifier == null;
 
-		let tags = tagStr.split(',');
+		let tags = tagStr.split(',').map((tag) => tag.trim());
 
 		// handle </> and <//>
 		if (!open && tags.length === 1) {

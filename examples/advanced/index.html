@@ -46,7 +46,6 @@
 
     let container = document.getElementById('container');
 
-    update();
     window.addEventListener('resize', update);
 
     function update() {
@@ -59,4 +58,6 @@
     function saveStateInURL() {
         window.history.replaceState(null, null, '#' + JSON.stringify(visualizer.getConfiguration()));
     }
+
+    update();
 </script>

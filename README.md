@@ -12,7 +12,7 @@ The quickest way to get started is to use [`valis-hpgv.js`](https://raw.githubus
 <script src="valis-hpgv.js"></script>
 ```
 
-- The visualizer can then be initialized with a list of files. The current supported file types are: `bigwig`, `vdna-dir`, `vgene-dir` with more types including BAM, gff3 and VCF planned in the [roadmap](#Roadmap):
+- The visualizer can then be initialized with a list of files. The current supported file types are: `bigwig`, `vdna-dir`, `vgene-dir` with more types including `BAM`, `gff3` and `VCF` planned in the [roadmap](#Roadmap):
 ```javascript
 // pass a list of files to visualize in an array, the viewer will determine the best visualization to use
 let browser = new GenomeBrowser([
@@ -72,7 +72,7 @@ The preprocessing script is used to prepare common genomics formats for optimal 
 
 Put the files you want to convert and visualize together in a directory
 
-`npx genome-preprocess <path to your directory>`
+`npx hpgv <path to your directory>`
 
 This will generate a new directory named `hpgv-files` which contains the converted files ready for viewing in HPGV
 
@@ -85,9 +85,9 @@ This will generate a new directory named `hpgv-files` which contains the convert
 
 ## Roadmap
 Support for displaying popular file types out of the box
-- BAM
-- VCF
-- GFF3
+- `BAM`
+- `VCF`
+- `GFF3`
 
 Support for new track types
 - `interval`

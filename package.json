@@ -13,7 +13,7 @@
     "build": "npm run prod"
   },
   "bin": {
-    "genome-preprocess": "./tools/genome-preprocess/index.js"
+    "hpgv": "./cli.js"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",

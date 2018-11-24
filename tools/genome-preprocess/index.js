@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
 // execute Main
-const outDir = './_built'; // from tsconfig
+const outDir = './dist'; // from tsconfig
 const mainPath = 'tools/genome-preprocess/src/Main'; // relative to rootDir
 require(`${outDir}/${mainPath}`); 

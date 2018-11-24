@@ -44,6 +44,7 @@ function processFile(filePath) {
             return Convert_1.gff3Convert(filePath, outputDirectory);
         }
         case '.fa':
+        case '.fna':
         case '.fasta': {
             Terminal_1.default.warn(`FASTA not yet implemented`);
             return Promise.resolve(null);
@@ -59,8 +60,10 @@ function printDoc() {
 
 Generates files optimized for viewing with VALIS Genome Visualizer 
 
-<b>Usage:</b> genome-preprocess <dim,i>[path to directory containing files to process]</>
+<b>Usage:</b> <#FFF>hpgv</> <dim,i>[path to directory containing files to process]</>
 
-Supports <b,i>.fasta</> and <b,i>.gff3</> files
+Supports the following file types
+- <b>FASTA</> <i,dim>.fa, .fna, .fasta</>
+- <b>GFF3</> <i,dim>.gff3</>
 `);
 }

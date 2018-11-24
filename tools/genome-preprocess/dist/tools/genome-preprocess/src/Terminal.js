@@ -180,7 +180,7 @@ function getAsciiFormat(flag) {
     }
 }
 function format(message) {
-    let formatPattern = /<(\/)?([^><{}\s]*|{[^}<>]*})>/g;
+    let formatPattern = /<(\/)?([^><{}]*|{[^}<>]*})>/g;
     let activeFormatFlagStack = new Array();
     let groupedProceedingTags = new Array();
     function addFlag(flag, proceedingTags) {
@@ -202,7 +202,7 @@ function format(message) {
     }
     let formatted = message.replace(formatPattern, (substr, closeModifier, tagStr) => {
         let open = closeModifier == null;
-        let tags = tagStr.split(',');
+        let tags = tagStr.split(',').map((tag) => tag.trim());
         // handle </> and <//>
         if (!open && tags.length === 1) {
             if (tags[0] == '') {

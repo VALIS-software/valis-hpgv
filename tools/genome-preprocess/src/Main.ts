@@ -68,7 +68,7 @@ function printDoc() {
 
 Generates files optimized for viewing with VALIS Genome Visualizer 
 
-<b>Usage:</b> genome-preprocess <dim,i>[path to files]</>
+<b>Usage:</b> genome-preprocess <dim,i>[path to directory containing files to process]</>
 
 Supports <b,i>.fasta</> and <b,i>.gff3</> files
 `

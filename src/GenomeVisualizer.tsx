@@ -297,6 +297,8 @@ export class GenomeVisualizer {
     }
 
     protected frameLoop = () => {
+        if (this.appCanvasRef == null) return;
+
         this._frameLoopHandle = window.requestAnimationFrame(this.frameLoop);
 
         // appCanvas should react to user input before animation are stepped

@@ -4,4 +4,4 @@
 
 ```npm run build```
 
-Then open index.html in a browser
+Then open `dist/index.html` in a browser

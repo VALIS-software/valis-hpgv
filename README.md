@@ -145,7 +145,6 @@ This will write generated files to a folder named `dist/`.
 See [examples/typescript](examples/typescript) for a completed example
 
 ## Creating a Custom Track – Multiple Signal Track
-Begin by following the steps to create a TypeScript project (however the principles are the same)
 
 ## Creating a Custom Track – Custom Interval Source
 

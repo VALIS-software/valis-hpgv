@@ -2,23 +2,21 @@
   "name": "example",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "prepare": "npm pack ../../",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && npx browserify _built/App.js -o bundle.js"
+    "dev": "tsc && parcel index.html",
+    "build": "tsc && parcel build index.html --public-url '.'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "genome-visualizer": "file:./genome-visualizer-1.0.0.tgz",
+    "genome-visualizer": "github:VALIS-software/valis-hpgv",
     "react": "16.3.x",
     "react-dom": "16.3.x"
   },
   "devDependencies": {
-    "browserify": "^16.2.2",
     "@types/react": "16.3.x",
     "@types/react-dom": "16.0.x",
-    "typescript": "3.0.x"
+    "parcel": "^1.10.3",
+    "typescript": "^3.0.3"
   }
 }

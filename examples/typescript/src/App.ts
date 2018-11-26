@@ -1,6 +1,6 @@
 import { GenomeVisualizer } from "genome-visualizer";
 
-let visualizer = new GenomeVisualizer({
+let hpgv = new GenomeVisualizer({
     allowNewPanels: true,
     panels: [
         {
@@ -33,7 +33,7 @@ let container = document.getElementById('container');
 window.addEventListener('resize', update);
 
 function update() {
-    visualizer.render({
+    hpgv.render({
         width: window.innerWidth,
         height: window.innerHeight
     }, container);

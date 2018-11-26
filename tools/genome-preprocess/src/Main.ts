@@ -31,6 +31,7 @@ if (inputStat.isDirectory()) {
 		// skip directories
 		.filter((filePath) => !fs.lstatSync(filePath).isDirectory());
 } else {
+	// user argument is path to a single file
 	filePaths = [inputPath];
 }
 

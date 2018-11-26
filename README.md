@@ -121,7 +121,7 @@ We need a html file to host the app, let's name this file
 
 ### Build and Test
 
-Finally we run [parcel](https://parceljs.org) on `index.html` to compile the project. Since parcel was installed locally, we can use [`npx`](https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner) to execute it`. In your shell, execute the following:
+Finally we run [parcel](https://parceljs.org) on `index.html` to compile the project. Since parcel was installed locally, we can use [`npx`](https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner) to execute it. In your shell, execute the following:
 
 ```bash
 npx parcel index.html
@@ -134,7 +134,13 @@ Server running at http://localhost:1234
 
 If you open `http://localhost:1234` in your browser you should see HPGV (with the same appearance as in the JavaScript getting-started example)
 
-When parcel first runs it will install the TypeScript compiler as a local dependency.
+You cannot normally load a `.ts` file from a `<script>` tag as we've done in `index.html`, to make it possible [parcel](https://parceljs.org) is first compiling `App.ts` to JavaScript and then serving a modified `index.html` that loads this file instead. To generate the final `index.html` and `App.js` files we can use parcel's `build` command:
+
+```bash
+npx parcel build index.html --public-url '.'
+```
+
+This will write generated files to a folder named `dist/`.
 
 See [examples/typescript](examples/typescript) for a completed example
 

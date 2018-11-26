@@ -134,7 +134,7 @@ Server running at http://localhost:1234
 
 If you open `http://localhost:1234` in your browser you should see HPGV (with the same appearance as in the JavaScript getting-started example)
 
-You cannot normally load a `.ts` file from a `<script>` tag as we've done in `index.html`, to make it possible [parcel](https://parceljs.org) is first compiling `App.ts` to JavaScript and then serving a modified `index.html` that loads this file instead. To generate the final `index.html` and `App.js` files we can use parcel's `build` command:
+You cannot normally load a `.ts` file from a `<script>` tag as we've done in `index.html`, to make it possible [parcel](https://parceljs.org) is first compiling `App.ts` to JavaScript and then serving a modified `index.html` that loads this file instead. To generate the final `index.html` and `App.js` files we can use parcel's [`build`](https://parceljs.org/production.html) command:
 
 ```bash
 npx parcel build index.html --public-url '.'

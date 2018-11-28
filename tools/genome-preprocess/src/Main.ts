@@ -35,6 +35,11 @@ if (inputStat.isDirectory()) {
 	filePaths = [inputPath];
 }
 
+if (filePaths.length === 0) {
+	Terminal.error(`No files found in "${inputPath}" (subdirectories are ignored)`);
+	process.exit(1);
+}
+
 Terminal.log(`Files queued for conversion:\n\t<b>${filePaths.join('\n\t')}</b>`);
 
 // build a chain of promises to convert the files

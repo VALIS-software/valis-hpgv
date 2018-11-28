@@ -181,7 +181,7 @@ export type DualSignalTrackModel = SignalTrackModel & {
 
 HPGV tracks work by loading data in segments called 'tiles'. To adaptively display data at different zoom levels, multiple layers of tiles are used – tile layers are organized into a hierarchy where successive levels fetch the data at lower sampling densities. For example, the bottom tile layer (maximum zoom) will have a one-to-one correspondence between source data and values in the tile, however the next layer up will aggregate values so that every two values in the source data corresponds to one value in the tile. This pattern of halving the sampling rate with each tile layer continues until all the source data is aggregated into a single value.
 
-For our custom [TileLoader](src/track/TileLoader.ts) we want to load two bigwig files into each tile. Since the existing signal track can handle loading bigwigs, we can use it as a starting point by extending the [SignalTileLoader](src/tracks/signal/SignalTileLoader.ts) class:
+For our custom [TileLoader](src/track/TileLoader.ts) we want to load two bigwig files into each tile. Since the existing signal track can handle loading bigwigs, we can use it as a starting point by extending the [SignalTileLoader](src/track/signal/SignalTileLoader.ts) class:
 
 ```typescript
 import { SignalTileLoader, SignalTilePayload, Tile } from 'genome-visualizer';

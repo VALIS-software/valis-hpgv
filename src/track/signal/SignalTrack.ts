@@ -50,6 +50,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading.relativeX = 1;
         this.signalReading.z = 3;
         this.signalReading.opacity = 0.6;
+        this.signalReading.mask = this;
 
         if (this.signalReadingSnapX) {
             this.signalReading.originX = 0;

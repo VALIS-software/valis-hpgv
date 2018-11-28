@@ -73,7 +73,22 @@ class Main {
 		}
 	}
 	/**/
+
 	/**/
+	static var fastaFilePath = 'data/Homo_sapiens.GRCh37.dna.primary_assembly.fa';
+	static var sequenceNameFilter: Null<EReg> = ~/(1) dna:chromosome chromosome:GRCh37/;
+
+	static function convertFastaSequenceName(name: String) {
+		if (sequenceNameFilter != null) {
+			sequenceNameFilter.match(name);
+			return 'chr${sequenceNameFilter.matched(1)}' + '.bin';
+		} else {
+			return '$name.bin';
+		}
+	}
+	/**/
+
+	/**
 	// test case
 	static var fastaFilePath = 'data/test.fa';
 	static var sequenceNameFilter: Null<EReg> = null;
@@ -83,6 +98,19 @@ class Main {
 	static var outputDirectory = '_generated';
 
 	static function main() {
+		var args = Sys.args();
+
+		if (args.length == 0) {
+			Console.error('Pass chromosome number as an argument');
+			Sys.exit(1);
+			return;
+		}
+
+		var filter = '^(${args[0]}) dna:chromosome chromosome:GRCh37';
+
+		Console.log('Filter is "$filter"');
+		sequenceNameFilter = new EReg(filter, '');
+
 		var generatedFilePaths = convertFastaFile(fastaFilePath);
 
 		for (path in generatedFilePaths) {
@@ -119,9 +147,9 @@ class Main {
 		}
 
 		// remove generated double sequences
-		// for (path in generatedFilePaths) {
-			// sys.FileSystem.deleteFile(path);	
-		// }
+		for (path in generatedFilePaths) {
+			sys.FileSystem.deleteFile(path);
+		}
 	}
 
 	// first-pass compression: doubles to bytes + minmax

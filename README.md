@@ -144,9 +144,61 @@ This will write generated files to a folder named `dist/`.
 
 See [examples/typescript](examples/typescript) for a completed example
 
-## Creating a Custom Track – Multiple Signal Track
+## Creating a Custom Track: Dual Signal Track
 
-## Creating a Custom Track – Custom Interval Source
+In this tutorial we demonstraight creating a custom track type that enables two bigwig signals to be overlaid on one another. To begin, first follow the [Getting Started with TypeScript](#Getting-Started-with-TypeScript) instructions (or use the existing [example project](examples/typescript)).
+
+The implementation of HPGV tracks is divided over 3 components:
+- A [TrackModel](src/track/TrackModel.ts) type to define the track's configuration (optional)
+- A [TileLoader](src/track/TileLoader.ts) instance to handle data fetching
+- A [TrackObject](src/track/TrackObject.ts) instance to handle rendering the tiles
+
+When all three components have been defined we can register the track type with HPGV by calling `registerTrackType`:
+
+```typescript
+GenomeVisualizer.registerTrackType('our-custom-track', OurCustomTileLoader, OurCustomTrackObject);
+```
+
+### Defining our TrackModel
+
+The [TrackModel](src/track/TrackModel.ts) serves as a definition for the configuration values the track requires. It's purely used to provide type definitions in TypeScript, so when developing custom tracks in JavaScript it is not required.
+
+For our dual signal track, we only require one addition configuration field: `path2`, to specify the second bigwig file. We can extend the existing [signal track model](src/track/signal/SignalTrackModel.ts).
+
+In a file called `DualSignalTrackModel.ts`:
+```typescript
+import { SignalTrackModel } from "genome-visualizer";
+
+export type DualSignalTrackModel = SignalTrackModel & {
+    // override the 'type' field, this will be the track type identifier used within HPGV
+    readonly type: 'dual-signal',
+    // we add extra field 'path2' to supply the second bigwig file
+    readonly path2: string,
+}
+```
+
+### Creating our Custom TileLoader
+
+HPGV tracks work by loading data in segments called 'tiles'. To adaptively display data at different zoom levels, multiple layers of tiles are used – tile layers are organized into a hierarchy where successive levels fetch the data at lower sampling densities. For example, the bottom tile layer (maximum zoom) will have a one-to-one correspondence between source data and values in the tile, however the next layer up will aggregate values so that every two values in the source data corresponds to one value in the tile. This pattern of halving the sampling rate with each tile layer continues until all the source data is aggregated into a single value.
+
+For our custom [TileLoader](src/track/TileLoader.ts) we want to load two bigwig files into each tile. Since the existing signal track can handle loading bigwigs, we can use it as a starting point by extending the [SignalTileLoader](src/tracks/signal/SignalTileLoader.ts) class:
+
+```typescript
+import { SignalTileLoader, SignalTilePayload, Tile } from 'genome-visualizer';
+import { DualSignalTrackModel } from './DualSignalTrackModel';
+
+export class DualSignalTileLoader extends SignalTileLoader {
+
+    protected readonly model: DualSignalTrackModel;
+
+    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
+        return null;
+    }
+
+}
+```
+
+## Creating a Custom Track: Custom Interval Source
 
 ## Using the Preprocessing Script to Visualize a Collection of Files
 The preprocessing script is used to prepare common genomics formats for optimal visualization with HPGV. Currently this preprocessing is required for sequence and annotation tracks but not signal tracks.

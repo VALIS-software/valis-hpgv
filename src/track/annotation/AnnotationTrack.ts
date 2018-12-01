@@ -55,7 +55,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected _macroTileCache = new UsageCache<IntervalInstances>();
     protected _annotationCache = new UsageCache<{gene: GeneAnnotation, name: Text}>();
     protected _onStageAnnotations = new UsageCache<Object2D>();
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
 
         if (widthPx > 0) {

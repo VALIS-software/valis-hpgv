@@ -215,7 +215,7 @@ export class TrackObject<
     /**
      * Override to handle drawing
      */
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
     }
 
     /**

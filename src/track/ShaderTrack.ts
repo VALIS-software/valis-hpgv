@@ -24,7 +24,7 @@ export class ShaderTrack<
 
     protected _tileNodeCache = new UsageCache<ShaderTile<TilePayload>>();
 
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._tileNodeCache.markAllUnused();
 
         if (widthPx > 0) {

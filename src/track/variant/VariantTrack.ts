@@ -38,7 +38,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
     protected _sequenceLabelCache = new UsageCache<{
         root: Object2D, textParent: Object2D, text: TextClone,
     }>();
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
         this._sequenceLabelCache.markAllUnused();
 

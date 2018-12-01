@@ -11,7 +11,7 @@ import { Text } from "engine";
 import { OpenSansRegular } from "../../ui";
 import Animator from "../../Animator";
 
-export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
+export class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
     protected yAxis: Axis;
 
@@ -177,7 +177,7 @@ export class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Mod
         this.signalReading.render = true;
     }
 
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         let tileLoader = this.getTileLoader();
 
         if (tileLoader.ready) {

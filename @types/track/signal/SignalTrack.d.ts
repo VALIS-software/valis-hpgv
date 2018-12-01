@@ -22,7 +22,7 @@ export declare class SignalTrack<Model extends SignalTrackModel = SignalTrackMod
     protected setSignalReading(value: number | null): void;
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
 }
-declare class SignalTile extends ShaderTile<SignalTilePayload> {
+export declare class SignalTile extends ShaderTile<SignalTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
     setTile(tile: Tile<SignalTilePayload>): void;
@@ -36,4 +36,3 @@ declare class SignalTile extends ShaderTile<SignalTilePayload> {
     protected static vertexShader: string;
     protected static fragmentShader: string;
 }
-export {};

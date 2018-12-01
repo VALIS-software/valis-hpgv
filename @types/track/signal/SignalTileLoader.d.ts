@@ -37,7 +37,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
     mapLodLevel(l: number): number;
-    protected _initializationPromise: Promise<void>;
+    private _initializationPromise;
     protected initializationPromise(): Promise<void>;
     protected onReady(): void;
     protected getBigWigLoader(path: string): Promise<BigWigLoader>;

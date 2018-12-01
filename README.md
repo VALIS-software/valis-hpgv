@@ -278,6 +278,9 @@ To make our new track type available we call `GenomeVisualizer.registerTrackType
 
 ```typescript
 GenomeVisualizer.registerTrackType('dual-signal', DualSignalTileLoader, DualSignalTrack);
+
+let hpgv = new GenomeVisualizer({
+...
 ```
 
 And add an instance of the track to the configuration

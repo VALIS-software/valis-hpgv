@@ -170,7 +170,9 @@ export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected annotationCache: AnnotationTileLoader;
 
-    static cacheKey(model: MacroAnnotationTrackModel): string { return null; }
+    static cacheKey(model: MacroAnnotationTrackModel): string {
+        return model.path;
+    }
 
     constructor(
         protected readonly dataSource: IDataSource,

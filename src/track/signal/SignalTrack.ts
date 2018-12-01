@@ -10,6 +10,7 @@ import { AxisPointer, AxisPointerStyle } from "../TrackObject";
 import { Text } from "engine";
 import { OpenSansRegular } from "../../ui";
 import Animator from "../../Animator";
+import { Shaders } from "../../Shaders";
 
 export class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
@@ -204,6 +205,14 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
 
+    protected colorShaderFunction = `
+        ${Shaders.functions.palettes.viridis}
+
+        vec3 color(vec4 textureSample, vec2 uv) {
+            return step(1.0 - textureSample.r, uv.y) * viridis(textureSample.r * uv.y);
+        }
+    `;
+
     setTile(tile: Tile<SignalTilePayload>) {
         super.setTile(tile);
 
@@ -218,7 +227,32 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
         this.gpuProgram = SharedResources.getProgram(
             device,
             SignalTile.vertexShader,
-            SignalTile.fragmentShader,
+            `
+                #version 100
+
+                precision mediump float;
+                uniform float opacity;
+                uniform sampler2D memoryBlock;
+                uniform vec2 size;
+
+                varying vec2 texCoord;
+                varying vec2 vUv;
+
+                ${this.colorShaderFunction}
+                
+                void main() {
+                    vec4 textureSample = texture2D(memoryBlock, texCoord);
+
+                    vec3 col = color(textureSample, vUv);
+
+                    #if 0
+                    float debug = step((1.0 - vUv.y) * size.y, 5.);
+                    col = mix( col, vec3( 0., vUv.xy ), debug);
+                    #endif
+                    
+                    gl_FragColor = vec4(col, 1.0) * opacity;
+                }
+            `,
             SignalTile.attributeLayout
         );
 
@@ -234,8 +268,6 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
     }
 
     draw(context: DrawContext) {
-        let payload = this.tile.payload;
-
         context.uniform2f('size', this.computedWidth, this.computedHeight);
         context.uniformMatrix4fv('model', false, this.worldTransformMat4);
         context.uniform1f('opacity', this.opacity);
@@ -266,47 +298,6 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
             texCoord = vec2(position.x, memoryBlockY);
             vUv = position;
             gl_Position = model * vec4(position * size, 0., 1.0);
-        }
-    `;
-
-    protected static fragmentShader = `
-        #version 100
-
-        precision mediump float;
-        uniform float opacity;
-        uniform sampler2D memoryBlock;
-        uniform vec2 size;
-
-        varying vec2 texCoord;
-        varying vec2 vUv;
-
-        vec3 viridis( float x ) {
-            x = clamp(x, 0., 1.0);
-            vec4 x1 = vec4( 1.0, x, x * x, x * x * x ); // 1 x x2 x3
-            vec4 x2 = x1 * x1.w * x; // x4 x5 x6 x7
-            return vec3(
-                dot( x1, vec4( +0.280268003, -0.143510503, +2.225793877, -14.81508888 ) ) + dot( x2.xy, vec2( +25.212752309, -11.77258958 ) ),
-                dot( x1, vec4( -0.002117546, +1.617109353, -1.909305070, +2.701152864 ) ) + dot( x2.xy, vec2(  -1.685288385, +0.178738871 ) ),
-                dot( x1, vec4( +0.300805501, +2.614650302, -12.01913909, +28.93355911 ) ) + dot( x2.xy, vec2( -33.491294770, +13.76205384 ) )
-            );
-        }
-        
-        void main() {
-            vec4 texRaw = texture2D(memoryBlock, texCoord);
-
-            // heatmap style
-            #if 0
-            vec3 col = viridis(texRaw.r);
-            #else
-            vec3 col = step(1.0 - texRaw.r, vUv.y) * viridis(texRaw.r * vUv.y);
-            #endif
-
-            #if 0
-            float debug = step((1.0 - vUv.y) * size.y, 5.);
-            col = mix( col, vec3( 0., vUv.xy ), debug);
-            #endif
-            
-            gl_FragColor = vec4(col, 1.0) * opacity;
         }
     `;
 

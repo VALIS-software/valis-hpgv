@@ -25,6 +25,7 @@ export declare class SignalTrack<Model extends SignalTrackModel = SignalTrackMod
 export declare class SignalTile extends ShaderTile<SignalTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
+    protected colorShaderFunction: string;
     setTile(tile: Tile<SignalTilePayload>): void;
     allocateGPUResources(device: GPUDevice): void;
     releaseGPUResources(): void;
@@ -34,5 +35,4 @@ export declare class SignalTile extends ShaderTile<SignalTilePayload> {
         type: AttributeType;
     }[];
     protected static vertexShader: string;
-    protected static fragmentShader: string;
 }

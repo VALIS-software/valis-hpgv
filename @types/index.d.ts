@@ -6,3 +6,4 @@ export * from './Animator';
 export * from './Engine';
 export * from './GenomeVisualizer';
 export * from './GenomeVisualizerConfiguration';
+export * from './Shaders';

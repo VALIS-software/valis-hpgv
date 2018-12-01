@@ -7,7 +7,8 @@ import { DrawContext } from "engine/rendering/Renderer";
 import { Tile } from "../TileLoader";
 import { AxisPointer, AxisPointerStyle } from "../TrackObject";
 import { Text } from "engine";
-export declare class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
+import TrackModel from "../TrackModel";
+export declare class SignalTrack<Model extends TrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
     protected yAxis: Axis;
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;

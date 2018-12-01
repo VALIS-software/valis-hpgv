@@ -315,6 +315,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     }
 
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
+        const nChannels = this.nChannels;
         // fill float array with zoom data regions
         let tileLoader = this;
         return this.loadPayloadBuffer(tile).then((data) => {
@@ -333,7 +334,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     // upload this tile's row to the block if not already uploaded
                     if (!payload.dataUploaded) {
-                        let nChannels = 4;
                         let dataWidthPixels = payload.array.length / nChannels;
 
                         let data: Uint8Array | Float32Array = payload.array;
@@ -369,14 +369,14 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     if (linearFiltering) {
                         let p = Math.max(x * nEntries - 0.5, 0);
-                        let low = payload.array[Math.floor(p) * this.nChannels + channel];
-                        let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * this.nChannels + channel];
+                        let low = payload.array[Math.floor(p) * nChannels + channel];
+                        let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * nChannels + channel];
                         let alpha = p - Math.floor(p);
 
                         return low * (1 - alpha) + high * alpha;
                     } else {
                         let i = Math.floor(x * nEntries);
-                        return payload.array[i * this.nChannels + channel]; // red channel
+                        return payload.array[i * nChannels + channel]; // red channel
                     }
                 }
             }

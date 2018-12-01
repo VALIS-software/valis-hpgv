@@ -294,7 +294,7 @@ After running `parcel index.html`, you should see the following when visiting [`
 
 <img width="837" alt="screenshot 2018-12-01 at 19 18 27" src="https://user-images.githubusercontent.com/3742992/49332015-ed050580-f59d-11e8-8f57-fe0e33d1656b.png">
 
-The red curve shows the first bigwig and the green the second. The yellow curve corresponds to the product of the two: signal1 * signal2.
+The red curve shows the first bigwig and the green the second. The yellow curve corresponds the overlap of the two signals.
 
 ## Creating a Custom Track: Custom Interval Source
 

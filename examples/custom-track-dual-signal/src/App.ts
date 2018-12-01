@@ -20,7 +20,7 @@ let hpgv = new GenomeVisualizer({
         {
             name: 'Dual Signal',
             type: 'dual-signal',
-            path1: 'https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig',
+            path: 'https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig',
             path2: 'https://www.encodeproject.org/files/ENCFF677VKI/@@download/ENCFF677VKI.bigWig',
         }
     ],

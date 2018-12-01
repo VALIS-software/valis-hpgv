@@ -296,7 +296,7 @@ And add an instance of the track to the configuration
 
 After running `parcel index.html`, you should see the following when visiting [`http://localhost:1234`](http://localhost:1234)
 
-<img width="837" alt="screenshot 2018-12-01 at 19 18 27" src="https://user-images.githubusercontent.com/3742992/49332015-ed050580-f59d-11e8-8f57-fe0e33d1656b.png">
+<img width="837" alt="screenshot 2018-12-01 at 19 46 14" src="https://user-images.githubusercontent.com/3742992/49332258-e7112380-f5a1-11e8-8ff6-786a696a1859.png">
 
 The red curve shows the first bigwig and the green the second. The yellow curve corresponds the overlap of the two signals.
 

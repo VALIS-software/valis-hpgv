@@ -199,7 +199,7 @@ export class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> exte
 
 }
 
-class SignalTile extends ShaderTile<SignalTilePayload> {
+export class SignalTile extends ShaderTile<SignalTilePayload> {
 
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;

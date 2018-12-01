@@ -11,7 +11,7 @@ export declare type SignalTilePayload = {
     };
     dataUploaded: boolean;
     getTexture(device: GPUDevice): GPUTexture;
-    getReading(fractionalX: number): number;
+    getReading(fractionalX: number, channel: number): number;
 };
 declare type BlockPayload = {
     _gpuTexture: GPUTexture;
@@ -33,6 +33,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected bigWigLoader: BigWigLoader;
     protected _scaleFactor: number;
     protected _logarithmicDisplay: boolean;
+    protected readonly nChannels: number;
     static cacheKey(model: SignalTrackModel): string;
     static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
@@ -46,6 +47,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
         lodZoomIndexMap: Array<number>;
     };
     protected getBigWigData(bigWigLoader: BigWigLoader, tile: Tile<SignalTilePayload>, buffer: Float32Array, nChannels: number, offset: number): Promise<Float32Array>;
+    protected loadPayloadBuffer(tile: Tile<SignalTilePayload>): Promise<Float32Array>;
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload>;
     protected createBlockPayload(lodLevel: number, lodX: number, tileWidth: number, rows: number): BlockPayload;
     protected releaseBlockPayload(payload: BlockPayload): void;

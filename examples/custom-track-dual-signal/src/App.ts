@@ -1,4 +1,4 @@
-import { GenomeVisualizer, TileLoader } from "genome-visualizer";
+import { GenomeVisualizer } from "genome-visualizer";
 import { DualSignalTileLoader } from "./dual-signal/DualSignalTileLoader";
 import { DualSignalTrack } from "./dual-signal/DualSignalTrack";
 

@@ -228,7 +228,7 @@ export class DualSignalTileLoader extends SignalTileLoader {
 }
 ```
 
-### Creating our Custom TrackObject
+### Rendering: Creating our Custom TrackObject
 
 ...
 

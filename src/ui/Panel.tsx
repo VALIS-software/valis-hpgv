@@ -146,13 +146,13 @@ export class Panel extends Object2D {
     }
 
     addTrackView(trackView: TrackObject) {
-        trackView.addInteractionListener('dragstart', this.onTileDragStart);
-        trackView.addInteractionListener('dragmove', this.onTileDragMove);
-        trackView.addInteractionListener('dragend', this.onTileDragEnd);
-        trackView.addInteractionListener('pointerup', this.onTileDragEnd);
-        trackView.addInteractionListener('wheel', this.onTileWheel);
-        trackView.addInteractionListener('pointermove', this.onTilePointerMove);
-        trackView.addInteractionListener('pointerleave', this.onTileLeave);
+        trackView.addInteractionListener('dragstart', this.onTrackDragStart);
+        trackView.addInteractionListener('dragmove', this.onTrackDragMove);
+        trackView.addInteractionListener('dragend', this.onTrackDragEnd);
+        trackView.addInteractionListener('pointerup', this.onTrackDragEnd);
+        trackView.addInteractionListener('wheel', this.onTrackWheel);
+        trackView.addInteractionListener('pointermove', this.onTrackPointerMove);
+        trackView.addInteractionListener('pointerleave', this.onTrackLeave);
         trackView.setDataSource(this.dataSource);
         trackView.setContig(this.contig);
         trackView.setRange(this.x0, this.x1);
@@ -164,13 +164,13 @@ export class Panel extends Object2D {
     }
 
     removeTrackView(trackView: TrackObject) {
-        trackView.removeInteractionListener('dragstart', this.onTileDragStart);
-        trackView.removeInteractionListener('dragmove', this.onTileDragMove);
-        trackView.removeInteractionListener('dragend', this.onTileDragEnd);
-        trackView.removeInteractionListener('pointerup', this.onTileDragEnd);
-        trackView.removeInteractionListener('wheel', this.onTileWheel);
-        trackView.removeInteractionListener('pointermove', this.onTilePointerMove);
-        trackView.removeInteractionListener('pointerleave', this.onTileLeave);
+        trackView.removeInteractionListener('dragstart', this.onTrackDragStart);
+        trackView.removeInteractionListener('dragmove', this.onTrackDragMove);
+        trackView.removeInteractionListener('dragend', this.onTrackDragEnd);
+        trackView.removeInteractionListener('pointerup', this.onTrackDragEnd);
+        trackView.removeInteractionListener('wheel', this.onTrackWheel);
+        trackView.removeInteractionListener('pointermove', this.onTrackPointerMove);
+        trackView.removeInteractionListener('pointerleave', this.onTrackLeave);
 
         this.remove(trackView);
 
@@ -330,20 +330,20 @@ export class Panel extends Object2D {
         this.updatePanelHeader();
     }
 
-    protected onTileLeave = (e: InteractionEvent) => {
+    protected onTrackLeave = (e: InteractionEvent) => {
         this.tileHovering = false;
         if (!this.tileDragging) {
             this.removeActiveAxisPointer(e);
         }
     }
 
-    protected onTilePointerMove = (e: InteractionEvent) => {
+    protected onTrackPointerMove = (e: InteractionEvent) => {
         this.tileHovering = true;
         this._dragMode = undefined;
         this.setActiveAxisPointer(e);
     }
 
-    protected onTileWheel = (e: WheelInteractionEvent) => {
+    protected onTrackWheel = (e: WheelInteractionEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -455,7 +455,7 @@ export class Panel extends Object2D {
     protected _lastDragLX: number;
     protected _dragDistLocal: number;
 
-    protected onTileDragStart = (e: InteractionEvent) => {
+    protected onTrackDragStart = (e: InteractionEvent) => {
         this._dragMode = undefined;
 
         if (e.buttonState !== 1) return;
@@ -492,7 +492,7 @@ export class Panel extends Object2D {
         }
     }
 
-    protected onTileDragMove = (e: InteractionEvent) => {
+    protected onTrackDragMove = (e: InteractionEvent) => {
         if (e.buttonState !== 1) return;
 
         this._dragDistLocal += Math.abs(e.localX - this._lastDragLX);
@@ -529,7 +529,7 @@ export class Panel extends Object2D {
         this.setActiveAxisPointer(e);
     }
 
-    protected onTileDragEnd = (e: InteractionEvent) => {
+    protected onTrackDragEnd = (e: InteractionEvent) => {
         e.stopPropagation();
 
         switch (this._dragMode) {

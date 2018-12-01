@@ -9,6 +9,7 @@ export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
         });
 
         this.customTileNodeClass = DualSignalTile;
+
         // don't show signal readings on hover
         this.showSignalReading = false;
     }
@@ -23,8 +24,10 @@ class DualSignalTile extends SignalTile {
         vec3 color(vec4 textureSample, vec2 uv) {
             return
                 vec3(
-                    (step(1.0 - textureSample.r, uv.y) * viridis(textureSample.r * uv.y)).g,
-                    (step(1.0 - textureSample.g, uv.y) * viridis(textureSample.g * uv.y)).g,
+                    // use the first signal to set the red channel
+                    step(1.0 - textureSample.r, uv.y),
+                    // use the second to set the green channel
+                    step(1.0 - textureSample.g, uv.y),
                     0.0
                 )
             ;

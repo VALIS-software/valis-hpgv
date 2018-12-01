@@ -31,7 +31,7 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
     protected _intervalTileCache = new UsageCache<IntervalInstances>();
     protected _tileNodes = new UsageCache<Object2D>();
     protected _labels = new UsageCache<IntervalTrackLabel>();
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._tileNodes.markAllUnused();
         this._labels.markAllUnused();
 

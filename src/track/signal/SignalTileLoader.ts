@@ -30,15 +30,11 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         return this._scaleFactor;
     }
 
-    protected _scaleFactor: number = 1;
-    protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
-
-    protected header: HeaderData;
-
     protected lodMap: Array<number>;
     protected lodZoomIndexMap: Array<number | null>;
-
     protected bigWigReader: BigWigReader;
+    protected _scaleFactor: number = 1;
+    protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
 
     static cacheKey(model: SignalTrackModel) {
         return model.path;
@@ -79,7 +75,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
         this.bigWigReader = new BigWigReader(loader);
         this.bigWigReader.getHeader().then((header) => {
-            this.header = header;
             console.log('Header loaded', header);
 
             let lookupTables = this.generateLodLookups(header);
@@ -94,7 +89,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 this.contig,
                 0,
                 this.contig,
-                this.header.chromTree.chromSize[this.contig], // @! needs checking,
+                header.chromTree.chromSize[this.contig], // @! needs checking,
                 maxZoomIndex,
             ).then((entries) => {
                 // console.log('maxZoom', entries);

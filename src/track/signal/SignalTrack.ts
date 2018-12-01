@@ -132,7 +132,7 @@ export class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> exte
                 let tile = tileNode.getTile();
                 
                 let tileRelativeX = (pointerTrackRelativeX - tileNode.relativeX) / tileNode.relativeW;
-                this.setSignalReading(tile.payload.getReading(tileRelativeX));
+                this.setSignalReading(tile.payload.getReading(tileRelativeX, 0));
 
                 if (this.signalReadingSnapX) {
                     let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();

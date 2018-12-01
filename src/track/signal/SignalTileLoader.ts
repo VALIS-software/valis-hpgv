@@ -13,7 +13,7 @@ export type SignalTilePayload = {
     };
     dataUploaded: boolean,
     getTexture(device: GPUDevice): GPUTexture;
-    getReading(fractionalX: number): number;
+    getReading(fractionalX: number, channel: number): number;
 }
 
 type BlockPayload = {
@@ -40,6 +40,8 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     protected bigWigLoader: BigWigLoader;
     protected _scaleFactor: number = 1;
     protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
+
+    protected readonly nChannels = 4;
 
     static cacheKey(model: SignalTrackModel) {
         return model.path;
@@ -301,18 +303,21 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         return dataPromise;
     }
 
-    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
-        // fill float array with zoom data regions
-        const nChannels = 4;
-        let tileLoader = this;
-        let buffer = new Float32Array(tile.lodSpan * nChannels);
+    protected loadPayloadBuffer(tile: Tile<SignalTilePayload>): Promise<Float32Array> {
+        let buffer = new Float32Array(tile.lodSpan * this.nChannels);
         return this.getBigWigData(
             this.bigWigLoader,
             tile,
             buffer,
-            nChannels,
+            this.nChannels,
             0
-        ).then((data) => {
+        );
+    }
+
+    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
+        // fill float array with zoom data regions
+        let tileLoader = this;
+        return this.loadPayloadBuffer(tile).then((data) => {
             return {
                 array: data,
                 sequenceMinMax: {
@@ -356,7 +361,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     return gpuTexture;
                 },
-                getReading(x: number) {
+                getReading(x: number, channel: number) {
                     let payload: SignalTilePayload = this;
                     
                     let nEntries = tile.lodSpan;
@@ -364,14 +369,14 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     if (linearFiltering) {
                         let p = Math.max(x * nEntries - 0.5, 0);
-                        let low = payload.array[Math.floor(p) * nChannels];
-                        let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * nChannels];
+                        let low = payload.array[Math.floor(p) * this.nChannels + channel];
+                        let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * this.nChannels + channel];
                         let alpha = p - Math.floor(p);
 
                         return low * (1 - alpha) + high * alpha;
                     } else {
                         let i = Math.floor(x * nEntries);
-                        return payload.array[i * nChannels]; // red channel
+                        return payload.array[i * this.nChannels + channel]; // red channel
                     }
                 }
             }

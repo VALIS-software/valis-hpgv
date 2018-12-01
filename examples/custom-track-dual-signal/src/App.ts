@@ -5,7 +5,7 @@ import { DualSignalTrack } from "./dual-signal/DualSignalTrack";
 GenomeVisualizer.registerTrackType('dual-signal', DualSignalTileLoader, DualSignalTrack);
 
 let hpgv = new GenomeVisualizer({
-    allowNewPanels: true,
+    allowNewPanels: false,
     panels: [
         {
             location: { contig: 'chr1', x0: 0, x1: 249e6 }

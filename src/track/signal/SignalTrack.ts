@@ -21,6 +21,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     protected yAxisPointer: AxisPointer;
 
     readonly signalReadingSnapX = true;
+    protected showSignalReading = true;
 
     constructor(model: Model) {
         super(model, SignalTile);
@@ -96,6 +97,12 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     }
 
     protected updateAxisPointerSample() {
+        if (!this.showSignalReading) {
+            // hide signal reading
+            this.setSignalReading(null);
+            return;
+        }
+
         let primary: AxisPointer = null;
 
         // get primary pointer

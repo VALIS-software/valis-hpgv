@@ -13,6 +13,7 @@ export declare class SignalTrack<Model extends TrackModel = SignalTrackModel> ex
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;
     readonly signalReadingSnapX: boolean;
+    protected showSignalReading: boolean;
     constructor(model: Model);
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle): void;
     removeAxisPointer(id: string): void;

@@ -163,16 +163,17 @@ GenomeVisualizer.registerTrackType('our-custom-track', OurCustomTileLoader, OurC
 
 The [TrackModel](src/track/TrackModel.ts) serves as a definition for the configuration values the track requires. It's purely used to provide type definitions in TypeScript, so when developing custom tracks in JavaScript it is not required.
 
-For our dual signal track, we only require one addition configuration field: `path2`, to specify the second bigwig file. We can extend the existing [signal track model](src/track/signal/SignalTrackModel.ts).
+For our dual signal track, we want the same model as `signal` tracks have but with one addition configuration field: `path2`, to specify the second bigwig file.
 
 In a file called `DualSignalTrackModel.ts`:
 ```typescript
-import { SignalTrackModel } from "genome-visualizer";
+import { TrackModel } from "genome-visualizer";
 
-export type DualSignalTrackModel = SignalTrackModel & {
-    // override the 'type' field, this will be the track type identifier used within HPGV
+export type DualSignalTrackModel = TrackModel & {
+    // the type field corresponds to the track type identifier used within HPGV
     readonly type: 'dual-signal',
-    // we add extra field 'path2' to supply the second bigwig file
+    // paths to bigwig files
+    readonly path: string,
     readonly path2: string,
 }
 ```
@@ -181,22 +182,119 @@ export type DualSignalTrackModel = SignalTrackModel & {
 
 HPGV tracks work by loading data in segments called 'tiles'. To adaptively display data at different zoom levels, multiple layers of tiles are used – tile layers are organized into a hierarchy where successive levels fetch the data at lower sampling densities. For example, the bottom tile layer (maximum zoom) will have a one-to-one correspondence between source data and values in the tile, however the next layer up will aggregate values so that every two values in the source data corresponds to one value in the tile. This pattern of halving the sampling rate with each tile layer continues until all the source data is aggregated into a single value.
 
-For our custom [TileLoader](src/track/TileLoader.ts) we want to load two bigwig files into each tile. Since the existing signal track can handle loading bigwigs, we can use it as a starting point by extending the [SignalTileLoader](src/track/signal/SignalTileLoader.ts) class:
+For our custom [TileLoader](src/track/TileLoader.ts) we want to load two bigwig files into each tile. Since the existing signal track can handle loading bigwigs, we can use it as a starting point by extending the [SignalTileLoader](src/track/signal/SignalTileLoader.ts) class. [SignalTileLoader](src/track/signal/SignalTileLoader.ts) uses a WebGL texture to store signal values. A WebGL texture can have 4 values per texture cell – these correspond to 'red', 'green', 'blue' and 'alpha' channels. With a single signal track, only the 'red' channel is used, in our extension we want to store the second bigwig signal into the 'green' channel.
 
 ```typescript
-import { SignalTileLoader, SignalTilePayload, Tile } from 'genome-visualizer';
+import { TileLoader, IDataSource, SignalTileLoader, TrackModel, TextureFormat, SignalTilePayload, GPUTexture, GPUDevice, Tile } from 'genome-visualizer';
 import { DualSignalTrackModel } from './DualSignalTrackModel';
 
 export class DualSignalTileLoader extends SignalTileLoader {
 
-    protected readonly model: DualSignalTrackModel;
+    protected bigWigLoader2: any;
 
-    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
-        return null;
+    static cacheKey(model: any) {
+        return model.path + '\x1f' + model.path2;
+    }
+
+    constructor(dataSource: IDataSource, model: DualSignalTrackModel, contig: string, ...args: Array<any>) {
+        super(dataSource, { ...model, type: 'signal' }, contig);
+    }
+
+    protected initializationPromise() {
+        // we should delay completing initialization until the second bigwig header has loaded
+        return Promise.all([
+            super.initializationPromise(),
+            this.getBigWigLoader((this.model as any as DualSignalTrackModel).path2).then((loader) => {
+                this.bigWigLoader2 = loader;
+            })
+        ]).then(() => {});
+    }
+
+    protected loadPayloadBuffer(tile: Tile<SignalTilePayload>): Promise<Float32Array> {
+        return
+            // load the first bigwig tile
+            super.loadPayloadBuffer(tile)
+            // then load the second bigwig tile into the same buffer as the first (which is returned from the first's promise)
+            .then(
+                (buffer) => this.getBigWigData(
+                    this.bigWigLoader2,
+                    tile,
+                    buffer,
+                    this.nChannels,
+                    1
+                )
+            );
+    }
+    
+}
+```
+
+...
+
+```typescript
+import { SignalTile, SignalTrack, Shaders } from "genome-visualizer";
+import { DualSignalTrackModel } from "./DualSignalTrackModel";
+
+export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
+
+    constructor(model: DualSignalTrackModel) {
+        super({
+            ...model
+        });
+
+        this.customTileNodeClass = DualSignalTile;
+
+        // don't show signal readings on hover
+        this.showSignalReading = false;
     }
 
 }
+
+class DualSignalTile extends SignalTile {
+
+    protected colorShaderFunction = `
+        ${Shaders.functions.palettes.viridis}
+
+        vec3 color(vec4 textureSample, vec2 uv) {
+            return
+                vec3(
+                    // use the first signal to set the red channel
+                    step(1.0 - textureSample.r, uv.y),
+                    // use the second to set the green channel
+                    step(1.0 - textureSample.g, uv.y),
+                    0.0
+                )
+            ;
+        }
+    `;
+
+}
 ```
+
+...
+
+- To make this track type available we call 
+
+```typescript
+GenomeVisualizer.registerTrackType('dual-signal', DualSignalTileLoader, DualSignalTrack);
+```
+
+And add an instance of the track to the configuration
+
+```typescript
+{
+    name: 'Dual Signal',
+    type: 'dual-signal',
+    path: 'https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig',
+    path2: 'https://www.encodeproject.org/files/ENCFF677VKI/@@download/ENCFF677VKI.bigWig',
+}
+```
+
+After running `parcel index.html`, you should see the following when visiting [`http://localhost:1234`](http://localhost:1234)
+
+<img width="837" alt="screenshot 2018-12-01 at 19 18 27" src="https://user-images.githubusercontent.com/3742992/49332015-ed050580-f59d-11e8-8f57-fe0e33d1656b.png">
+
+The red curve shows the first bigwig and the green the second. The yellow curve corresponds to the product of the two: signal1 * signal2.
 
 ## Creating a Custom Track: Custom Interval Source
 

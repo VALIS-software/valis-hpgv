@@ -72,7 +72,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         }
     }
 
-    protected _initializationPromise: Promise<void>;
+    private _initializationPromise: Promise<void>;
     protected initializationPromise() {
         if (this._initializationPromise == null) {
             this._initializationPromise = this.getBigWigLoader(this.model.path).then((loader) => {

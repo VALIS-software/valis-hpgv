@@ -228,6 +228,8 @@ export class DualSignalTileLoader extends SignalTileLoader {
 }
 ```
 
+### Creating our Custom TrackObject
+
 ...
 
 ```typescript
@@ -270,9 +272,9 @@ class DualSignalTile extends SignalTile {
 }
 ```
 
-...
+### Testing our Custom Track
 
-- To make this track type available we call 
+To make our new track type available we call `GenomeVisualizer.registerTrackType` before calling `new GenomeVisualizer` in `App.ts`:
 
 ```typescript
 GenomeVisualizer.registerTrackType('dual-signal', DualSignalTileLoader, DualSignalTrack);
@@ -294,6 +296,8 @@ After running `parcel index.html`, you should see the following when visiting [`
 <img width="837" alt="screenshot 2018-12-01 at 19 18 27" src="https://user-images.githubusercontent.com/3742992/49332015-ed050580-f59d-11e8-8f57-fe0e33d1656b.png">
 
 The red curve shows the first bigwig and the green the second. The yellow curve corresponds the overlap of the two signals.
+
+See [examples/custom-track-dual-signal](examples/custom-track-dual-signal) for a completed example.
 
 ## Creating a Custom Track: Custom Interval Source
 

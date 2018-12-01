@@ -1,7 +1,8 @@
-import { GenomeVisualizer } from "genome-visualizer";
+import { GenomeVisualizer, TileLoader } from "genome-visualizer";
 import { DualSignalTileLoader } from "./dual-signal/DualSignalTileLoader";
+import { DualSignalTrack } from "./dual-signal/DualSignalTrack";
 
-// GenomeVisualizer.registerTrackType('dual-signal', DualSignalTileLoader, )
+GenomeVisualizer.registerTrackType('dual-signal', DualSignalTileLoader, DualSignalTrack);
 
 let hpgv = new GenomeVisualizer({
     allowNewPanels: true,
@@ -17,17 +18,11 @@ let hpgv = new GenomeVisualizer({
             path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir',
         },
         {
-            name: 'Genes',
-            type: 'annotation',
-            compact: true,
-            path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vgenes-dir',
-        },
-        {
-            name: 'Cerebellum, DNase',
-            type: 'signal',
-            path: "https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig",
-            heightPx: 150,
-        },
+            name: 'Dual Signal',
+            type: 'dual-signal',
+            path1: 'https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig',
+            path2: 'https://www.encodeproject.org/files/ENCFF677VKI/@@download/ENCFF677VKI.bigWig',
+        }
     ],
 });
 

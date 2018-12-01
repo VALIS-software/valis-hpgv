@@ -11,8 +11,9 @@ import { Text } from "engine";
 import { OpenSansRegular } from "../../ui";
 import Animator from "../../Animator";
 import { Shaders } from "../../Shaders";
+import TrackModel from "../TrackModel";
 
-export class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
+export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
     protected yAxis: Axis;
 

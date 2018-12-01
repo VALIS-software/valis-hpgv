@@ -177,7 +177,7 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
         },
         indicesPerBase: number,
     }> {
-        let binPath = `${path}/${contig}/dna/${lodLevel}.bin`;
+        let binPath = `${path}/${contig}/${lodLevel}.bin`;
         let minMaxPath = binPath + '.minmax';
 
         let samplingDensity = (1 << lodLevel);

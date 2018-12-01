@@ -1,4 +1,4 @@
-import { SignalTrackModel, TrackModel } from "genome-visualizer";
+import { TrackModel } from "genome-visualizer";
 
 export type DualSignalTrackModel = TrackModel & {
     // override the 'type' field, this will be the track type identifier used within HPGV

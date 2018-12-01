@@ -24,12 +24,11 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected readonly contig: string;
     ready: boolean;
     readonly scaleFactor: number;
-    protected _scaleFactor: number;
-    protected _logarithmicDisplay: boolean;
-    protected header: HeaderData;
     protected lodMap: Array<number>;
     protected lodZoomIndexMap: Array<number | null>;
     protected bigWigReader: BigWigReader;
+    protected _scaleFactor: number;
+    protected _logarithmicDisplay: boolean;
     static cacheKey(model: SignalTrackModel): string;
     static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);

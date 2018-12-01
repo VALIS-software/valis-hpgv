@@ -40,7 +40,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     /**
      * Override to handle drawing
      */
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
     /**
      * Show or hide the loading indicator via animation
      * This function can be safely called repeatedly without accounting for the current state of the indicator

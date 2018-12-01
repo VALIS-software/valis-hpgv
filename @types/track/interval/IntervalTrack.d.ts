@@ -17,7 +17,7 @@ export declare class IntervalTrack<Model extends IntervalTrackModel = IntervalTr
     protected _intervalTileCache: UsageCache<IntervalInstances>;
     protected _tileNodes: UsageCache<Object2D>;
     protected _labels: UsageCache<IntervalTrackLabel>;
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
     protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, continuousLodLevel: number): IntervalInstances;
     protected intervalLabelKey(tile: Tile<IntervalTilePayload>, index: number, startIndex: number, endIndex: number): string;
     protected createTileNode(tile: Tile<IntervalTilePayload>): IntervalInstances;

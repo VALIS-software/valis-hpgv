@@ -97,11 +97,11 @@ export declare class AppCanvas extends React.Component<Props, State> {
     protected applyCursor(): void;
     private _lastActivePointers;
     protected handlePointerChanges(): void;
-    protected onPointerEnter: (e: MouseEvent | PointerEvent) => void;
-    protected onPointerLeave: (e: MouseEvent | PointerEvent) => void;
-    protected onPointerMove: (e: MouseEvent | PointerEvent) => void;
-    protected onPointerDown: (e: MouseEvent | PointerEvent) => void;
-    protected onPointerUp: (e: MouseEvent | PointerEvent) => void;
+    protected onPointerEnter: (e: PointerEvent | MouseEvent) => void;
+    protected onPointerLeave: (e: PointerEvent | MouseEvent) => void;
+    protected onPointerMove: (e: PointerEvent | MouseEvent) => void;
+    protected onPointerDown: (e: PointerEvent | MouseEvent) => void;
+    protected onPointerUp: (e: PointerEvent | MouseEvent) => void;
     protected onClick: (e: MouseEvent) => void;
     protected onDoubleClick: (e: MouseEvent) => void;
     protected onWheel: (e: WheelEvent) => void;

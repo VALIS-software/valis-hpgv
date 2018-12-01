@@ -7,7 +7,7 @@ import { DrawContext } from "engine/rendering/Renderer";
 import { Tile } from "../TileLoader";
 import { AxisPointer, AxisPointerStyle } from "../TrackObject";
 import { Text } from "engine";
-export declare class SignalTrack<Model extends SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
+export declare class SignalTrack<Model extends SignalTrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
     protected yAxis: Axis;
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;
@@ -20,7 +20,7 @@ export declare class SignalTrack<Model extends SignalTrackModel> extends ShaderT
     protected deleteTileNode(tileNode: ShaderTile<SignalTilePayload>): void;
     protected updateAxisPointerSample(): void;
     protected setSignalReading(value: number | null): void;
-    protected updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
 }
 declare class SignalTile extends ShaderTile<SignalTilePayload> {
     protected gpuTexture: GPUTexture;

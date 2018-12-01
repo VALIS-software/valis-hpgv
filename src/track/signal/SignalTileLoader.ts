@@ -22,17 +22,22 @@ type BlockPayload = {
     getTexture(device: GPUDevice): GPUTexture;
 }
 
+type BigWigLoader = {
+    header: HeaderData,
+    reader: BigWigReader,
+    lodMap: Array<number>,
+    lodZoomIndexMap: Array<number | null>,
+}
+
 export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload> {
 
-    ready : boolean = false;
+    ready: boolean = false;
 
     get scaleFactor() {
         return this._scaleFactor;
     }
 
-    protected lodMap: Array<number>;
-    protected lodZoomIndexMap: Array<number | null>;
-    protected bigWigReader: BigWigReader;
+    protected bigWigLoader: BigWigLoader;
     protected _scaleFactor: number = 1;
     protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
 
@@ -49,13 +54,92 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     ) {
         super(2048, 32);
 
+        this.initializationPromise().then(() => {
+            this.ready = true;
+            this.onReady();
+        });
+    }
+
+    mapLodLevel(l: number) {
+        if (this.ready) {
+            if (l >= this.bigWigLoader.lodMap.length) {
+                // l is out of range of lookup table, return the top lod
+                return this.bigWigLoader.lodMap[this.bigWigLoader.lodMap.length - 1];
+            }
+            return this.bigWigLoader.lodMap[l];
+        } else {
+            return l;
+        }
+    }
+
+    protected _initializationPromise: Promise<void>;
+    protected initializationPromise() {
+        if (this._initializationPromise == null) {
+            this._initializationPromise = this.getBigWigLoader(this.model.path).then((loader) => {
+                this.bigWigLoader = loader;
+
+                // determine scale factor
+                let maxLod = loader.lodMap[loader.lodMap.length - 1];
+                let maxZoomIndex = loader.lodZoomIndexMap[maxLod];
+
+                loader.reader.readZoomData(
+                    this.contig,
+                    0,
+                    this.contig,
+                    loader.header.chromTree.chromSize[this.contig],
+                    maxZoomIndex,
+                ).then((entries) => {
+                    // console.log('maxZoom', entries);
+
+                    let maxValue = -Infinity;
+                    let maxAvg = -Infinity;
+                    for (let entry of entries) {
+                        let avg = entry.sumData / entry.validCount;
+                        maxAvg = Math.max(avg, maxAvg);
+                        maxValue = Math.max(entry.maxVal, entry.maxVal);
+                    }
+
+                    let maxValueWeight = 0.0;
+                    let maxAverageWeight = 1 - maxValueWeight;
+
+                    let weightedAveraged = maxValue * maxValueWeight + maxAvg * maxAverageWeight;
+
+                    let maxDisparity = maxValue / maxAvg;
+
+                    // this._logarithmicDisplay = maxDisparity > 10;
+                    this._logarithmicDisplay = false;
+
+                    // console.log(maxValue, maxAvg, weightedAveraged);
+
+                    // @! hacky
+                    this._scaleFactor = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
+                });
+            });
+        }
+
+        return this._initializationPromise;
+    }
+
+    protected onReady() {
+        // preload low-resolution data when we know the size of the contig
+        this.dataSource.getContigs().then((contigs) => {
+            let contigInfo = contigs.find((c) => c.id === this.contig);
+            if (contigInfo != null) {
+                let maxX = contigInfo.span - 1;
+                let minSpan = 512;
+                this.forEachTile(0, maxX, contigInfo.span / minSpan, true, () => { });
+            }
+        });
+    }
+
+    protected getBigWigLoader(path: string): Promise<BigWigLoader> {
         // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
-        let loader = {
+        let bigWigReader = new BigWigReader({
             load: (start: number, size?: number) => {
                 return new Promise<ArrayBuffer>((resolve, reject) => {
                     let request = new XMLHttpRequest();
                     // disable caching (because of common browser bugs)
-                    request.open('GET', model.path + '?cacheAvoid=' + SignalTileLoader.requestIndex++, true);
+                    request.open('GET', path + '?cacheAvoid=' + SignalTileLoader.requestIndex++, true);
                     request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
 
                     request.responseType = 'arraybuffer';
@@ -71,80 +155,16 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     request.send();
                 });
             }
-        }
-
-        this.bigWigReader = new BigWigReader(loader);
-        this.bigWigReader.getHeader().then((header) => {
+        });
+        return bigWigReader.getHeader().then((header) => {
             console.log('Header loaded', header);
 
             let lookupTables = this.generateLodLookups(header);
-            this.lodMap = lookupTables.lodMap;
-            this.lodZoomIndexMap = lookupTables.lodZoomIndexMap;
-
-            // determine scale factor
-            let maxLod = this.lodMap[this.lodMap.length - 1];
-            let maxZoomIndex = this.lodZoomIndexMap[maxLod];
-
-            this.bigWigReader.readZoomData(
-                this.contig,
-                0,
-                this.contig,
-                header.chromTree.chromSize[this.contig], // @! needs checking,
-                maxZoomIndex,
-            ).then((entries) => {
-                // console.log('maxZoom', entries);
-
-                let maxValue = -Infinity;
-                let maxAvg = -Infinity;
-                for (let entry of entries) {
-                    let avg = entry.sumData / entry.validCount;
-                    maxAvg = Math.max(avg, maxAvg);
-                    maxValue = Math.max(entry.maxVal, entry.maxVal);
-                }
-
-                let maxValueWeight = 0.0;
-                let maxAverageWeight = 1 - maxValueWeight;
-
-                let weightedAveraged = maxValue * maxValueWeight + maxAvg * maxAverageWeight;
-
-                let maxDisparity = maxValue / maxAvg;
-
-                // this._logarithmicDisplay = maxDisparity > 10;
-                this._logarithmicDisplay = false;
-
-                // console.log(maxValue, maxAvg, weightedAveraged);
-
-                // @! hacky
-                this._scaleFactor = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
-
-                this.ready = true;
-
-                this.onReady();
-            });
-        });
-    }
-
-    mapLodLevel(l: number) {
-        if (this.ready) {
-            if (l >= this.lodMap.length) {
-                // l is out of range of lookup table, return the top lod
-                return this.lodMap[this.lodMap.length - 1];
-            }
-            return this.lodMap[l];
-        } else {
-            return l;
-        }
-    }
-
-    protected onReady() {
-        // preload low-resolution data when we know the size of the contig
-        this.dataSource.getContigs().then((contigs) => {
-            let contigInfo = contigs.find((c) => c.id === this.contig);
-            if (contigInfo != null) {
-                let maxX = contigInfo.span - 1;
-                let minSpan = 512;
-                this.forEachTile(0, maxX, contigInfo.span / minSpan, true, () => { });
-            }
+            return {
+                ...lookupTables,
+                header: header,
+                reader: bigWigReader,
+            };
         });
     }
 
@@ -210,9 +230,14 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         }
     }
 
-    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
-        const nChannels = 4;
-        let zoomIndex = this.lodZoomIndexMap[tile.lodLevel];
+    protected getBigWigData(
+        bigWigLoader: BigWigLoader,
+        tile: Tile<SignalTilePayload>,
+        buffer: Float32Array,
+        nChannels: number,
+        offset: number
+    ): Promise<Float32Array> {
+        let zoomIndex = bigWigLoader.lodZoomIndexMap[tile.lodLevel];
         let lodDensity = Math.pow(2, tile.lodLevel);
 
         // @! use for normalization
@@ -223,17 +248,14 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
         if (zoomIndex !== null) {
             // fetch from zoomed
-            dataPromise = this.bigWigReader.readZoomData(
+            dataPromise = bigWigLoader.reader.readZoomData(
                 this.contig,
                 tile.x,
                 this.contig,
                 tile.x + tile.span, // @! needs checking,
                 zoomIndex,
             ).then((zoomData) => {
-                // fill float array with zoom data regions
-                let nChannels = 4;
-                let floatArray = new Float32Array(tile.lodSpan * nChannels);
-
+                // fill buffer with zoom data regions
                 for (let entry of zoomData) {
                     let x0 = entry.start - tile.x;
                     let x1 = entry.end - tile.x;
@@ -244,23 +266,20 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     let value = (entry.sumData / entry.validCount) * dataMultiplier;
 
                     for (let i = i0; i < i1; i++) {
-                        floatArray[i * nChannels] = value;
+                        buffer[i * nChannels + offset] = value;
                     }
                 }
 
-                return floatArray;
+                return buffer;
             });
         } else {
             // fetch 'raw'
-            dataPromise = this.bigWigReader.readBigWigData(
+            dataPromise = bigWigLoader.reader.readBigWigData(
                 this.contig,
                 tile.x,
                 this.contig,
                 tile.x + tile.span, // @! needs checking,
             ).then((rawData) => {
-                // fill float array with zoom data regions
-                let floatArray = new Float32Array(tile.lodSpan * nChannels);
-
                 for (let entry of rawData) {
                     let x0 = entry.start - tile.x;
                     let x1 = entry.end - tile.x;
@@ -271,17 +290,29 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     for (let i = i0; i < i1; i++) {
                         if ((i < 0) || (i >= tile.lodSpan)) continue; // out of range
-                        floatArray[i * nChannels] = value * dataMultiplier;
+                        buffer[i * nChannels + offset] = value * dataMultiplier;
                     }
                 }
 
-                return floatArray;
+                return buffer;
             });
         }
 
-        let tileLoader = this;
+        return dataPromise;
+    }
 
-        return dataPromise.then((data) => {
+    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
+        // fill float array with zoom data regions
+        const nChannels = 4;
+        let tileLoader = this;
+        let buffer = new Float32Array(tile.lodSpan * nChannels);
+        return this.getBigWigData(
+            this.bigWigLoader,
+            tile,
+            buffer,
+            nChannels,
+            0
+        ).then((data) => {
             return {
                 array: data,
                 sequenceMinMax: {

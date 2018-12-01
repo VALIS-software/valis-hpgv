@@ -1,8 +1,9 @@
-import { SignalTrackModel } from "genome-visualizer";
+import { SignalTrackModel, TrackModel } from "genome-visualizer";
 
-export type DualSignalTrackModel = SignalTrackModel & {
+export type DualSignalTrackModel = TrackModel & {
     // override the 'type' field, this will be the track type identifier used within HPGV
     readonly type: 'dual-signal',
-    // we add extra field 'path2' to supply the second bigwig file
+    // paths to bigwig files
+    readonly path1: string,
     readonly path2: string,
 }

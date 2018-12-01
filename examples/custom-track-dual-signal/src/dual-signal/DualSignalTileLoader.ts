@@ -1,12 +1,14 @@
-import { SignalTileLoader, SignalTilePayload, Tile } from 'genome-visualizer';
+import { TileLoader, IDataSource } from 'genome-visualizer';
 import { DualSignalTrackModel } from './DualSignalTrackModel';
 
-export class DualSignalTileLoader extends SignalTileLoader {
+export class DualSignalTileLoader extends TileLoader<null, null> {
 
-    protected readonly model: DualSignalTrackModel;
+    static cacheKey(model: DualSignalTrackModel) {
+        return model.path + '\x1f' + model.path2;
+    }
 
-    protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload> {
-        return null;
+    constructor(dataSource: IDataSource, model: DualSignalTrackModel, contig: string, ...args: Array<any>) {
+        super();
     }
 
 }

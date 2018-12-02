@@ -36,17 +36,6 @@ function transformAnnotations(flatFeatures: Array<GenomeFeature>) {
 
         if (feature.type === GenomeFeatureType.Gene) {
             let geneInfo = feature as GeneInfo;
-
-            // convert strand from old format to new
-            if (typeof geneInfo.strand === 'number') {
-                switch (geneInfo.strand) {
-                    case 0: geneInfo.strand = Strand.None; break;
-                    case 1: geneInfo.strand = Strand.Unknown; break;
-                    case 2: geneInfo.strand = Strand.Positive; break;
-                    case 3: geneInfo.strand = Strand.Negative; break;
-                    default: geneInfo.strand = Strand.Unknown; break;
-                }
-            }
             activeGene = {
                 ...geneInfo,
                 transcripts: [],

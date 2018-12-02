@@ -36,6 +36,16 @@ Opening the HTML you created should now show
 
 See [examples/minimal/index.html](examples/minimal/index.html) for a completed example
 
+## Available Example Files
+VALIS hosts a number of preprocessed files to help with testing, to create your own, see the section [Using the Preprocessing Script](#Using-the-Preprocessing-Script)
+
+| DNA | Genes |
+|-------|-------|
+| [GRCh38.92.vdna-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vdna-dir) | [GRCh38.92.vgenes-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vgenes-dir) |
+| [GRCh37.87.vdna-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh37.87.vdna-dir) | [GRCh37.87.vgenes-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh37.87.vgenes-dir) |
+| [Arabidopsis_thaliana.TAIR10.59.vdna-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/Arabidopsis_thaliana.TAIR10.59.vdna-dir) | [Arabidopsis_thaliana.TAIR10.59.vgenes-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/Arabidopsis_thaliana.TAIR10.59.vgenes-dir) |
+| [Sorghum_bicolor.Sorghum_bicolor_NCBIv3.59.vdna-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/Sorghum_bicolor.Sorghum_bicolor_NCBIv3.59.vdna-dir) | [Sorghum_bicolor.Sorghum_bicolor_NCBIv3.59.vgenes-dir](https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/Sorghum_bicolor.Sorghum_bicolor_NCBIv3.59.vgenes-dir) |
+
 ### Advanced Configuration
 
 For more control, you can configure panels and track properties on initialization:

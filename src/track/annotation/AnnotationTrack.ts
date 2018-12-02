@@ -23,8 +23,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected readonly macroLodThresholdLow = 7;
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
-    protected readonly namesLodBlendRange = 2;
-    protected readonly namesLodThresholdLow = 7;
+    protected readonly namesLodBlendRange = 1;
+    protected readonly namesLodThresholdLow = 6;
     protected readonly namesLodThresholdHigh = this.namesLodThresholdLow + this.namesLodBlendRange;
 
     protected macroModel: MacroAnnotationTrackModel;

@@ -19,8 +19,16 @@ class AnnotationTileset {
         };
     }
     addFeature(tile, feature) {
+        let displayName;
+        // if feature.name is missing then try to use the ID field
+        if (feature.name != null) {
+            displayName = feature.name;
+        }
+        else if (feature.id != null) {
+            displayName = feature.id.split(':').pop();
+        }
         let featureCommon = {
-            name: feature.name,
+            name: displayName,
             startIndex: feature.start - 1,
             length: feature.end - feature.start + 1,
             soClass: feature.type,

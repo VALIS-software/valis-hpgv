@@ -28,7 +28,12 @@ if (inputStat.isDirectory()) {
         .filter((filePath) => !fs.lstatSync(filePath).isDirectory());
 }
 else {
+    // user argument is path to a single file
     filePaths = [inputPath];
+}
+if (filePaths.length === 0) {
+    Terminal_1.default.error(`No files found in "${inputPath}" (subdirectories are ignored)`);
+    process.exit(1);
 }
 Terminal_1.default.log(`Files queued for conversion:\n\t<b>${filePaths.join('\n\t')}</b>`);
 // build a chain of promises to convert the files
@@ -60,7 +65,7 @@ function printDoc() {
 
 Generates files optimized for viewing with VALIS Genome Visualizer 
 
-<b>Usage:</b> <#FFF>hpgv</> <dim,i>[path to directory containing files to process]</>
+<b>Usage:</b> <light_white>hpgv</> <dim,i>[path to directory containing files to process]</>
 
 Supports the following file types
 - <b>FASTA</> <i,dim>.fa, .fna, .fasta</>

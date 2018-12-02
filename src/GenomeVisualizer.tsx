@@ -24,6 +24,7 @@ import { BigWigReader, AxiosDataLoader } from "bigwig-reader";
 import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel } from "./track";
 import { GenomicLocation } from "./model";
 import { Panel } from "./ui";
+import Axios from "axios";
 
 export interface GenomeVisualizerRenderProps {
     width: number,
@@ -72,9 +73,12 @@ export class GenomeVisualizer {
                     // we don't know what contigs are available so we must read the first file for this
                     let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
 
+                    this.trackViewer.setNothingToDisplayText('Loading');
+
                     switch (fileType) {
                         case 'bigwig': {
-                            this.trackViewer.setNothingToDisplayText('Loading');
+                            foundContigs = true;
+
                             let bigwigReader = new BigWigReader(new AxiosDataLoader(path));
                             bigwigReader.getHeader().then((header) => {
                                 this.trackViewer.resetNothingToDisplayText();
@@ -101,27 +105,55 @@ export class GenomeVisualizer {
                                     this.setDataSource(new ManifestDataSource(manifest));
                                 }
                             }).catch((reason) => {
-                                this.trackViewer.resetNothingToDisplayText();
+                                this.trackViewer.setNothingToDisplayText('Error loading bigwig header (see browser console)');
                                 console.error(`Error loading bigwig header: ${reason}`);
                             });
-                            foundContigs = true;
                             break;
                         }
-                        // case 'vgenes-dir': { break; }
-                        // case 'vdna-dir': { break; }
+
+                        case 'vgenes-dir':
+                        case 'vdna-dir': {
+                            foundContigs = true;
+
+                            Axios.get(path + '/manifest.json')
+                            .then((response) => {
+                                let json = response.data;
+
+                                console.log(json);
+
+                                // create a manifest that lists the available contigs
+                                let manifest: Manifest = {
+                                    contigs: json.contigs
+                                }
+
+                                if (this.getPanels().size === 0) {
+                                    this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
+                                    this.setDataSource(new ManifestDataSource(manifest));
+                                }
+                            })
+                            .catch((reason) => {
+                                this.trackViewer.setNothingToDisplayText('Error loading manifest (see browser console)');
+                                console.error(`Error loading vdna-dir manifest: ${reason}`);
+                            });
+                            break;
+                        }
+
                         // case 'bam': { break; }
                         // case 'vcf': { break; }
                         // case 'fasta': { break; }
                         // case 'gff3': { break; }
+
+                        default: {
+                            this.trackViewer.resetNothingToDisplayText();
+                        }
                     }
 
                     if (foundContigs) break;
                 }
 
                 if (!foundContigs) {
-                    console.error(`Could not determine contigs from supplied files, defaulting to human chr1`);
-                    // add a human chromosome 1 panel and _hope_ that matches the available data
-                    this.addPanel({ contig: 'chr1', x0: 0, x1: 249e9 }, false);
+                    console.error(`Could not determine contigs from supplied files`);
+                    this.addPanel({ contig: 'chr1', x0: 0, x1: 100 }, false);
                 }
             }
         } else {
@@ -193,7 +225,6 @@ export class GenomeVisualizer {
                     type: 'annotation',
                     name: filename,
                     path: path,
-                    compact: true,
                 };
                 return this.addTrack(model, animateIn);
             }

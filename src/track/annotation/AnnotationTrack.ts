@@ -19,6 +19,8 @@ const TRANSCRIPT_HEIGHT = 20;
 
 export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
 
+    static defaultHeightPx = 70;
+
     protected readonly macroLodBlendRange = 2;
     protected readonly macroLodThresholdLow = 7;
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;

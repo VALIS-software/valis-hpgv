@@ -350,7 +350,7 @@ class GeneAnnotation extends Object2D {
         } else {
             // no transcripts provided, just mark the gene's span
             let spanMarker = new TranscriptSpan(gene.strand);
-            spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.38]);
+            spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.8]);
             spanMarker.h = 10;
             spanMarker.relativeW = 1;
             spanMarker.originY = -0.5;

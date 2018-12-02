@@ -4,8 +4,8 @@
 
 The genome visualizer can be used to explore individual genomic files (such as bigwig or BAM) or a collection of files via the [preprocessing script](#Using-the-Preprocessing-Script)
 
-The quickest way to get started is to use [`valis-hpgv.js`](https://raw.githubusercontent.com/VALIS-software/High-Performance-Genome-Visualizer/master/dist/valis-hpgv.js?token=ADkdENDxMTYiHKUCsbbAxUHGeMXPJD8qks5b6czowA%3D%3D) available in the `/dist` folder of this repository
-- Download a copy of [valis-hpgv.js](https://raw.githubusercontent.com/VALIS-software/High-Performance-Genome-Visualizer/master/dist/valis-hpgv.js?token=ADkdENDxMTYiHKUCsbbAxUHGeMXPJD8qks5b6czowA%3D%3D) from this repository
+The quickest way to get started is to use [`valis-hpgv.js`](dist/valis-hpgv.js) available in the `/dist` folder of this repository
+- Download a copy of [valis-hpgv.js](dist/valis-hpgv.js) from this repository
 - Create a HTML file, inside it load `valis-hpgv.js` and create an element to contain the app
 ```html
 <div id="container"></div>

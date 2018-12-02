@@ -75,8 +75,7 @@ class Main {
 	/**/
 
 	/**/
-	static var fastaFilePath = 'data/Homo_sapiens.GRCh37.dna.primary_assembly.fa';
-	static var sequenceNameFilter: Null<EReg> = ~/(1) dna:chromosome chromosome:GRCh37/;
+	static var sequenceNameFilter: Null<EReg>;
 
 	static function convertFastaSequenceName(name: String) {
 		if (sequenceNameFilter != null) {
@@ -95,23 +94,25 @@ class Main {
 	static function convertFastaSequenceName(name: String) return name + '.double';
 	/**/
 
-	static var outputDirectory = '_generated';
-
 	static function main() {
 		var args = Sys.args();
 
-		if (args.length == 0) {
-			Console.error('Pass chromosome number as an argument');
+		if (args.length < 1) {
+			Console.error('Pass a fasta path and optional chromosome number as arguments');
 			Sys.exit(1);
 			return;
 		}
 
-		var filter = '^(${args[0]}) dna:chromosome chromosome:GRCh37';
+		var fastaFilePath = args[0];
+		var fastaFilename = Path.withoutExtension(Path.withoutDirectory(fastaFilePath));
+
+		var chromosomeFilter = args[1] != null ? args[1] : '\\w+';
+		var filter = '^(${chromosomeFilter}) dna:chromosome chromosome';
 
 		Console.log('Filter is "$filter"');
 		sequenceNameFilter = new EReg(filter, '');
 
-		var generatedFilePaths = convertFastaFile(fastaFilePath);
+		var generatedFilePaths = convertFastaFile(fastaFilePath, Path.join(['_output', fastaFilename + '.vdna-dir']));
 
 		for (path in generatedFilePaths) {
 			sys.FileSystem.createDirectory(Path.withoutExtension(path));
@@ -414,6 +415,7 @@ class Main {
 
 	static function convertFastaFile(
 		path: String,
+		outputDirectory: String,
 		chunkSize_bytes: Int = Std.int(10e6) /* be careful, it's very easy to exceed max int if this is too large */
 	) {
 		Console.log('<cyan>Reading "<b>$path</b>"</cyan>');

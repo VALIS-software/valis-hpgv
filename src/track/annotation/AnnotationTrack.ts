@@ -20,11 +20,11 @@ const TRANSCRIPT_HEIGHT = 20;
 export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
 
     protected readonly macroLodBlendRange = 2;
-    protected readonly macroLodThresholdLow = 10;
+    protected readonly macroLodThresholdLow = 7;
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
     protected readonly namesLodBlendRange = 2;
-    protected readonly namesLodThresholdLow = 9;
+    protected readonly namesLodThresholdLow = 7;
     protected readonly namesLodThresholdHigh = this.namesLodThresholdLow + this.namesLodBlendRange;
 
     protected macroModel: MacroAnnotationTrackModel;
@@ -215,16 +215,16 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     if (this.model.compact === true) {
                         instanceData.push({
                             x: 0,
-                            y: yPadding,
+                            y: (gene.strand === Strand.Positive ? -15 : 15) - TRANSCRIPT_HEIGHT * 0.5,
                             z: 0,
                             w: 0,
-                            h: - 2 * yPadding,
+                            h: TRANSCRIPT_HEIGHT,
 
                             relativeX: (gene.startIndex - tile.x) / tile.span,
-                            relativeY: 0,
+                            relativeY: 0.5,
 
                             relativeW: gene.length / tile.span,
-                            relativeH: 1.0,
+                            relativeH: 0.0,
 
                             color: color,
                         });

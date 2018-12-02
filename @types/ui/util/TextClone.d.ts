@@ -16,6 +16,7 @@ export declare class TextClone extends Object2D {
     render: boolean;
     constructor(text: Text, color?: ArrayLike<number>);
     onAdded(): void;
+    onRemoved(): void;
     allocateGPUResources(device: GPUDevice): void;
     releaseGPUResources(): void;
     draw(context: DrawContext): void;

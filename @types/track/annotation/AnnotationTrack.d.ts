@@ -9,6 +9,7 @@ import { AnnotationTileLoader, Gene } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GenomeFeature } from "./AnnotationTypes";
 export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
+    static defaultHeightPx: number;
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;

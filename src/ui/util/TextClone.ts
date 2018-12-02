@@ -35,6 +35,10 @@ export class TextClone extends Object2D {
         }
     }
 
+    onRemoved() {
+        this.text.removeEventListener('glyphLayoutChanged', this.glyphLayoutChanged);
+    }
+
     allocateGPUResources(device: GPUDevice) {
         let textInternal = (this.text as any as Object2DInternal);
 

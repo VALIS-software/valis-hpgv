@@ -17,6 +17,7 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     protected readonly namesLodThresholdHigh: number;
     protected macroModel: MacroAnnotationTrackModel;
     protected pointerState: TrackPointerState;
+    readonly compact: boolean;
     constructor(model: AnnotationTrackModel);
     protected _macroTileCache: UsageCache<IntervalInstances>;
     protected _annotationCache: UsageCache<{

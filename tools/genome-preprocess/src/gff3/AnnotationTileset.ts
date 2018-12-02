@@ -29,8 +29,17 @@ export class AnnotationTileset {
     }
 
     protected addFeature(tile: AnnotationTile, feature: Feature) {
+        let displayName: string | undefined;
+
+        // if feature.name is missing then try to use the ID field
+        if (feature.name != null) {
+            displayName = feature.name;
+        } else if (feature.id != null) {
+            displayName = feature.id.split(':').pop() as string;
+        }
+
         let featureCommon = {
-            name: feature.name,
+            name: displayName,
             startIndex: feature.start - 1,
             length: feature.end - feature.start + 1,
             soClass: feature.type,

@@ -331,18 +331,31 @@ class GeneAnnotation extends Object2D {
         const transcriptSpacing = 10;
         this.h = compact ? TRANSCRIPT_HEIGHT : 0;
 
-        for (let i = 0; i < gene.transcripts.length; i++) {
-            let transcript = gene.transcripts[i];
+        if (gene.transcripts.length > 0) {
+            for (let i = 0; i < gene.transcripts.length; i++) {
+                let transcript = gene.transcripts[i];
 
-            let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
-            transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
-            
-            transcriptAnnotation.y = compact ? 0 : i * (TRANSCRIPT_HEIGHT + transcriptSpacing) + transcriptOffset;
+                let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
+                transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
 
-            transcriptAnnotation.relativeX = (transcript.startIndex - gene.startIndex) / gene.length;
-            transcriptAnnotation.relativeW = transcript.length / gene.length;
+                transcriptAnnotation.y = compact ? 0 : i * (TRANSCRIPT_HEIGHT + transcriptSpacing) + transcriptOffset;
 
-            this.add(transcriptAnnotation);
+                transcriptAnnotation.relativeX = (transcript.startIndex - gene.startIndex) / gene.length;
+                transcriptAnnotation.relativeW = transcript.length / gene.length;
+
+                this.add(transcriptAnnotation);
+            }
+        } else {
+            // no transcripts provided, just mark the gene's span
+            let spanMarker = new TranscriptSpan(gene.strand);
+            spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.38]);
+            spanMarker.h = 10;
+            spanMarker.relativeW = 1;
+            spanMarker.originY = -0.5;
+            spanMarker.relativeY = 0.5;
+            spanMarker.z = 0.1;
+            spanMarker.transparent = true;
+            this.add(spanMarker);
         }
     }
 

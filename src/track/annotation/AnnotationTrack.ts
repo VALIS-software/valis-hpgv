@@ -33,8 +33,12 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         pointerOver: false,
     }
 
+    readonly compact: boolean;
+
     constructor(model: AnnotationTrackModel) {
         super(model);
+
+        this.compact = this.model.compact !== false;
 
         this.macroModel = {
             ...model,
@@ -81,8 +85,6 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
-        const compact = this.model.compact === true;
-
         this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 return;
@@ -100,11 +102,11 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create gene object
-                    let geneAnnotation = new GeneAnnotation(compact, gene, this.pointerState, this.onAnnotationClicked);
+                    let geneAnnotation = new GeneAnnotation(this.compact, gene, this.pointerState, this.onAnnotationClicked);
                     geneAnnotation.z = 1 / 4;
                     geneAnnotation.relativeH = 0;
 
-                    if (compact) {
+                    if (this.compact) {
                         geneAnnotation.y = gene.strand === Strand.Positive ? -15 : 15;
                         geneAnnotation.relativeY = 0.5;
                         geneAnnotation.originY = -0.5;
@@ -116,13 +118,13 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.forEachSubNode((sub) => sub.mask = this);
 
                     // create name text
-                    let name = new Text(OpenSansRegular, gene.name, compact ? 11 : 16, [1, 1, 1, 1]);
+                    let name = new Text(OpenSansRegular, gene.name, this.compact ? 11 : 16, [1, 1, 1, 1]);
                     name.mask = this;
                     name.y = geneAnnotation.y;
                     name.relativeY = geneAnnotation.relativeY;
                     name.z = 5.0;
 
-                    if (compact) {
+                    if (this.compact) {
                         name.originY = -0.5;
                     } else {
                         name.originY = -1;
@@ -212,7 +214,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                     let color = gene.class === GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
 
-                    if (this.model.compact === true) {
+                    if (this.compact) {
                         instanceData.push({
                             x: 0,
                             y: (gene.strand === Strand.Positive ? -15 : 15) - TRANSCRIPT_HEIGHT * 0.5,

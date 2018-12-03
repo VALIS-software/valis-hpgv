@@ -25,9 +25,9 @@ class DualSignalTile extends SignalTile {
             return
                 vec3(
                     // use the first signal to set the red channel
-                    step(1.0 - textureSample.r, uv.y),
+                    step(1.0 - uv.y, textureSample.r),
                     // use the second to set the green channel
-                    step(1.0 - textureSample.g, uv.y),
+                    step(1.0 - uv.y, textureSample.g),
                     0.0
                 )
             ;

@@ -240,7 +240,9 @@ export class DualSignalTileLoader extends SignalTileLoader {
 
 ### Rendering: Creating our Custom TrackObject
 
-...
+Once we've created a [TileLoader](src/track/TileLoader.ts), we need a [TrackObject](src/track/TrackObject.ts) to render the tiles. For this dual signal example we can use the existing signal track class and extend it to display two signals. A [TrackObject](src/track/TrackObject.ts) displays tile data via tile objects, in [SignalTrack.ts](src/track/signal/SignalTrack.ts) there's a class called [SignalTile](src/track/signal/SignalTrack.ts) which is used to draw a single tile. We extend [SignalTrack](src/track/signal/SignalTrack.ts) and change the `customTileNodeClass` field to refer to our custom tile class we'll call `DualSignalTile`.
+
+To draw two signal tracks we override the value of `colorShaderFunction` in our extension of [SignalTile](src/track/signal/SignalTrack.ts). `colorShaderFunction` contains WebGL shader code that decides the color of pixel given the corresponding tile data and pixel's coordinates. In our custom `colorShaderFunction` we use `step(1.0 - signal, uv.y)` to set the output value to 1 when the pixel's y coordinate (`uv.y`) is less than `signal`. `signal` and `uv.y` are normalised to cover the range 0 to 1. This fills in the area below the signal's curve. We set the output pixel color's red component to correspond to first bigwig signal (`textureSample.r`) and the green component to correspond to the second bigwig signal (`textureSample.g`).
 
 ```typescript
 import { SignalTile, SignalTrack, Shaders } from "genome-visualizer";
@@ -249,9 +251,7 @@ import { DualSignalTrackModel } from "./DualSignalTrackModel";
 export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
 
     constructor(model: DualSignalTrackModel) {
-        super({
-            ...model
-        });
+        super({ ...model });
 
         this.customTileNodeClass = DualSignalTile;
 
@@ -270,9 +270,9 @@ class DualSignalTile extends SignalTile {
             return
                 vec3(
                     // use the first signal to set the red channel
-                    step(1.0 - textureSample.r, uv.y),
+                    step(1.0 - uv.y, textureSample.r),
                     // use the second to set the green channel
-                    step(1.0 - textureSample.g, uv.y),
+                    step(1.0 - uv.y, textureSample.g),
                     0.0
                 )
             ;

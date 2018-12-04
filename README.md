@@ -244,6 +244,8 @@ Once we've created a [TileLoader](src/track/TileLoader.ts), we need a [TrackObje
 
 To draw two signal tracks we override the value of `colorShaderFunction` in our extension of [SignalTile](src/track/signal/SignalTrack.ts). `colorShaderFunction` contains WebGL shader code that decides the color of pixel given the corresponding tile data and pixel's coordinates. In our custom `colorShaderFunction` we use `step(1.0 - signal, uv.y)` to set the output value to 1 when the pixel's y coordinate (`uv.y`) is less than `signal`. `signal` and `uv.y` are normalised to cover the range 0 to 1. This fills in the area below the signal's curve. We set the output pixel color's red component to correspond to first bigwig signal (`textureSample.r`) and the green component to correspond to the second bigwig signal (`textureSample.g`).
 
+In a file called `DualSignalTrack.ts`:
+
 ```typescript
 import { SignalTile, SignalTrack, Shaders } from "genome-visualizer";
 import { DualSignalTrackModel } from "./DualSignalTrackModel";
@@ -314,6 +316,69 @@ See [examples/custom-track-dual-signal](examples/custom-track-dual-signal) for a
 
 ## Creating a Custom Track: Custom Interval Source
 
+Data displayed in HPGV doesn't need to come from static files, it's possible to display data loaded dynamically from an API. Interval data is fetched in segments call 'tiles' and it's requested within the method `getTilePayload(tile): Promise<IntervalTilePayload>` of a track's tile-loader class. In this example we will extend [IntervalTileLoader](src/track/interval/IntervalTileLoader.ts) and override `getTilePayload` with a method that fetches intervals from an API. `getTilePayload` should return a promise to an object with the type:
+
+```typescript
+type IntervalTilePayload = {
+    intervals: Float32Array,
+    userdata?: any
+}
+```
+
+Where `intervals` is an array of intervals, for example:
+
+```javascript
+new Float32Array([
+    startIndex0, length0, // first interval
+    startIndex1, length1, // second interval
+    ...
+    startIndexN, lengthN  // nth interval
+]);
+```
+
+And `userdata` contains any extra data we might want to use when rendering.
+
+Assuming we have an API method to load intervals with the following signature:
+```typescript
+loadTiles(contig: {
+    contig: string,
+    startIndex: number,
+    span: number,
+    lodLevel: number,
+}): Promise<{intervals: Float32Array}>
+```
+
+Then we can use it as follows, in a file named `CustomIntervalTileLoader.ts`:
+
+```typescript
+export class CustomIntervalTileLoader extends IntervalTileLoader {
+    
+    protected getTilePayload(tile: Tile<IntervalTilePayload>): Promise<IntervalTilePayload> {
+        return api.loadTiles(
+            {
+                // the tile object tells us the contig and range of data requested, including the level of detail it was requested at
+                contig: this.contig,
+                startIndex: tile.x,
+                span: tile.span,
+                lodLevel: tile.lodLeve,
+            }
+        );
+    }
+
+}
+```
+
+Then to make our new track type available we call `GenomeVisualizer.registerTrackType` before calling `new GenomeVisualizer` in `App.ts`:
+
+```typescript
+GenomeVisualizer.registerTrackType('custom-interval', CustomIntervalTileLoader, IntervalTrack);
+
+let hpgv = new GenomeVisualizer({
+...
+```
+
+By default [IntervalTileLoader](src/track/interval/IntervalTileLoader.ts) has two levels of detail, specified by `microLodThreshold`, `macroLodLevel`. We can control the level-of-detail granularity by overriding `mapLodLevel(level)` and specifying our own function to alias levels together.
+
 ## Using the Preprocessing Script to Visualize a Collection of Files
 The preprocessing script is used to prepare common genomics formats for optimal visualization with HPGV. Currently this preprocessing is required for sequence and annotation tracks but not signal tracks.
 
@@ -321,7 +386,9 @@ Put the files you want to convert and visualize together in a directory
 
 `npx hpgv <path to your directory>`
 
-This will generate a new directory named `hpgv-files` which contains the converted files ready for viewing in HPGV
+This will generate a new directory named `hpgv-files` which contains the converted files ready for viewing in HPGV.
+
+The tool is currently a WIP so expect improvements soon!
 
 
 ## Roadmap

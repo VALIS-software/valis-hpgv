@@ -316,7 +316,7 @@ See [examples/custom-track-dual-signal](examples/custom-track-dual-signal) for a
 
 ## Creating a Custom Track: Custom Interval Source
 
-Data displayed in HPGV doesn't need to come from static files, it's possible to display data loaded dynamically from an API. Interval data is fetched in segments call 'tiles' and it's requested within the method `getTilePayload(tile): Promise<IntervalTilePayload>` of a track's tile-loader class. In this example we will extend [IntervalTileLoader](src/track/interval/IntervalTileLoader.ts) and override `getTilePayload` with a method that fetches intervals from an API. `getTilePayload` should return a promise to an object with the type:
+Data displayed in HPGV doesn't need to come from static files, it's possible to display data loaded dynamically from an API. Interval data is fetched in segments call 'tiles' and it's requested within the method `getTilePayload(tile)` of a track's tile-loader class. In this example we will extend [IntervalTileLoader](src/track/interval/IntervalTileLoader.ts) and override `getTilePayload` with a method that fetches intervals from an API. `getTilePayload` should return a promise to an object with the type:
 
 ```typescript
 type IntervalTilePayload = {

@@ -119,8 +119,6 @@ export class GenomeVisualizer {
                             .then((response) => {
                                 let json = response.data;
 
-                                console.log(json);
-
                                 // create a manifest that lists the available contigs
                                 let manifest: Manifest = {
                                     contigs: json.contigs

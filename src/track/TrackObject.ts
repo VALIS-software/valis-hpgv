@@ -157,6 +157,14 @@ export class TrackObject<
         super.applyTransformToSubNodes(root);
     }
 
+    currentSamplingDensity() {
+        const span = this.x1 - this.x0;
+        const widthPx = this.getComputedWidth();
+        let basePairsPerDOMPixel = (span / widthPx);
+        let samplingDensity = basePairsPerDOMPixel / this.pixelRatio;
+        return samplingDensity;
+    }
+
     protected getTileLoader(): TileLoaderType {
         return this.dataSource.getTileLoader(this.model, this.contig) as any;
     }
@@ -166,12 +174,9 @@ export class TrackObject<
         this._loadingTiles.markAllUnused();
         this.displayNeedUpdate = false;
 
-        const x0 = this.x0;
-        const x1 = this.x1;
-        const span = x1 - x0;
+        const span = this.x1 - this.x0;
         const widthPx = this.getComputedWidth();
-        let basePairsPerDOMPixel = (span / widthPx);
-        let samplingDensity = basePairsPerDOMPixel / this.pixelRatio;
+        let samplingDensity = this.currentSamplingDensity();
         let continuousLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
         let lodLevel = Math.floor(continuousLodLevel);
 

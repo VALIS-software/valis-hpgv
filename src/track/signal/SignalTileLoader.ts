@@ -2,7 +2,7 @@ import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFo
 import { SignalTrackModel } from "./SignalTrackModel";
 
 import { BigWigReader, HeaderData } from  "bigwig-reader";
-import { TileLoader, Tile } from "../TileLoader";
+import { TileLoader, Tile, TileState } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
 
 export type SignalTilePayload = {
@@ -74,6 +74,52 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         }
     }
 
+    /**
+    * Executes callback on every current tile value within the range x0 to x1 at a given lod
+    * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded
+    */
+    iterateValues(x0: number, x1: number, channel: number, lodLevel: number, callback: (x: number, value: number, lodLevel: number) => void) {
+        let lodDensity = Math.pow(2, lodLevel);
+        let lodX0 = Math.floor(x0 / lodDensity);
+        let lodX1 = Math.ceil(x1 / lodDensity);
+
+        this.forEachTileAtLod(x0, x1, lodLevel, false, (tile) => {
+            if (tile.state === TileState.Complete) {
+                let i0 = Math.max(lodX0 - tile.lodX, 0);
+                let i1 = Math.min(lodX1 - tile.lodX, tile.lodSpan - 1);
+
+                for (let i = i0; i <= i1; i++) {
+                    let x = tile.x + i;
+                    let value = tile.payload.array[this.nChannels * i + channel];
+                    callback(x, value, lodLevel);
+                }
+            } else {
+                // we have a gap here, try the next lod
+                // find next lod, accounting for lod aliasing by mapLodLevel
+                let nextLodLevel = -1;
+                for (let l = lodLevel + 1; l <= this.topTouchedLod(); l++) {
+                    let mappedLod = this.mapLodLevel(l);
+                    if (mappedLod > lodLevel) {
+                        nextLodLevel = mappedLod;
+                        break;
+                    }
+                }
+
+                if (nextLodLevel != -1) {
+                    this.iterateValues(
+                        Math.max(tile.x, x0),
+                        Math.min(tile.x + tile.span, x1),
+                        channel,
+                        nextLodLevel,
+                        callback
+                    );
+                } else {
+                    // exhausted all lods and found no data that covers the range of this tile
+                }
+            }
+        });
+    }
+
     private _initializationPromise: Promise<void>;
     protected initializationPromise() {
         if (this._initializationPromise == null) {
@@ -114,6 +160,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     // console.log(maxValue, maxAvg, weightedAveraged);
 
                     // @! hacky
+                    // ideally find some decent mid scale that doesn't necessarily capture all the peaks but makes the overall shape of the data visible
                     this._scaleFactor = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
                 });
             });
@@ -237,7 +284,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         tile: Tile<SignalTilePayload>,
         buffer: Float32Array,
         nChannels: number,
-        offset: number
+        targetChannel: number
     ): Promise<Float32Array> {
         let zoomIndex = bigWigLoader.lodZoomIndexMap[tile.lodLevel];
         let lodDensity = Math.pow(2, tile.lodLevel);
@@ -268,7 +315,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     let value = (entry.sumData / entry.validCount) * dataMultiplier;
 
                     for (let i = i0; i < i1; i++) {
-                        buffer[i * nChannels + offset] = value;
+                        buffer[i * nChannels + targetChannel] = value;
                     }
                 }
 
@@ -292,7 +339,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     for (let i = i0; i < i1; i++) {
                         if ((i < 0) || (i >= tile.lodSpan)) continue; // out of range
-                        buffer[i * nChannels + offset] = value * dataMultiplier;
+                        buffer[i * nChannels + targetChannel] = value * dataMultiplier;
                     }
                 }
 
@@ -361,21 +408,25 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     return gpuTexture;
                 },
-                getReading(x: number, channel: number) {
+                /**
+                 * Where 0 corresponds to the first value in the tile and 1, the last
+                 * This is design to mirror the behavior of `texture2D` in GLSL
+                 */
+                getReading(u: number, channel: number) {
                     let payload: SignalTilePayload = this;
                     
                     let nEntries = tile.lodSpan;
                     let linearFiltering = tile.lodLevel > 0;
 
                     if (linearFiltering) {
-                        let p = Math.max(x * nEntries - 0.5, 0);
+                        let p = Math.max(u * nEntries - 0.5, 0);
                         let low = payload.array[Math.floor(p) * nChannels + channel];
                         let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * nChannels + channel];
                         let alpha = p - Math.floor(p);
 
                         return low * (1 - alpha) + high * alpha;
                     } else {
-                        let i = Math.floor(x * nEntries);
+                        let i = Math.floor(u * nEntries);
                         return payload.array[i * nChannels + channel]; // red channel
                     }
                 }

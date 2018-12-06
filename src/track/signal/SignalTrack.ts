@@ -7,7 +7,7 @@ import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice
 import { DrawMode, DrawContext } from "engine/rendering/Renderer";
 import { Tile, TileState } from "../TileLoader";
 import { AxisPointer, AxisPointerStyle } from "../TrackObject";
-import { Text } from "engine";
+import { Text, Scalar } from "engine";
 import { OpenSansRegular } from "../../ui";
 import Animator from "../../Animator";
 import { Shaders } from "../../Shaders";
@@ -81,6 +81,28 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     removeAxisPointer(id: string) {
         super.removeAxisPointer(id);
         this.updateAxisPointerSample();
+    }
+
+    protected scaleToFit() {
+        let tileLoader = this.getTileLoader();
+
+        let continuousLodLevel = Scalar.log2(Math.max(this.currentSamplingDensity(), 1));
+        let lodLevel = Math.floor(continuousLodLevel);
+        let visibleLod = tileLoader.mapLodLevel(lodLevel);
+
+        let max = -Infinity;
+        
+        tileLoader.iterateValues(this.x0, this.x1, 0, visibleLod, (x, value, level) => {
+            if (isFinite(value)) {
+                max = Math.max(value, max);
+            }
+        });
+
+        if (max > 0) {
+            // @! todo re-scale the data
+        } else {
+            // could not find any data for the current visible range
+        }
     }
 
     protected tileNodes = new Set<SignalTile>();

@@ -208,7 +208,6 @@ export class GenomeVisualizer {
         parts.pop();
         let filename = parts.join('.');
 
-
         switch (fileType) {
             case 'bigwig': {
                 let model: SignalTrackModel = {

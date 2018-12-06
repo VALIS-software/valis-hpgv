@@ -1,5 +1,7 @@
 # VALIS High Performance Genome Visualizer
 
+## [Live Demo](https://valis-software.github.io/valis-hpgv/examples/minimal/index.html)
+
 ## Getting Started
 
 The genome visualizer can be used to explore individual genomic files (such as bigwig or BAM) or a collection of files via the [preprocessing script](#Using-the-Preprocessing-Script)
@@ -33,6 +35,8 @@ hpgv.render({ width: 800, height: 600 }, document.getElementById('container'));
 Opening the HTML you created should now show
 
 <img alt="VALIS Genome Visualizer Demo" src="https://user-images.githubusercontent.com/3742992/49345571-97ecf080-f67e-11e8-92f5-b05e46340b9a.png">
+
+[Live Demo](https://valis-software.github.io/valis-hpgv/examples/minimal/index.html)
 
 See [examples/minimal/index.html](examples/minimal/index.html) for a completed example
 
@@ -309,6 +313,8 @@ And add an instance of the track to the configuration
 After running `parcel index.html`, you should see the following when visiting [`http://localhost:1234`](http://localhost:1234)
 
 <img alt="Dual signal track demo" src="https://user-images.githubusercontent.com/3742992/49332258-e7112380-f5a1-11e8-8ff6-786a696a1859.png">
+
+[Live Demo](https://valis-software.github.io/valis-hpgv/examples/custom-track-dual-signal/dist/index.html)
 
 The red curve shows the first bigwig and the green the second. The yellow curve corresponds the overlap of the two signals.
 

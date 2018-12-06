@@ -41,7 +41,7 @@ Opening the HTML you created should now show
 See [examples/minimal/index.html](examples/minimal/index.html) for a completed example
 
 ## Available Example Files
-VALIS hosts a number of preprocessed files to help with testing. To create your own, see the section [Using the Preprocessing Script](#Using-the-Preprocessing-Script). To use the following files, right click, select "Copy link address" and then paste into the list of files use to initialize HPGV (see [Getting Started](#Getting-Started))
+VALIS hosts a number of preprocessed files to help with testing. To create your own, see the section [Using the Preprocessing Script](#Using-the-Preprocessing-Script-to-Visualize-a-Collection-of-Files). To use the following files, right click, select "Copy link address" and then paste into the list of files use to initialize HPGV (see [Getting Started](#Getting-Started))
 
 | DNA | Genes |
 |-------|-------|

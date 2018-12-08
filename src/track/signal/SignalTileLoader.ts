@@ -6,6 +6,7 @@ import { TileLoader, Tile, TileState } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
 
 export type SignalTilePayload = {
+    textureUnpackMultiplier: number,
     array: Float32Array,
     sequenceMinMax: {
         min: number,
@@ -33,12 +34,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
     ready: boolean = false;
 
-    get scaleFactor() {
-        return this._scaleFactor;
-    }
-
     protected bigWigLoader: BigWigLoader;
-    protected _scaleFactor: number = 1;
     protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
 
     protected readonly nChannels = 4;
@@ -79,7 +75,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded.
     * If there are no loaded tiles in this range the callback will not fire
     */
-    forEachValue(x0: number, x1: number, lodLevel: number, callback: (x: number, r: number, g: number, b: number, a: number, lodLevel: number) => void) {
+    forEachValue(x0: number, x1: number, lodLevel: number, coverGapsWithHigherLevels: boolean, callback: (x: number, r: number, g: number, b: number, a: number, lodLevel: number) => void) {
         let lodDensity = Math.pow(2, lodLevel);
         let lodX0 = Math.floor(x0 / lodDensity);
         let lodX1 = Math.ceil(x1 / lodDensity);
@@ -97,7 +93,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     let a = tile.payload.array[this.nChannels * i + 3];
                     callback(x, r,g,b,a, lodLevel);
                 }
-            } else {
+            } else if (coverGapsWithHigherLevels) {
                 // we have a gap here, try the next lod
                 // find next lod, accounting for lod aliasing by mapLodLevel
                 let nextLodLevel = -1;
@@ -114,6 +110,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                         Math.max(tile.x, x0),
                         Math.min(tile.x + tile.span, x1),
                         nextLodLevel,
+                        coverGapsWithHigherLevels,
                         callback
                     );
                 } else {
@@ -164,7 +161,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     // @! hacky
                     // ideally find some decent mid scale that doesn't necessarily capture all the peaks but makes the overall shape of the data visible
-                    this._scaleFactor = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
+                    // this._dataMultiplier = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
                 });
             });
         }
@@ -293,7 +290,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         let lodDensity = Math.pow(2, tile.lodLevel);
 
         // @! use for normalization
-        let dataMultiplier = this._scaleFactor;
         // @! review floor in i0, i1
 
         let dataPromise: Promise<Float32Array>;
@@ -315,7 +311,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     let i1 = Math.floor(x1 / lodDensity);
 
                     // fake norm
-                    let value = (entry.sumData / entry.validCount) * dataMultiplier;
+                    let value = (entry.sumData / entry.validCount);
 
                     for (let i = i0; i < i1; i++) {
                         buffer[i * nChannels + targetChannel] = value;
@@ -342,7 +338,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                     for (let i = i0; i < i1; i++) {
                         if ((i < 0) || (i >= tile.lodSpan)) continue; // out of range
-                        buffer[i * nChannels + targetChannel] = value * dataMultiplier;
+                        buffer[i * nChannels + targetChannel] = value;
                     }
                 }
 
@@ -370,6 +366,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         let tileLoader = this;
         return this.loadPayloadBuffer(tile).then((data) => {
             return {
+                textureUnpackMultiplier: 1,
                 array: data,
                 sequenceMinMax: {
                     min: 0,
@@ -390,9 +387,13 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                         
                         // convert float32array to bytes, we lose lots of precision but atleast we see something
                         if (blockPayload.floatPacking) {
+                            // use the max value to crush array into the 0-1 range and set payload.unpackMultiplier so we can correct when reading from the texture
+                            let max = payload.array.reduce((prev, curr, i) => Math.max(prev, curr));
+                            payload.textureUnpackMultiplier = max;
+
                             data = new Uint8Array(payload.array.length);
                             for (let i = 0; i < payload.array.length; i++) {
-                                data[i] = payload.array[i] * 0xFF;
+                                data[i] = (payload.array[i] / max) * 0xFF;
                             }
                         }
 
@@ -427,7 +428,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                         let high = payload.array[Math.min(Math.ceil(p), nEntries - 1) * nChannels + channel];
                         let alpha = p - Math.floor(p);
 
-                        return low * (1 - alpha) + high * alpha;
+                        return (low * (1 - alpha) + high * alpha);
                     } else {
                         let i = Math.floor(u * nEntries);
                         return payload.array[i * nChannels + channel]; // red channel

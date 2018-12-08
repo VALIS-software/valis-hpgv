@@ -7,7 +7,7 @@ import { TrackModel } from "./TrackModel";
 import { TrackObject } from "./TrackObject";
 
 interface CustomTileNode<Payload> {
-    new(): ShaderTile<Payload>;
+    new(...args: Array<any>): ShaderTile<Payload>;
 }
 
 export class ShaderTrack<
@@ -101,9 +101,9 @@ export class ShaderTrack<
         this._tileNodeCache.removeUnused((t) => this.deleteTileNode(t));
     }
 
-    protected createTileNode(): ShaderTile<TilePayload> {
+    protected createTileNode(...args: Array<any>): ShaderTile<TilePayload> {
         // create empty tile node
-        let tileNode = new this.customTileNodeClass();
+        let tileNode = new this.customTileNodeClass(...args);
         tileNode.mask = this;
         this.add(tileNode);
         return tileNode;

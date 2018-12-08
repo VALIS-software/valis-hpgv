@@ -316,7 +316,9 @@ And add an instance of the track to the configuration
 }
 ```
 
-After running `parcel index.html`, you should see the following when visiting [`http://localhost:1234`](http://localhost:1234)
+After running `parcel index.html`, you should see the following when visiting [`http://localhost:1234`](http://localhost:1234). To generate the final index.html and App.js files we can use parcel's build command:
+
+npx parcel build index.html --public-url '.'
 
 <img alt="Dual signal track demo" src="https://user-images.githubusercontent.com/3742992/49332258-e7112380-f5a1-11e8-8ff6-786a696a1859.png">
 

@@ -4,9 +4,7 @@ import { DualSignalTrackModel } from "./DualSignalTrackModel";
 export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
 
     constructor(model: DualSignalTrackModel) {
-        super({
-            ...model
-        });
+        super({ ...model });
 
         this.customTileNodeClass = DualSignalTile;
 
@@ -14,13 +12,20 @@ export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
         this.showSignalReading = false;
     }
 
+    protected maxValue(r: number, g: number, b: number, a: number) {
+        let max = -Infinity;
+        if (isFinite(r)) max = Math.max(r, max);
+        if (isFinite(g)) max = Math.max(g, max);
+        if (isFinite(b)) max = Math.max(b, max);
+        if (isFinite(a)) max = Math.max(a, max);
+        return max;
+    }
+
 }
 
 class DualSignalTile extends SignalTile {
 
     protected colorShaderFunction = `
-        ${Shaders.functions.palettes.viridis}
-
         vec3 color(vec4 textureSample, vec2 uv) {
             return
                 vec3(

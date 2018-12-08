@@ -75,10 +75,11 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     }
 
     /**
-    * Executes callback on every current tile value within the range x0 to x1 at a given lod
-    * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded
+    * Executes callback on every current tile value within the range x0 to x1 at a given lod.
+    * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded.
+    * If there are no loaded tiles in this range the callback will not fire
     */
-    iterateValues(x0: number, x1: number, channel: number, lodLevel: number, callback: (x: number, value: number, lodLevel: number) => void) {
+    forEachValue(x0: number, x1: number, lodLevel: number, callback: (x: number, r: number, g: number, b: number, a: number, lodLevel: number) => void) {
         let lodDensity = Math.pow(2, lodLevel);
         let lodX0 = Math.floor(x0 / lodDensity);
         let lodX1 = Math.ceil(x1 / lodDensity);
@@ -90,8 +91,11 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
                 for (let i = i0; i <= i1; i++) {
                     let x = tile.x + i;
-                    let value = tile.payload.array[this.nChannels * i + channel];
-                    callback(x, value, lodLevel);
+                    let r = tile.payload.array[this.nChannels * i + 0];
+                    let g = tile.payload.array[this.nChannels * i + 1];
+                    let b = tile.payload.array[this.nChannels * i + 2];
+                    let a = tile.payload.array[this.nChannels * i + 3];
+                    callback(x, r,g,b,a, lodLevel);
                 }
             } else {
                 // we have a gap here, try the next lod
@@ -106,10 +110,9 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 }
 
                 if (nextLodLevel != -1) {
-                    this.iterateValues(
+                    this.forEachValue(
                         Math.max(tile.x, x0),
                         Math.min(tile.x + tile.span, x1),
-                        channel,
                         nextLodLevel,
                         callback
                     );

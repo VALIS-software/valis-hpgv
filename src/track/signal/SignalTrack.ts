@@ -86,23 +86,32 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     protected scaleToFit() {
         let tileLoader = this.getTileLoader();
 
-        let continuousLodLevel = Scalar.log2(Math.max(this.currentSamplingDensity(), 1));
-        let lodLevel = Math.floor(continuousLodLevel);
-        let visibleLod = tileLoader.mapLodLevel(lodLevel);
+        if (tileLoader.ready) {
+            let continuousLodLevel = Scalar.log2(Math.max(this.currentSamplingDensity(), 1));
+            let lodLevel = Math.floor(continuousLodLevel);
+            let visibleLod = tileLoader.mapLodLevel(lodLevel);
 
-        let max = -Infinity;
-        
-        tileLoader.iterateValues(this.x0, this.x1, 0, visibleLod, (x, value, level) => {
-            if (isFinite(value)) {
-                max = Math.max(value, max);
+            let max = -Infinity;
+
+            tileLoader.forEachValue(this.x0, this.x1, visibleLod, (x, r,g,b,a, level) => {
+                const maxRGBA = this.maxValue(r, g, b, a);
+                if (isFinite(maxRGBA)) max = Math.max(maxRGBA, max);
+            });
+
+            if (max > 0) {
+                // @! todo re-scale the data
+            } else {
+                // could not find any data for the current visible range
             }
-        });
-
-        if (max > 0) {
-            // @! todo re-scale the data
         } else {
-            // could not find any data for the current visible range
+            // @! todo: queue scale to fit on ready?
         }
+    }
+
+    protected maxValue(r: number, g: number, b:number, a: number) {
+        let max = -Infinity;
+        if (isFinite(r)) max = Math.max(r, max);
+        return max;
     }
 
     protected tileNodes = new Set<SignalTile>();

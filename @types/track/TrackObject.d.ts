@@ -34,6 +34,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     clearFocusRegion(): void;
     private _lastComputedWidth;
     applyTransformToSubNodes(root?: boolean): void;
+    currentSamplingDensity(): number;
     protected getTileLoader(): TileLoaderType;
     protected _loadingTiles: UsageCache<Tile<any>>;
     protected triggerDisplayUpdate(): void;

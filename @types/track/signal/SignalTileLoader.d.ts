@@ -4,6 +4,7 @@ import { BigWigReader, HeaderData } from "bigwig-reader";
 import { TileLoader, Tile } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
 export declare type SignalTilePayload = {
+    textureUnpackMultiplier: number;
     array: Float32Array;
     sequenceMinMax: {
         min: number;
@@ -29,15 +30,19 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected readonly model: SignalTrackModel;
     protected readonly contig: string;
     ready: boolean;
-    readonly scaleFactor: number;
     protected bigWigLoader: BigWigLoader;
-    protected _scaleFactor: number;
     protected _logarithmicDisplay: boolean;
     protected readonly nChannels: number;
     static cacheKey(model: SignalTrackModel): string;
     static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
     mapLodLevel(l: number): number;
+    /**
+    * Executes callback on every current tile value within the range x0 to x1 at a given lod.
+    * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded.
+    * If there are no loaded tiles in this range the callback will not fire
+    */
+    forEachValue(x0: number, x1: number, lodLevel: number, coverGapsWithHigherLevels: boolean, callback: (x: number, r: number, g: number, b: number, a: number, lodLevel: number) => void): void;
     private _initializationPromise;
     protected initializationPromise(): Promise<void>;
     protected onReady(): void;
@@ -46,7 +51,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
         lodMap: Array<number>;
         lodZoomIndexMap: Array<number>;
     };
-    protected getBigWigData(bigWigLoader: BigWigLoader, tile: Tile<SignalTilePayload>, buffer: Float32Array, nChannels: number, offset: number): Promise<Float32Array>;
+    protected getBigWigData(bigWigLoader: BigWigLoader, tile: Tile<SignalTilePayload>, buffer: Float32Array, nChannels: number, targetChannel: number): Promise<Float32Array>;
     protected loadPayloadBuffer(tile: Tile<SignalTilePayload>): Promise<Float32Array>;
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload>;
     protected createBlockPayload(lodLevel: number, lodX: number, tileWidth: number, rows: number): BlockPayload;

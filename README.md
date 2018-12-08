@@ -270,8 +270,6 @@ export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
 class DualSignalTile extends SignalTile {
 
     protected colorShaderFunction = `
-        ${Shaders.functions.palettes.viridis}
-
         vec3 color(vec4 textureSample, vec2 uv) {
             return
                 vec3(

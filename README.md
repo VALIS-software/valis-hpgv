@@ -265,6 +265,14 @@ export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
         this.showSignalReading = false;
     }
 
+    // we override the maxValue method so that the green channel is accounted for when auto scaling 
+    protected maxValue(r: number, g: number, b: number, a: number) {
+        let max = -Infinity;
+        if (isFinite(r)) max = Math.max(r, max);
+        if (isFinite(g)) max = Math.max(g, max);
+        return max;
+    }
+
 }
 
 class DualSignalTile extends SignalTile {

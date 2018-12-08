@@ -15,6 +15,19 @@ import TrackModel from "../TrackModel";
 
 export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
+    autoScale = true;
+    autoScaleDelay_ms = 300;
+
+    protected get displayScale() {
+        return this._displayScale;
+    }
+
+    protected set displayScale(value: number) {
+        this._displayScale = value;
+        this.yAxis.setRange(0, 1 / value);
+        this.updateAxisPointerSample();
+    }
+
     protected yAxis: Axis;
 
     protected signalReading: Text;
@@ -22,6 +35,8 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
     readonly signalReadingSnapX = true;
     protected showSignalReading = true;
+
+    protected _displayScale = 1;
 
     constructor(model: Model) {
         super(model, SignalTile);
@@ -71,6 +86,17 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         this.yAxisPointer.opacity = 0.3;
         this.yAxisPointer.mask = this;
         this.add(this.yAxisPointer);
+
+        // begin frame loop
+        this.frameLoop();
+
+        (window as any).scaleToFit = () => {
+            this.scaleToFit();
+        }
+
+        (window as any).setDisplayScale = (x: number) => {
+            this.setDisplayScale(x);
+        }
     }
 
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle) {
@@ -83,7 +109,49 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         this.updateAxisPointerSample();
     }
 
+    setDisplayScale(scale: number) {
+        Animator.springTo(this, {displayScale: scale}, 200);
+    }
+
+    private _animationFrameHandle = -1;
+
+    protected frameLoop = () => {
+        this._animationFrameHandle = window.requestAnimationFrame(this.frameLoop);
+        this.autoScaleOnFrame();
+    }
+
+    private _autoScaleNeedsUpdate = false;
+    // private _autoScaleContig: string;
+    // private _autoScaleX0: number;
+    // private _autoScaleX1: number;
+    private _autoScaleLastChangeT_ms: number = -Infinity;
+
+    protected autoScaleNeedsUpdate() {
+        if (this.autoScale) {
+            this._autoScaleLastChangeT_ms = window.performance.now();
+
+            if (this.autoScaleDelay_ms > 0) {
+                this._autoScaleNeedsUpdate = true;
+            } else {
+                this.scaleToFit();
+            }
+        }
+    }
+
+    protected autoScaleOnFrame() {
+        if (this._autoScaleNeedsUpdate && this.autoScale) {
+            let dt_ms = window.performance.now() - this._autoScaleLastChangeT_ms;
+            if (dt_ms >= this.autoScaleDelay_ms) {
+                this.scaleToFit();
+                this._autoScaleNeedsUpdate = false;
+            }
+        }
+    }
+
     protected scaleToFit() {
+        // add a little bit of space at the top by multiplying the scale factor by a little
+        const spaceAtTheTopMultiplier = 1.05;
+
         let tileLoader = this.getTileLoader();
 
         if (tileLoader.ready) {
@@ -93,13 +161,14 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
             let max = -Infinity;
 
-            tileLoader.forEachValue(this.x0, this.x1, visibleLod, (x, r,g,b,a, level) => {
+            tileLoader.forEachValue(this.x0, this.x1, visibleLod, true, (x, r,g,b,a, level) => {
                 const maxRGBA = this.maxValue(r, g, b, a);
                 if (isFinite(maxRGBA)) max = Math.max(maxRGBA, max);
             });
 
             if (max > 0) {
                 // @! todo re-scale the data
+                this.setDisplayScale(1 / (max * spaceAtTheTopMultiplier));
             } else {
                 // could not find any data for the current visible range
             }
@@ -117,7 +186,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     protected tileNodes = new Set<SignalTile>();
     protected createTileNode(): ShaderTile<SignalTilePayload> {
         // create empty tile node
-        let tileNode = super.createTileNode() as SignalTile;
+        let tileNode = super.createTileNode(this) as SignalTile;
         this.tileNodes.add(tileNode);
         return tileNode;
     }
@@ -196,7 +265,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
         let makingVisible = this.yAxisPointer.render === false;
 
-        let relativeY = 1 - value;
+        let relativeY = 1 - (value * this.displayScale);
 
         let relativeYOfSignalReading = (this.signalReading.getComputedHeight() + Math.abs(this.signalReading.y)*2) / this.getComputedHeight();
         let signalReadingRelativeY = Math.min(Math.max(relativeY, relativeYOfSignalReading), 1);
@@ -221,9 +290,10 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         let tileLoader = this.getTileLoader();
 
         if (tileLoader.ready) {
-            this.yAxis.setRange(0, 1 / tileLoader.scaleFactor);
+            this.yAxis.setRange(0, 1 / this.displayScale);
             this.displayLoadingIndicator = false;
             super.updateDisplay(samplingDensity, continuousLodLevel, span, widthPx);
+            this.autoScaleNeedsUpdate();
             this.updateAxisPointerSample();
         } else {
             // show loading indicator until tileLoader is ready
@@ -252,6 +322,12 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
         }
     `;
 
+    constructor(protected readonly sharedProperties: {
+        displayScale: number,
+    }) {
+        super();
+    }
+
     setTile(tile: Tile<SignalTilePayload>) {
         super.setTile(tile);
 
@@ -273,6 +349,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                 uniform float opacity;
                 uniform sampler2D memoryBlock;
                 uniform vec2 size;
+                uniform float scaleFactor;
 
                 varying vec2 texCoord;
                 varying vec2 vUv;
@@ -282,7 +359,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                 void main() {
                     vec4 textureSample = texture2D(memoryBlock, texCoord);
 
-                    vec3 col = color(textureSample, vUv);
+                    vec3 col = color(textureSample * scaleFactor, vUv);
 
                     #if 0
                     float debug = step((1.0 - vUv.y) * size.y, 5.);
@@ -312,6 +389,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
         context.uniform1f('opacity', this.opacity);
         context.uniform1f('memoryBlockY', this.memoryBlockY);
         context.uniformTexture2D('memoryBlock', this.gpuTexture);
+        context.uniform1f('scaleFactor', this.sharedProperties.displayScale * this.tile.payload.textureUnpackMultiplier);
         context.draw(DrawMode.TRIANGLES, 6, 0);
 
         this.tile.markLastUsed();

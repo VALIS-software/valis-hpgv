@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "fast-deep-equal": "^2.0.1",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",
+    "mkdirp": "^0.5.1",
     "string-split-by": "^1.0.0"
   },
   "author": "",

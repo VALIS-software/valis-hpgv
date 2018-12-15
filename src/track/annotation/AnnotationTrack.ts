@@ -13,7 +13,7 @@ import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
-import { GeneClass, GenomeFeature, TranscriptClass } from "./AnnotationTypes";
+import { GeneClass, GenomeFeature, TranscriptClass, GenomeFeatureType } from "./AnnotationTypes";
 
 const TRANSCRIPT_HEIGHT = 20;
 
@@ -28,6 +28,13 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected readonly namesLodBlendRange = 1;
     protected readonly namesLodThresholdLow = 6;
     protected readonly namesLodThresholdHigh = this.namesLodThresholdLow + this.namesLodBlendRange;
+
+    protected readonly annotationY = {
+        [Strand.Positive]: -15,
+        [Strand.Negative]:  15,
+        [Strand.Unknown]:  0,
+        [Strand.None]:  0,
+    };
 
     protected macroModel: MacroAnnotationTrackModel;
 
@@ -109,7 +116,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.relativeH = 0;
 
                     if (this.compact) {
-                        geneAnnotation.y = gene.strand === Strand.Positive ? -15 : 15;
+                        geneAnnotation.y = this.annotationY[gene.strand];
                         geneAnnotation.relativeY = 0.5;
                         geneAnnotation.originY = -0.5;
                     } else {
@@ -219,7 +226,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     if (this.compact) {
                         instanceData.push({
                             x: 0,
-                            y: (gene.strand === Strand.Positive ? -15 : 15) - TRANSCRIPT_HEIGHT * 0.5,
+                            y: (this.annotationY[gene.strand]) - TRANSCRIPT_HEIGHT * 0.5,
                             z: 0,
                             w: 0,
                             h: TRANSCRIPT_HEIGHT,
@@ -350,16 +357,23 @@ class GeneAnnotation extends Object2D {
                 this.add(transcriptAnnotation);
             }
         } else {
-            // no transcripts provided, just mark the gene's span
-            let spanMarker = new TranscriptSpan(gene.strand);
-            spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.8]);
-            spanMarker.h = 10;
-            spanMarker.relativeW = 1;
-            spanMarker.originY = -0.5;
-            spanMarker.relativeY = 0.5;
-            spanMarker.z = 0.1;
-            spanMarker.transparent = true;
-            this.add(spanMarker);
+            // no transcripts provided, use an empty transcript marker to make the gene visible
+            let emptyTranscript: Transcript = {
+                type: GenomeFeatureType.Transcript,
+                class: TranscriptClass.Unspecified,
+                startIndex: gene.startIndex,
+                soClass: 'transcript',
+                length: gene.length,
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            };
+            let transcriptAnnotation = new TranscriptAnnotation(emptyTranscript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
+            transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
+            transcriptAnnotation.y = 0;
+            transcriptAnnotation.relativeW = 1;
+            this.add(transcriptAnnotation);        
         }
     }
 

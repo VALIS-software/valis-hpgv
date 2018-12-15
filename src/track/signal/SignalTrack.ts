@@ -161,19 +161,18 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
             let max = -Infinity;
 
-            tileLoader.forEachValue(this.x0, this.x1, visibleLod, true, (x, r,g,b,a, level) => {
+            tileLoader.forEachValue(this.x0, this.x1, visibleLod, false, (x, r,g,b,a, level) => {
                 const maxRGBA = this.maxValue(r, g, b, a);
                 if (isFinite(maxRGBA)) max = Math.max(maxRGBA, max);
             });
 
             if (max > 0) {
-                // @! todo re-scale the data
                 this.setDisplayScale(1 / (max * spaceAtTheTopMultiplier));
             } else {
                 // could not find any data for the current visible range
             }
         } else {
-            // @! todo: queue scale to fit on ready?
+            // could not scale because tile loader was not ready
         }
     }
 

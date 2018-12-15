@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "genomics-formats": "github:VALIS-software/Genomics-Formats"
+    "genomics-formats": "github:VALIS-software/Genomics-Formats",
+    "string-split-by": "^1.0.0"
   },
   "author": "",
   "license": "ISC"

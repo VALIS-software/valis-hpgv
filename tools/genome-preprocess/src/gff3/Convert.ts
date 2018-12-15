@@ -25,14 +25,14 @@ import { deleteDirectory } from '../FileSystemUtils';
 
 // settings
 
-export function gff3Convert(inputFilePath: string, saveInto: string): Promise<string> {
+export function gff3Convert(inputFilePath: string, outputDirectory: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 		let parsedPath = path.parse(inputFilePath);
 		const filename = parsedPath.name;
-		const outputDirectory = `${saveInto}/${filename}.vgenes-dir`;
+		const vgenesDirectory = `${outputDirectory}/${filename}.vgenes-dir`;
 
-		deleteDirectory(outputDirectory);
-		fs.mkdirSync(outputDirectory);
+		deleteDirectory(vgenesDirectory);
+		fs.mkdirSync(vgenesDirectory);
 
 		const featureTypeBlacklist = ['biological_region', 'chromosome'];
 
@@ -131,7 +131,7 @@ export function gff3Convert(inputFilePath: string, saveInto: string): Promise<st
 						Terminal.log('Skipped features:<b>', skippedFeatureTypes);
 					}
 
-					resolve(outputDirectory);
+					resolve(vgenesDirectory);
 				}
 
 			},
@@ -150,8 +150,8 @@ export function gff3Convert(inputFilePath: string, saveInto: string): Promise<st
 
 			// save tiles to disk
 			// assume all sequences represent chromosome and prefix with chr
-			saveTiles(tileset.sequences[sequenceId], `${outputDirectory}/chr${sequenceId}`);
-			saveTiles(macroTileset.sequences[sequenceId], `${outputDirectory}/chr${sequenceId}-macro`);
+			saveTiles(tileset.sequences[sequenceId], `${vgenesDirectory}/chr${sequenceId}`);
+			saveTiles(macroTileset.sequences[sequenceId], `${vgenesDirectory}/chr${sequenceId}-macro`);
 
 			// release sequence tile data to GC since we no longer need it
 			delete tileset.sequences[sequenceId];

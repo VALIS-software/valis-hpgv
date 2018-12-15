@@ -1,25 +1,77 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { deleteDirectory } from '../FileSystemUtils';
-import { any, string } from 'prop-types';
 import Terminal from '../Terminal';
+import AnnotationTileset from '../gff3/AnnotationTileset';
+import Strand from 'genomics-formats/lib/gff3/Strand';
 let splitPreserving = require("string-split-by");
 
 export function vcfConvert(inputFilePath: string, outputDirectory: string): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
+        // @! temporary to process custom biobureau files
+        let biobureauFilenameMatch = /^LF_itr6_\d+_([^\.]+)/.exec(path.basename(inputFilePath));
+        let biobureauGeneName: string;
+        if (biobureauFilenameMatch) {
+            biobureauGeneName = biobureauFilenameMatch[1];
+        } else {
+            // @!
+            reject(`Biobureau demo: filename does not match (@! remove this)`);
+        }
+
+        const lodLevel0TileSize = 1 << 28;
+
+        let biobureauGeneTileset = new AnnotationTileset(
+            lodLevel0TileSize, // ~1 million,
+            false,
+            (f) => Terminal.error(`Unknown feature`, f),
+            Terminal.error,
+        );
+
         let parser = new VCFParser({
             onMetadata: (meta) => {
             },
             onError: Terminal.error,
             onComplete: (vcf) => {
                 if (vcf.metadata.contig != null) {
-                    vcf.metadata.contig
-                    Terminal.log(vcf.metadata.contig);
 
+                    let biobureauContigPattern = /([^.]+)\.([^:]+):(\d+)-(\d+)/;
+                    let biobureauMatch = biobureauContigPattern.exec(vcf.metadata.contig.ID);
+
+                    if (biobureauMatch != null) {
+                        let species = biobureauMatch[1];
+                        let namedRegion = biobureauMatch[2];
+                        let startBase = parseInt(biobureauMatch[3]);
+                        let endBase = parseInt(biobureauMatch[4]);
+
+                        biobureauGeneTileset.addTopLevelFeature({
+                            sequenceId: 'main',
+                            id: biobureauGeneName,
+                            name: biobureauGeneName,
+                            type: 'gene',
+                            children: [],
+                            start: startBase,
+                            end: endBase,
+                            strand: Strand.Unknown,
+                            phase: null,
+                            attributes: {isCircular: false, custom: {}},
+                        });
+
+                        Terminal.log(
+                            biobureauGeneName,
+                            startBase,
+                            endBase,
+                        );
+                        for (let tile of biobureauGeneTileset.sequences['main']) {
+                            let filename = `${tile.startIndex.toFixed(0)},${tile.span.toFixed(0)}`;
+                            Terminal.log(filename, tile.content);
+                        }
+
+                    }
                 }
+
                 resolve([]);
             }
         });
+
         let stream = fs.createReadStream(inputFilePath, {
             encoding: 'utf8',
             autoClose: true,
@@ -27,6 +79,7 @@ export function vcfConvert(inputFilePath: string, outputDirectory: string): Prom
         stream.on('data', parser.parseChunk);
         stream.on('close', parser.end);
         stream.on('error', reject);
+
         return;
     });
 }

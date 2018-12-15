@@ -71,7 +71,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     }
 
     /**
-    * Executes callback on every current tile value within the range x0 to x1 at a given lod.
+    * Executes callback on every tile value within the range x0 to x1 at a given lod (if the tile has loaded).
     * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded.
     * If there are no loaded tiles in this range the callback will not fire
     */
@@ -181,6 +181,9 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         });
     }
 
+    /**
+     * Generate a BigWig loader instance for a given BigWig file path
+     */
     protected getBigWigLoader(path: string): Promise<BigWigLoader> {
         // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
         let bigWigReader = new BigWigReader({
@@ -217,6 +220,9 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         });
     }
 
+    /**
+     * Convert a BigWig zoom levels header into maps so we can lookup the zoom level for any given lod
+     */
     protected generateLodLookups(bigWigHeader: HeaderData): {
         lodMap: Array<number>,
         lodZoomIndexMap: Array<number>,
@@ -279,6 +285,10 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         }
     }
 
+    /**
+     * Given a BigWig loader instance, load BigWig data to cover *tile* into texture ArrayBuffer *buffer*.
+     * Copies values into *targetChannel* assuming *nChannels* texture channels.
+     */
     protected getBigWigData(
         bigWigLoader: BigWigLoader,
         tile: Tile<SignalTilePayload>,

@@ -262,7 +262,7 @@ function format(message: string) {
 			let proceedingTags = 0;
 			for (let tag of tags) {
 				let flag = formatFlagFromTag(tag);
-				if (flag == null) continue; // unhandled tag
+				if (flag == null) return substr; // unhandled tag, don't treat as formatting
 				if (open) {
 					addFlag(flag, proceedingTags);
 					proceedingTags++;

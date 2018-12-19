@@ -21,7 +21,7 @@ import { TrackObject } from "./track/TrackObject";
 import { SignalTileLoader } from "./track/signal/SignalTileLoader";
 import { SignalTrack } from "./track/signal/SignalTrack";
 import { BigWigReader, AxiosDataLoader } from "bigwig-reader";
-import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel } from "./track";
+import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel, VariantTrackModel } from "./track";
 import { GenomicLocation } from "./model";
 import { Panel } from "./ui";
 import Axios from "axios";
@@ -112,7 +112,8 @@ export class GenomeVisualizer {
                         }
 
                         case 'vgenes-dir':
-                        case 'vdna-dir': {
+                        case 'vdna-dir':
+                        case 'vvariants-dir': {
                             foundContigs = true;
 
                             Axios.get(path + '/manifest.json')
@@ -228,6 +229,14 @@ export class GenomeVisualizer {
             case 'vdna-dir': {
                 let model: SequenceTrackModel = {
                     type: 'sequence',
+                    name: filename,
+                    path: path,
+                };
+                return this.addTrack(model, animateIn);
+            }
+            case 'vvariants-dir': {
+                let model: VariantTrackModel = {
+                    type: 'variant',
                     name: filename,
                     path: path,
                 };
@@ -350,7 +359,11 @@ export class GenomeVisualizer {
     }
 
     static getTrackType(type: string) {
-        return this.trackTypes[type];
+        let trackClass = this.trackTypes[type];
+        if (trackClass == null) {
+            console.warn(`No track type "${type}", available types are: ${Object.keys(this.trackTypes).join(', ')}`);
+        }
+        return trackClass;
     }
 
     private static trackTypes: {

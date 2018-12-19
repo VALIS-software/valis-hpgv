@@ -1,6 +1,7 @@
 import { IDataSource } from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
+import Axios from "axios";
 
 export type VariantTilePayload = Array<{
     id: string,
@@ -35,7 +36,15 @@ export class VariantTileLoader extends TileLoader<VariantTilePayload, void> {
     }
 
     protected getTilePayload(tile: Tile<VariantTilePayload>): Promise<VariantTilePayload> | VariantTilePayload {
-        console.warn('Loading variants from static files is not yet supported');
+        if (this.model.path != null) {
+
+            // vvariants-dir json file load
+            let jsonPath = `${this.model.path}/${this.contig}/${tile.x},${tile.span}.json`;
+            return Axios.get(jsonPath).then((a) => {
+                return a.data;
+            });
+        }
+
         return [];
     }
 

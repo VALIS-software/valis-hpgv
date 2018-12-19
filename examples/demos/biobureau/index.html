@@ -1,0 +1,54 @@
+<style>
+    body {
+        margin: 0;
+    }
+</style>
+
+<div id="container"></div>
+
+<script src="../../dist/valis-hpgv.js"></script>
+
+<script>
+
+    let config = {
+        panels: [
+            {
+                location: { contig: 'l_fortunei', x0: 0, x1: 505196 }
+            }
+        ],
+        tracks: [
+            {
+                name: 'DNA',
+                type: 'sequence',
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/l_fortunei.vdna-dir',
+            },
+            {
+                name: 'Genes',
+                type: 'annotation',
+                compact: true,
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/l_fortunei.vgenes-dir',
+            },
+            {
+                name: 'Variants',
+                type: 'variant',
+                compact: true,
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/l_fortunei.vvariants-dir',
+            },
+        ],
+    };
+
+    let visualizer = new GenomeVisualizer(config);
+
+    let container = document.getElementById('container');
+
+    window.addEventListener('resize', update);
+
+    function update() {
+        visualizer.render({
+            width: window.innerWidth,
+            height: window.innerHeight
+        }, container);
+    }
+
+    update();
+</script>

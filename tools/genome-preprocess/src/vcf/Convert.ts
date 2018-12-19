@@ -4,109 +4,53 @@ import Terminal from '../Terminal';
 import AnnotationTileset from '../gff3/AnnotationTileset';
 import Strand from 'genomics-formats/lib/gff3/Strand';
 import { GenomeFeature } from '../../../../src/track/annotation/AnnotationTypes';
+import Tileset from '../Tileset';
 const splitPreserving = require("string-split-by");
 const mkdirp = require('mkdirp');
 const deepEqual = require('fast-deep-equal');
 
 export function vcfConvert(inputFilePath: string, outputDirectory: string): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
-        // @! temporary to process custom biobureau files
-        let biobureauFilenameMatch = /^LF_itr6_\d+_([^\.]+)/.exec(path.basename(inputFilePath));
-        let biobureauGeneName: string;
-        if (biobureauFilenameMatch) {
-            biobureauGeneName = biobureauFilenameMatch[1];
-        } else {
-            // @!
-            reject(`Biobureau demo: filename does not match (@! remove this)`);
-        }
-
-        const lodLevel0TileSize = 1 << 20;
-
-        let biobureauGeneTileset = new AnnotationTileset(
-            lodLevel0TileSize, // ~1 million,
-            false,
-            (f) => Terminal.error(`Unknown feature`, f),
-            Terminal.error,
-        );
-
-        let macroLodLevel = 5;
-        let biobureauGeneMacroTileset = new AnnotationTileset(
-            lodLevel0TileSize * (1 << macroLodLevel),
-            true,
-            (f) => Terminal.error(`Unknown feature`, f),
-            Terminal.error,
-        );
-
         let parser = new VCFParser({
             onMetadata: (meta) => {
             },
-            onError: Terminal.error,
+            onError: (err) => Terminal.error(err),
             onComplete: (vcf) => {
-                let filesWritten = new Set();
+                let filesWritten = new Array();
+
+                Terminal.log(`<b>Processing <cyan>${inputFilePath}</></b>`);
+
+                let contigRange = { startIndex: 0, length: 0 };
 
                 if (vcf.metadata.contig != null) {
-
-                    let biobureauContigPattern = /([^.]+)\.([^:]+):(\d+)-(\d+)/;
-                    let biobureauMatch = biobureauContigPattern.exec(vcf.metadata.contig.ID);
-
-                    if (biobureauMatch != null) {
-                        let species = biobureauMatch[1];
-                        let namedRegion = biobureauMatch[2];
-                        let startBase = parseInt(biobureauMatch[3]);
-                        let endBase = parseInt(biobureauMatch[4]);
-
-                        let feature = {
-                            sequenceId: 'main',
-                            id: biobureauGeneName,
-                            name: biobureauGeneName,
-                            type: 'gene',
-                            children: [],
-                            start: startBase,
-                            end: endBase,
-                            strand: Strand.Unknown,
-                            phase: null,
-                            attributes: { isCircular: false, custom: {} },
-                        };
-
-                        biobureauGeneTileset.addTopLevelFeature(feature);
-                        biobureauGeneMacroTileset.addTopLevelFeature(feature);
-
-                        saveTileset(biobureauGeneTileset, `${outputDirectory}/${species.toLowerCase()}.vgenes-dir/${species.toLowerCase()}`);
-                        saveTileset(biobureauGeneMacroTileset, `${outputDirectory}/${species.toLowerCase()}.vgenes-dir/${species.toLowerCase()}-macro`);
-
-                        function saveTileset(tileset: AnnotationTileset, directory: string) {
-                            for (let tile of tileset.sequences['main']) {
-                                let filename = `${tile.startIndex.toFixed(0)},${tile.span.toFixed(0)}`;
-                                let filePath = `${directory}/${filename}.json`;
-
-                                mkdirp.sync(path.dirname(filePath));
-
-                                if (!fs.existsSync(filePath)) {
-                                    fs.writeFileSync(filePath, JSON.stringify(tile.content));
-                                } else {
-                                    let existingContent: Array<GenomeFeature> = JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }));
-
-                                    for (let feature of tile.content) {
-                                        let match = existingContent.find((existingFeature) => {
-                                            return deepEqual(feature, existingFeature);
-                                        });
-                                        if (!match) {
-                                            existingContent.push(feature);
-                                        }
-                                    }
-
-                                    fs.writeFileSync(filePath, JSON.stringify(existingContent));
-                                }
-
-                                filesWritten.add(filePath);
-                            }
-                        }
+                    let metadataRange = rangeFromContig(vcf.metadata.contig.ID);
+                    if (metadataRange != null) {
+                        contigRange = metadataRange;
                     }
                 }
+                
+                let tileset = new Tileset(1 << 15);
+                for (let feature of vcf.features) {
+                    let featureIndex = parseInt(feature.POS);
+                    let range = rangeFromContig(feature.CHROM) || contigRange;
+                    let featureAbsoluteIndex = range.startIndex + (parseInt(feature.POS) - 1);
+                    
+                    tileset.addFeature('main', featureAbsoluteIndex, 1, {
+                        id: feature.ID,
+                        baseIndex: featureAbsoluteIndex,
+                        refSequence: feature.REF,
+                        alts: feature.ALT.split('')
+                    });
+                }
 
-                let array = new Array<string>();
-                for (let path of filesWritten) array.push(path);
-                resolve(array);
+                // @! temporary for demo
+                let species = 'l_fortunei';
+                saveSequence(tileset.sequences['main'] || [], `${outputDirectory}/${species.toLowerCase()}.vvariants-dir/${species.toLowerCase()}`);
+
+                // @! temporary, save out genes for biobureau demo
+                filesWritten = filesWritten.concat(biobureauGenerateGenes(inputFilePath, outputDirectory, vcf));
+
+                resolve(filesWritten);
             }
         });
 
@@ -122,6 +66,127 @@ export function vcfConvert(inputFilePath: string, outputDirectory: string): Prom
     });
 }
 
+function rangeFromContig(contig: string) {
+    let match = /:(\d+)-(\d+)/.exec(contig);
+    if (match) {
+        let startBase = parseInt(match[1]);
+        let endBase = parseInt(match[2]);
+
+        return {
+            startIndex: startBase - 1,
+            length: (endBase - startBase) + 1
+        }
+    } else {
+
+    }
+}
+
+function saveSequence(
+    sequence: Array<{
+        startIndex: number,
+        span: number,
+        content: Array<any>
+    }>,
+    directory: string
+) {
+    let filesWritten = new Set<string>();
+    for (let tile of sequence) {
+        let filename = `${tile.startIndex.toFixed(0)},${tile.span.toFixed(0)}`;
+        let filePath = `${directory}/${filename}.json`;
+
+        mkdirp.sync(path.dirname(filePath));
+
+        if (!fs.existsSync(filePath)) {
+            fs.writeFileSync(filePath, JSON.stringify(tile.content));
+        } else {
+            let existingContent: Array<GenomeFeature> = JSON.parse(fs.readFileSync(filePath, { encoding: 'utf8' }));
+
+            for (let feature of tile.content) {
+                let match = existingContent.find((existingFeature) => {
+                    return deepEqual(feature, existingFeature);
+                });
+                if (!match) {
+                    existingContent.push(feature);
+                }
+            }
+
+            fs.writeFileSync(filePath, JSON.stringify(existingContent));
+        }
+
+        filesWritten.add(filePath);
+    }
+    return filesWritten; 
+}
+
+// @! temporary to generate genes from custom biobureau files
+function biobureauGenerateGenes(inputFilePath: string, outputDirectory: string, vcf: VCF4_2) {
+    const lodLevel0TileSize = 1 << 20;
+
+    let biobureauFilenameMatch = /^LF_itr6_\d+_([^\.]+)/.exec(path.basename(inputFilePath));
+    let biobureauGeneName: string;
+    if (biobureauFilenameMatch) {
+        biobureauGeneName = biobureauFilenameMatch[1];
+    } else {
+        throw `Biobureau demo: filename does not match (@! remove this)`;
+    }
+
+    let filesWritten = new Set();
+
+    let biobureauGeneTileset = new AnnotationTileset(
+        lodLevel0TileSize, // ~1 million,
+        false,
+        (f) => Terminal.error(`Unknown feature`, f),
+        Terminal.error,
+    );
+
+    let macroLodLevel = 5;
+    let biobureauGeneMacroTileset = new AnnotationTileset(
+        lodLevel0TileSize * (1 << macroLodLevel),
+        true,
+        (f) => Terminal.error(`Unknown feature`, f),
+        Terminal.error,
+    );
+
+    if (vcf.metadata.contig != null) {
+        let biobureauContigPattern = /([^.]+)\.([^:]+):(\d+)-(\d+)/;
+        let biobureauMatch = biobureauContigPattern.exec(vcf.metadata.contig.ID);
+
+        if (biobureauMatch != null) {
+            let species = biobureauMatch[1];
+            let namedRegion = biobureauMatch[2];
+            let startBase = parseInt(biobureauMatch[3]);
+            let endBase = parseInt(biobureauMatch[4]);
+
+            let feature = {
+                sequenceId: 'main',
+                id: biobureauGeneName,
+                name: biobureauGeneName,
+                type: 'gene',
+                children: [],
+                start: startBase,
+                end: endBase,
+                strand: Strand.Unknown,
+                phase: null,
+                attributes: { isCircular: false, custom: {} },
+            };
+
+            biobureauGeneTileset.addTopLevelFeature(feature);
+            biobureauGeneMacroTileset.addTopLevelFeature(feature);
+
+            saveSequence(biobureauGeneTileset.sequences['main'] || [], `${outputDirectory}/${species.toLowerCase()}.vgenes-dir/${species.toLowerCase()}`);
+            saveSequence(biobureauGeneMacroTileset.sequences['main'] || [], `${outputDirectory}/${species.toLowerCase()}.vgenes-dir/${species.toLowerCase()}-macro`);
+        }
+    }
+
+    let array = new Array<string>();
+    for (let path of filesWritten) array.push(path);
+    return array;
+}
+
+/**
+ * VCF v4.2 Parser
+ * @author George Corney (haxiomic)
+ */
 enum VCFParseMode {
     LINE_START,
     META_LINE,
@@ -263,7 +328,7 @@ class VCFParser {
                             break;
                         }
                         case '\n': {
-                            // ignore
+                            // ignore empty lines
                             break;
                         }
                         default: {
@@ -271,7 +336,7 @@ class VCFParser {
                             if (/\s/.test(char)) {
                                 // ignore
                             } else {
-                                // metadata is complete
+                                // metadata is complete (all metadata lines start with a #)
                                 this.onMetaComplete(this.output.metadata);
                                 parserState.mode = VCFParseMode.FEATURE_LINE;
                                 parserState.featureLineBuffer = char;
@@ -334,6 +399,8 @@ class VCFParser {
     }
 
     protected onMetaLine(line: string) {
+        if (line.trim() === '') return;
+
         if (line.substr(0, 2) === '##') {
             // meta line
             let eqIndex = line.indexOf('=', 2);
@@ -372,9 +439,16 @@ class VCFParser {
     }
 
     protected onFeatureLine(line: string) {
+        if (line.trim() === '') return;
+
         let feature: any = {};
 
         let parts = line.split('\t');
+        
+        if (parts.length !== this.output.columns.length) {
+            this.callbacks.onError(`Unexpected number of columns for feature line "${line}", got ${parts.length}, expected ${this.output.columns.length}`);
+        }
+
         for (let i = 0; i < parts.length; i++) {
             let columnHeader = this.output.columns[i];
             if (columnHeader == null) {

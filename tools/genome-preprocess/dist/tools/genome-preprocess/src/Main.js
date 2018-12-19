@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const FileSystemUtils_1 = require("./FileSystemUtils");
 const Convert_1 = require("./gff3/Convert");
+const Convert_2 = require("./vcf/Convert");
 const outputDirectory = 'hpgv-files';
 let userArgs = process.argv.slice(2);
 if (userArgs.length === 0) {
@@ -35,7 +36,7 @@ if (filePaths.length === 0) {
     Terminal_1.default.error(`No files found in "${inputPath}" (subdirectories are ignored)`);
     process.exit(1);
 }
-Terminal_1.default.log(`Files queued for conversion:\n\t<b>${filePaths.join('\n\t')}</b>`);
+Terminal_1.default.log(`Files queued for conversion:\n\t<i,dim>${filePaths.join('\n\t')}</>`);
 // build a chain of promises to convert the files
 // this ensures file conversion is sequential rather than parallel (which improves logging)
 let processAllPromise = Promise.resolve();
@@ -53,6 +54,9 @@ function processFile(filePath) {
         case '.fasta': {
             Terminal_1.default.warn(`FASTA not yet implemented`);
             return Promise.resolve(null);
+        }
+        case '.vcf': {
+            return Convert_2.vcfConvert(filePath, outputDirectory);
         }
         default: {
             Terminal_1.default.warn(`Unknown file type "${ext}" for "${filePath}"`);

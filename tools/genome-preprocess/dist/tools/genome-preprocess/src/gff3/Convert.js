@@ -23,13 +23,13 @@ const Gff3Parser_1 = require("genomics-formats/lib/gff3/Gff3Parser");
 const Terminal_1 = require("../Terminal");
 const FileSystemUtils_1 = require("../FileSystemUtils");
 // settings
-function gff3Convert(inputFilePath, saveInto) {
+function gff3Convert(inputFilePath, outputDirectory) {
     return new Promise((resolve, reject) => {
         let parsedPath = path.parse(inputFilePath);
         const filename = parsedPath.name;
-        const outputDirectory = `${saveInto}/${filename}.vgenes-dir`;
-        FileSystemUtils_1.deleteDirectory(outputDirectory);
-        fs.mkdirSync(outputDirectory);
+        const vgenesDirectory = `${outputDirectory}/${filename}.vgenes-dir`;
+        FileSystemUtils_1.deleteDirectory(vgenesDirectory);
+        fs.mkdirSync(vgenesDirectory);
         const featureTypeBlacklist = ['biological_region', 'chromosome'];
         // initialize
         let unknownFeatureTypes = {};
@@ -98,7 +98,7 @@ function gff3Convert(inputFilePath, saveInto) {
                 if (Object.keys(skippedFeatureTypes).length > 0) {
                     Terminal_1.Terminal.log('Skipped features:<b>', skippedFeatureTypes);
                 }
-                resolve(outputDirectory);
+                resolve(vgenesDirectory);
             }
         }, storeFeatures);
         stream.on('data', parser.parseChunk);
@@ -109,8 +109,8 @@ function gff3Convert(inputFilePath, saveInto) {
             completedSequences.add(sequenceId);
             // save tiles to disk
             // assume all sequences represent chromosome and prefix with chr
-            saveTiles(tileset.sequences[sequenceId], `${outputDirectory}/chr${sequenceId}`);
-            saveTiles(macroTileset.sequences[sequenceId], `${outputDirectory}/chr${sequenceId}-macro`);
+            saveTiles(tileset.sequences[sequenceId], `${vgenesDirectory}/chr${sequenceId}`);
+            saveTiles(macroTileset.sequences[sequenceId], `${vgenesDirectory}/chr${sequenceId}-macro`);
             // release sequence tile data to GC since we no longer need it
             delete tileset.sequences[sequenceId];
             delete macroTileset.sequences[sequenceId];

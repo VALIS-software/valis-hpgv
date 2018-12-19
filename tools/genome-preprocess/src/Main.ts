@@ -41,7 +41,7 @@ if (filePaths.length === 0) {
 	process.exit(1);
 }
 
-Terminal.log(`Files queued for conversion:\n\t<b>${filePaths.join('\n\t')}</b>`);
+Terminal.log(`Files queued for conversion:\n\t<i,dim>${filePaths.join('\n\t')}</>`);
 
 // build a chain of promises to convert the files
 // this ensures file conversion is sequential rather than parallel (which improves logging)

@@ -3,6 +3,7 @@ import UsageCache from "engine/ds/UsageCache";
 import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import Text from "engine/ui/Text";
+import { Strand } from "genomics-formats/lib/gff3/Strand";
 import IntervalInstances from "../../ui/util/IntervalInstances";
 import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene } from "./AnnotationTileLoader";
@@ -16,6 +17,12 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     protected readonly namesLodBlendRange: number;
     protected readonly namesLodThresholdLow: number;
     protected readonly namesLodThresholdHigh: number;
+    protected readonly annotationY: {
+        [Strand.Positive]: number;
+        [Strand.Negative]: number;
+        [Strand.Unknown]: number;
+        [Strand.None]: number;
+    };
     protected macroModel: MacroAnnotationTrackModel;
     protected pointerState: TrackPointerState;
     readonly compact: boolean;

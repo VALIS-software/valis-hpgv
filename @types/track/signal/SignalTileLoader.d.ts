@@ -38,7 +38,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
     mapLodLevel(l: number): number;
     /**
-    * Executes callback on every current tile value within the range x0 to x1 at a given lod.
+    * Executes callback on every tile value within the range x0 to x1 at a given lod (if the tile has loaded).
     * Successively higher lods are used to fill in missing gaps for tiles that have not yet loaded.
     * If there are no loaded tiles in this range the callback will not fire
     */
@@ -46,11 +46,21 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     private _initializationPromise;
     protected initializationPromise(): Promise<void>;
     protected onReady(): void;
+    /**
+     * Generate a BigWig loader instance for a given BigWig file path
+     */
     protected getBigWigLoader(path: string): Promise<BigWigLoader>;
+    /**
+     * Convert a BigWig zoom levels header into maps so we can lookup the zoom level for any given lod
+     */
     protected generateLodLookups(bigWigHeader: HeaderData): {
         lodMap: Array<number>;
         lodZoomIndexMap: Array<number>;
     };
+    /**
+     * Given a BigWig loader instance, load BigWig data to cover *tile* into texture ArrayBuffer *buffer*.
+     * Copies values into *targetChannel* assuming *nChannels* texture channels.
+     */
     protected getBigWigData(bigWigLoader: BigWigLoader, tile: Tile<SignalTilePayload>, buffer: Float32Array, nChannels: number, targetChannel: number): Promise<Float32Array>;
     protected loadPayloadBuffer(tile: Tile<SignalTilePayload>): Promise<Float32Array>;
     protected getTilePayload(tile: Tile<SignalTilePayload>): Promise<SignalTilePayload>;

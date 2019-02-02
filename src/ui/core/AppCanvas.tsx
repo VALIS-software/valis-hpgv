@@ -290,8 +290,13 @@ export class AppCanvas extends React.Component<Props, State> {
         let y: number = 0;
 
         let canvasRect = this.canvas.getBoundingClientRect();
-        let canvasX = window.scrollX + this.canvas.clientLeft;
+
+        // canvas coordinate in absolute space, rather than viewport space
+        // this means that the coordinates are the same independent of page scroll
+        // see https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+        let canvasX = window.scrollX + canvasRect.left;
         let canvasY = window.scrollY + canvasRect.top;
+
         x = e.pageX - canvasX;
         y = e.pageY - canvasY;
 

@@ -34,6 +34,7 @@
     "create-ts-index": "1.0.x",
     "file-loader": "2.0.x",
     "rimraf": "^2.6.2",
+    "text-loader": "0.0.1",
     "ts-loader": "4.2.x",
     "typescript": "3.0.x",
     "url-loader": "1.1.x",

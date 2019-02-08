@@ -296,7 +296,7 @@ export class GenomeVisualizer {
         }
         let width = props.width == null ? 800 : props.width;
         let height = props.height == null ? 600 : props.height;
-        return (
+        return (<div>
             <AppCanvas
                 ref={(v) => {
                     this.appCanvasRef = v;
@@ -316,7 +316,8 @@ export class GenomeVisualizer {
                     this.stopFrameLoop();
                 }}
             />
-        );
+            <div className="hpgv_proxy hpgv_track"></div>
+        </div>);
     }
 
     private _frameLoopHandle: number = 0;
@@ -366,6 +367,24 @@ export class GenomeVisualizer {
         return trackClass;
     }
 
+    static setBaseStyle(cssString: string) {
+        let hpgvStyleEl = document.head.querySelector('style#hpgv-base');
+        if (hpgvStyleEl == null) {
+            // add hpgv style
+            hpgvStyleEl = document.createElement('style');
+            hpgvStyleEl.id = 'hpgv-base';
+            (document.head as any).prepend(hpgvStyleEl);
+        }
+        hpgvStyleEl.innerHTML = cssString;
+    }
+
+    static removeBaseStyle() {
+        let hpgvStyleEl = document.head.querySelector('style#hpgv-base');
+        if (hpgvStyleEl != null) {
+            hpgvStyleEl.remove();
+        }
+    }
+
     private static trackTypes: {
         [ type: string ]: {
             tileLoaderClass: CustomTileLoader<TrackModel>
@@ -382,5 +401,7 @@ GenomeVisualizer.registerTrackType('interval', IntervalTileLoader, IntervalTrack
 GenomeVisualizer.registerTrackType('sequence', SequenceTileLoader, SequenceTrack);
 GenomeVisualizer.registerTrackType('variant', VariantTileLoader, VariantTrack);
 GenomeVisualizer.registerTrackType('signal', SignalTileLoader, SignalTrack);
+
+GenomeVisualizer.setBaseStyle(require('./styles/default.css'));
 
 export default GenomeVisualizer;

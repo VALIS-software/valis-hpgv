@@ -1,0 +1,35 @@
+.hpgv_proxy {
+    display: none;
+}
+
+.hpgv_ui-block {
+    color: #e8e8e8;
+    background-color: #171615;
+    font-size: 12px;
+    border-radius: 8px;
+}
+
+.hpgv_panel-header {
+    font-weight: 200;
+}
+
+.hpgv_track-header {
+    font-size: 15px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.hpgv_track-close-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.hpgv_track-add-button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* The following are draw via WebGL, so only the properties CSS used here can be changed */
+.hpgv_track {
+    background-color: red;    
+}

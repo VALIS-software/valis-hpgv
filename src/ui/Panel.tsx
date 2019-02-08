@@ -728,8 +728,6 @@ class PanelHeader extends React.Component<PanelProps,{}> {
             marginLeft: 8
         }
 
-        const iconColor = 'rgb(171, 171, 171)';
-        const iconHoverColor = 'rgb(255, 255, 255)';
         const iconViewBoxSize = '0 0 32 32';
         
         const closeIcon = this.props.enableClose ? (
@@ -738,7 +736,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 right: 0
             }}>
                 <IconButton onClick={() => this.props.onClose(this.props.panel)} color="inherit">
-                    <CloseIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                    <CloseIcon />
                 </IconButton>
             </div>
         ) : null;
@@ -749,7 +747,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 left: 0
             }}>
                 <IconButton onClick={() => this.props.onPreviousContig(this.props.panel)} color="inherit">
-                    <ChevronLeftIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                    <ChevronLeftIcon />
                 </IconButton>
             </div>
         );
@@ -760,7 +758,7 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 right: 0
             }}>
                 <IconButton onClick={() => this.props.onNextContig(this.props.panel)} color="inherit">
-                    <ChevronRightIcon /*color='rgb(171, 171, 171)' hoverColor='rgb(255, 255, 255)'*/ />
+                    <ChevronRightIcon />
                 </IconButton>
             </div>
         );
@@ -787,16 +785,12 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                     <CancelIcon
                         onClick={() => this.props.onEditCancel()} 
                         viewBox={iconViewBoxSize}
-                        // color={iconColor}
-                        // hoverColor={iconHoverColor} 
                     />
                 </span>
                 <span style={headerStyle}>
                     <CheckIcon 
                         onClick={() => this.props.onEditSave(userRangeSpecifier)} 
                         viewBox={iconViewBoxSize}
-                        // color={iconColor}
-                        // hoverColor={iconHoverColor} 
                     />
                 </span>
                 {closeIcon}
@@ -808,8 +802,6 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 <span style={headerStyle} onClick={() => this.props.onEditStart()}>
                     <EditIcon 
                         viewBox={iconViewBoxSize}
-                        // color={iconColor}
-                        // hoverColor={iconHoverColor} 
                     />
                 </span>
                 {this.props.enableContigNavigation ? nextIcon : null}
@@ -817,15 +809,11 @@ class PanelHeader extends React.Component<PanelProps,{}> {
         }
 
         return <div
+            className="hpgv_ui-block hpgv_panel-header"
             style={{
                 position: 'relative',
                 width: '100%',
                 height: '100%',
-                color: '#e8e8e8',
-                backgroundColor: '#171615',
-                borderRadius: '8px',
-                fontSize: '12px',
-                fontWeight: 200,
                 overflow: 'hidden',
                 userSelect: 'none',
             }}

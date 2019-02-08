@@ -835,15 +835,13 @@ export class TrackViewer extends Object2D {
         track: RowObject,
     }) {
         return <div
+            className="hpgv_ui-block hpgv_track-close-button"
             style={{
                 position: 'relative',
                 height: '100%',
                 width: '100%',
-                color: '#e8e8e8',
                 overflow: 'hidden',
                 userSelect: 'none',
-                backgroundColor: '#171615',
-                borderRadius: '0px 8px 8px 0px',
             }}
         >
             <div style={{
@@ -865,8 +863,6 @@ export class TrackViewer extends Object2D {
         setExpanded?: (state: boolean) => void,
         isExpanded: boolean,
     }) {
-        const iconColor = 'rgb(171, 171, 171)';
-        const iconHoverColor = 'rgb(255, 255, 255)';
         const iconViewBoxSize = '0 0 32 32';
         const style = {
             marginTop: 8,
@@ -884,18 +880,13 @@ export class TrackViewer extends Object2D {
         const expandArrow = (<ArrowElem
             style={style}
             viewBox={iconViewBoxSize}
-        // color={iconColor}	
-        // hoverColor={iconHoverColor}	
         />);
         return <div
+            className="hpgv_ui-block hpgv_track-header"
             style={{
                 position: 'relative',
                 width: '100%',
                 height: '100%',
-                color: '#e8e8e8',
-                backgroundColor: '#171615',
-                borderRadius: '8px 0px 0px 8px',
-                fontSize: '15px',
                 overflow: 'hidden',
                 userSelect: 'none',
             }}
@@ -923,13 +914,11 @@ export class TrackViewer extends Object2D {
         onClick: () => void,
     }) {
         return <div
+            className="hpgv_ui-block hpgv_track-add-button"
             style={{
                 position: 'relative',
                 width: '100%',
                 height: '100%',
-                color: '#e8e8e8',
-                backgroundColor: '#171615',
-                borderRadius: '8px 0px 0px 8px',
             }}
         >
             <div style={{

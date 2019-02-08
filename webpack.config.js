@@ -45,6 +45,11 @@ module.exports = (env, argv) => {
                 {
                     test: /\.bin/,
                     loader: 'url-loader'
+                },
+                // css are loaded as strings
+                {
+                    test: /\.css/,
+                    loader: 'text-loader'
                 }
             ]
         },

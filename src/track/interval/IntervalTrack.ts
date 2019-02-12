@@ -29,18 +29,9 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
     }
 
     // @! needs releasing
-    protected _intervalTileCache = new UsageCache<IntervalInstances>(
-        null,
-        (instances) => instances.releaseGPUResources(),
-    );
-    protected _tileNodes = new UsageCache<IntervalInstances>(
-        null,
-        (t) => this.removeTileNode(t),
-    );
-    protected _labels = new UsageCache<IntervalTrackLabel>(
-        null,
-        (label) => this.removeLabel(label),
-    );
+    protected _intervalTileCache = new UsageCache<IntervalInstances>(null, (instances) => instances.releaseGPUResources());
+    protected _tileNodes = new UsageCache<IntervalInstances>(null, (t) => this.removeTileNode(t));
+    protected _labels = new UsageCache<IntervalTrackLabel>(null, (label) => this.removeLabel(label));
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._tileNodes.markAllUnused();
         this._labels.markAllUnused();

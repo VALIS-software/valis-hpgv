@@ -12,6 +12,7 @@ import { OpenSansRegular } from "../../ui";
 import Animator from "../../Animator";
 import { Shaders } from "../../Shaders";
 import TrackModel from "../TrackModel";
+import { StyleProxy } from "../../ui/util/StyleProxy";
 
 export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
 
@@ -97,6 +98,13 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         (window as any).setDisplayScale = (x: number) => {
             this.setDisplayScale(x);
         }
+    }
+
+    applyStyle(styleProxy: StyleProxy) {
+        super.applyStyle(styleProxy);
+
+        this.yAxis.color = styleProxy.getColor('--text') || this.yAxis.color;
+        this.signalReading.color = styleProxy.getColor('--text') || this.signalReading.color;
     }
 
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle) {

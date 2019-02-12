@@ -26,11 +26,19 @@
 }
 
 /* The following are draw via WebGL, so only the properties CSS used here can be changed */
+/*
+.hpgv_panel {
+    --axis-color: black;
+}
+*/
+
 .hpgv_track {
     background-color: #191919;
+    --axis: white;
     --loading-indicator: white;
     --cursor: rgba(255, 255, 255, 0.8);
     --secondary-cursor: rgba(52, 52, 52, 0.6);
+    --text: white;
 }
 
 .hpgv_track-annotation {
@@ -39,5 +47,4 @@
     --coding: rgba(26, 174, 222, 0.58);
     --non-coding: rgba(82, 75, 165, 0.4);
     --untranslated: rgba(138, 136, 191, 0.38);
-    --text: white;
 }

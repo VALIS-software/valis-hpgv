@@ -7,6 +7,7 @@ import { OpenSansRegular } from "../ui/font/Fonts";
 import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { Scalar } from "engine/math/Scalar";
+import { StyleProxy } from "../ui/util/StyleProxy";
 
 export class TrackObject<
     ModelType extends TrackModel = TrackModel,
@@ -42,7 +43,10 @@ export class TrackObject<
     protected loadingIndicatorPadding = 0.1;
 
     constructor(protected readonly model: ModelType) {
-        super(0, 0, [0.1, 0.1, 0.1, 1]);
+        super(0, 0);
+        
+        // set default background color
+        this.color = [0.1, 0.1, 0.1, 1];
 
         this.cursorStyle = this.defaultCursor;
     
@@ -165,11 +169,27 @@ export class TrackObject<
         return samplingDensity;
     }
 
+    applyStyle(styleProxy: StyleProxy) {
+        this.color = styleProxy.getColor('background-color');
+        this.loadingIndicator.color = styleProxy.getColor('--loading-indicator') || this.loadingIndicator.color;
+        this.activeAxisPointerColor = styleProxy.getColor('--cursor') || this.activeAxisPointerColor;
+        this.secondaryAxisPointerColor = styleProxy.getColor('--secondary-cursor') || this.secondaryAxisPointerColor;
+    }
+
+    /**
+     * Override to handle drawing
+     */
+    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
+    }
+
     protected getTileLoader(): TileLoaderType {
         return this.dataSource.getTileLoader(this.model, this.contig) as any;
     }
 
-    protected _loadingTiles = new UsageCache<Tile<any>>();
+    protected _loadingTiles = new UsageCache<Tile<any>>(
+        null,
+        (tile) => this.removeTileLoadingDependency(tile),
+    );
     protected triggerDisplayUpdate() {
         this._loadingTiles.markAllUnused();
         this.displayNeedUpdate = false;
@@ -212,15 +232,9 @@ export class TrackObject<
             _lastMappedLod = mappedLod;
         }
 
-        this._loadingTiles.removeUnused(this.removeTileLoadingDependency);
+        this._loadingTiles.removeUnused();
 
         this.toggleLoadingIndicator((this._loadingTiles.count > 0) || this.displayLoadingIndicator, true);
-    }
-
-    /**
-     * Override to handle drawing
-     */
-    updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
     }
 
     /**
@@ -283,10 +297,10 @@ export class AxisPointer extends Rect {
     setStyle(style: AxisPointerStyle) {
         switch (style) {
             case AxisPointerStyle.Active:
-                this.color.set(this.activeColor);
+                this.color = this.activeColor;
                 break;
             case AxisPointerStyle.Secondary:
-                this.color.set(this.secondaryColor);
+                this.color = this.secondaryColor;
                 break;
         }
 

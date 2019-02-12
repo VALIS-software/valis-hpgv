@@ -89,7 +89,10 @@ export class Axis extends Object2D {
 
     protected clippingMask: Rect;
 
-    protected labelCache = new UsageCache<Label>();
+    protected labelCache = new UsageCache<Label>(
+        null,
+        (label) => this.deleteLabel(label),
+    );
 
     protected _labelsNeedUpdate: boolean;
     protected _lastComputedWidth: number;
@@ -187,7 +190,7 @@ export class Axis extends Object2D {
     protected resetLabels() {
         if (this.labelCache === undefined) return;
 
-        this.labelCache.removeAll(this.deleteLabel);
+        this.labelCache.removeAll();
         this._labelsNeedUpdate = true;
     }
 
@@ -197,7 +200,7 @@ export class Axis extends Object2D {
         // guard case where we cannot display anything
         let span = this.x1 - this.x0;
         if (span === 0) {
-            this.labelCache.removeUnused(this.deleteLabel);
+            this.labelCache.removeUnused();
             return;
         }
 
@@ -239,7 +242,7 @@ export class Axis extends Object2D {
             this.touchLabel(xMajor, 1, span, yMode);
         }
 
-        this.labelCache.removeUnused(this.deleteLabel);
+        this.labelCache.removeUnused();
         this._labelsNeedUpdate = false;
     }
 
@@ -447,8 +450,8 @@ class Label extends Object2D {
     }
 
     setColor(r: number, g: number, b: number, a: number) {
-        this.text.color.set([r, g, b, a]);
-        this.tick.color.set([r, g, b, a * 0.5]);
+        this.text.color = [r, g, b, a];
+        this.tick.color = [r, g, b, a * 0.5];
     }
 
     setMask(mask: Renderable<any>) {

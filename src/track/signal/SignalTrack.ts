@@ -299,7 +299,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
             this.displayLoadingIndicator = true;
 
             if (this._tileNodeCache.count > 0) {
-                this._tileNodeCache.removeAll((n) => this.deleteTileNode(n));
+                this._tileNodeCache.removeAll();
             }
             // keep updating display until tileLoader is complete
             this.displayNeedUpdate = true;

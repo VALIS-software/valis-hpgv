@@ -27,6 +27,7 @@ import Panel, { PanelInternal } from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
 import { DEFAULT_SPRING } from "./UIConstants";
 import { OpenSansRegular } from "./font";
+import { StyleProxy } from "./util/StyleProxy";
 
 export class TrackViewer extends Object2D {
 
@@ -59,6 +60,8 @@ export class TrackViewer extends Object2D {
     protected masks = new Array<Object2D>();
     protected nothingToDisplay: Text;
 
+    protected styleProxies: { [trackType: string]: StyleProxy } = {};
+    
     constructor() {
         super();
 
@@ -452,6 +455,30 @@ export class TrackViewer extends Object2D {
 
     resetNothingToDisplayText() {
         this.nothingToDisplay.string = 'Nothing to display';
+    }
+
+    setTrackStyleNode(trackType: string, node: HTMLElement) {
+        // end any existing style proxy callbacks
+        if (this.styleProxies[trackType]) {
+            this.styleProxies[trackType].removeAllObservers();
+        }
+
+        let styleProxy = this.styleProxies[trackType] = new StyleProxy(node);
+
+        styleProxy.observeAllStyle(() => this.updateStyle(trackType));
+        this.updateStyle(trackType);
+    }
+
+    updateStyle(trackType: string) {
+        let styleProxy = this.styleProxies[trackType];
+        if (styleProxy == null) return;
+
+        // update style for tracks if any of the style attributes are changed
+        for (let track of this.tracks) {
+            if (track.model.type === trackType) {
+                track.applyStyle(styleProxy);
+            }
+        }
     }
 
     protected onPanelsChanged() {
@@ -962,7 +989,10 @@ export class Track {
         protected _heightPx: number,
         protected onHeightChanged: () => void
     ) {
+    }
 
+    applyStyle(styleProxy: StyleProxy) {
+        this.rowObject.applyStyle(styleProxy);
     }
 
 }
@@ -1000,6 +1030,7 @@ class RowObject {
     protected _h: number;
 
     protected _headerIsExpandedState: boolean | undefined = undefined;
+    protected styleProxy: StyleProxy;
 
     constructor(
         protected model: TrackModel,
@@ -1022,16 +1053,27 @@ class RowObject {
 
     setResizable(v: boolean) {
         this.resizeHandle.cursorStyle = v ? 'row-resize' : null;
-        this.resizeHandle.color.set(v ? [0, 1, 0, 1] : [0.3, 0.3, 0.3, 1]);
+        this.resizeHandle.color = (v ? [0, 1, 0, 1] : [0.3, 0.3, 0.3, 1]);
     }
     
     addTrackView(trackView: TrackObject) {
         this.trackViews.add(trackView);
+        if (this.styleProxy != null) {
+            trackView.applyStyle(this.styleProxy);
+        }
         this.layoutY();
     }
 
     removeTrackView(trackView: TrackObject) {
         this.trackViews.delete(trackView);
+    }
+
+    applyStyle(styleProxy: StyleProxy) {
+        this.styleProxy = styleProxy;
+
+        for (let view of this.trackViews) {
+            view.applyStyle(styleProxy);
+        }
     }
 
     /**

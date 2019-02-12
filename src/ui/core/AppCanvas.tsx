@@ -171,6 +171,7 @@ export class AppCanvas extends React.Component<Props, State> {
                         (ro) => <ReactObjectContainer key={ro.reactUid} reactObject={ro} scene={this.scene} />
                     )
                 }
+                {this.props.children}
             </div>
         );
     }

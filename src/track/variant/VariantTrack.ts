@@ -33,11 +33,19 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
         });
     }
 
-    protected _microTileCache = new UsageCache<IntervalInstances>();
-    protected _onStageAnnotations = new UsageCache<Object2D>();
-    protected _sequenceLabelCache = new UsageCache<{
-        root: Object2D, textParent: Object2D, text: TextClone,
-    }>();
+    // @! this needs clearing
+    protected _microTileCache = new UsageCache<IntervalInstances>(
+        null,
+        (instances) => instances.releaseGPUResources(),
+    );
+    protected _onStageAnnotations = new UsageCache<Object2D>(
+        null,
+        (t) => this.remove(t),
+    );
+    protected _sequenceLabelCache = new UsageCache<{root: Object2D, textParent: Object2D, text: TextClone,}>(
+        null,
+        (label) => this.deleteBaseLabel(label)
+    );
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
         this._sequenceLabelCache.markAllUnused();
@@ -266,8 +274,9 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
         }
 
-        this._onStageAnnotations.removeUnused((t) => this.remove(t));
-        this._sequenceLabelCache.removeUnused(this.deleteBaseLabel);
+        this._onStageAnnotations.removeUnused();
+        this._sequenceLabelCache.removeUnused();
+        this._microTileCache.removeUnused();
     }
 
     protected displayLabel(

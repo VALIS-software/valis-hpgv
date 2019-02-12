@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import Animator from "../../Animator";
 import UsageCache from "engine/ds/UsageCache";
 import { Scalar } from "engine/math/Scalar";
@@ -14,6 +16,7 @@ import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GeneClass, GenomeFeature, TranscriptClass, GenomeFeatureType } from "./AnnotationTypes";
+import { StyleProxy } from "../../ui/util/StyleProxy";
 
 const TRANSCRIPT_HEIGHT = 20;
 
@@ -38,11 +41,21 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
     protected macroModel: MacroAnnotationTrackModel;
 
-    protected pointerState: TrackPointerState = {
-        pointerOver: false,
+    readonly compact: boolean;
+
+    protected colors = {
+        'transcript-arrow': [138 / 0xff, 136 /0xff, 191 /0xff, 0.38],
+        'transcript': [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17],
+        'coding': [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4],
+        'non-coding': [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4],
+        'untranslated': [138 / 0xff, 136 / 0xff, 191 / 0xff, 0.38],
+        'text': [1, 1, 1, 1],
     }
 
-    readonly compact: boolean;
+    protected sharedState = {
+        colors: this.colors,
+        pointerOver: false,
+    }
 
     constructor(model: AnnotationTrackModel) {
         super(model);
@@ -54,20 +67,35 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
             type: 'macro-annotation'
         };
 
-        this.color.set([0.1, 0.1, 0.1, 1]);
-
         this.addInteractionListener('pointerenter', (e) => {
-            this.pointerState.pointerOver = true;
+            this.sharedState.pointerOver = true;
         });
 
         this.addInteractionListener('pointerleave', (e) => {
-            this.pointerState.pointerOver = false;
+            this.sharedState.pointerOver = false;
         });
     }
 
-    protected _macroTileCache = new UsageCache<IntervalInstances>();
-    protected _annotationCache = new UsageCache<{gene: GeneAnnotation, name: Text}>();
-    protected _onStageAnnotations = new UsageCache<Object2D>();
+    applyStyle(styleProxy: StyleProxy) {
+        super.applyStyle(styleProxy);
+
+        // clear caches
+        this._macroTileCache.removeAll();
+        this._annotationCache.removeAll();
+        this._onStageAnnotations.removeAll();
+        this.displayNeedUpdate = true;
+
+        for (let propertyName in this.colors) {
+            let color = styleProxy.getColor('--' + propertyName);
+            if (color != null) {
+                (this.colors as {[key: string]: Array<number>})[propertyName] = color;
+            }
+        }
+    }
+
+    protected _macroTileCache = new UsageCache<IntervalInstances>(null, (instances) => instances.releaseGPUResources());
+    protected _annotationCache = new UsageCache<{gene: GeneAnnotation, name: Text}>(null, (annotation) => this.deleteAnnotation(annotation));
+    protected _onStageAnnotations = new UsageCache<Object2D>(null, (node) => this.removeAnnotation(node));
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._onStageAnnotations.markAllUnused();
 
@@ -86,7 +114,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
             }
         }
 
-        this._onStageAnnotations.removeUnused(this.removeAnnotation);
+        this._onStageAnnotations.removeUnused();
     }
 
     protected updateMicroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, continuousLodLevel: number, opacity: number) {
@@ -111,7 +139,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create gene object
-                    let geneAnnotation = new GeneAnnotation(this.compact, gene, this.pointerState, this.onAnnotationClicked);
+                    let geneAnnotation = new GeneAnnotation(this.compact, gene, this.sharedState, this.onAnnotationClicked);
                     geneAnnotation.z = 1 / 4;
                     geneAnnotation.relativeH = 0;
 
@@ -127,7 +155,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.forEachSubNode((sub) => sub.mask = this);
 
                     // create name text
-                    let name = new Text(OpenSansRegular, gene.name, this.compact ? 11 : 16, [1, 1, 1, 1]);
+                    let name = new Text(OpenSansRegular, gene.name, this.compact ? 11 : 16, this.colors['text']);
                     name.mask = this;
                     name.y = geneAnnotation.y;
                     name.relativeY = geneAnnotation.relativeY;
@@ -198,7 +226,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         }
         */
 
-        this._annotationCache.removeUnused(this.deleteAnnotation);
+        this._annotationCache.removeUnused();
     }
 
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
@@ -214,14 +242,15 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 // initialize macro gene instances
                 // create array of gene annotation data
                 let instanceData = new Array<IntervalInstance>();
-                let nonCodingColor = [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4];
-                let codingColor = [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4];
                 const yPadding = 5;
 
                 for (let gene of tile.payload) {
                     if (this.model.strand != null && gene.strand !== this.model.strand) continue;
 
-                    let color = gene.class === GeneClass.NonProteinCoding ? nonCodingColor : codingColor;
+                    let color = gene.class === GeneClass.NonProteinCoding ? this.colors['non-coding'] : this.colors['coding'];
+
+                    let colorLowerAlpha = color.slice();
+                    colorLowerAlpha[3] *= .689655172;
 
                     if (this.compact) {
                         instanceData.push({
@@ -237,7 +266,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                             relativeW: gene.length / tile.span,
                             relativeH: 0.0,
 
-                            color: color,
+                            color: colorLowerAlpha,
                         });
                     } else {
                         let height = gene.transcriptCount * 20 + (gene.transcriptCount - 1) * 10 + 60;
@@ -254,7 +283,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                             relativeW: gene.length / tile.span,
                             relativeH: 0,
 
-                            color: color,
+                            color: colorLowerAlpha,
                         });
                     }
 
@@ -310,10 +339,6 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
 }
 
-type TrackPointerState = {
-    pointerOver: boolean,
-}
-
 
 class GeneAnnotation extends Object2D {
 
@@ -333,7 +358,7 @@ class GeneAnnotation extends Object2D {
     constructor(
         readonly compact: boolean,
         readonly gene: Gene,
-        trackPointerState: TrackPointerState,
+        sharedState: AnnotationTrack['sharedState'],
         onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void
     ) {
         super();
@@ -346,7 +371,7 @@ class GeneAnnotation extends Object2D {
             for (let i = 0; i < gene.transcripts.length; i++) {
                 let transcript = gene.transcripts[i];
 
-                let transcriptAnnotation = new TranscriptAnnotation(transcript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
+                let transcriptAnnotation = new TranscriptAnnotation(sharedState, transcript, gene.strand, (e, f) => onAnnotationClicked(e, f, gene));
                 transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
 
                 transcriptAnnotation.y = compact ? 0 : i * (TRANSCRIPT_HEIGHT + transcriptSpacing) + transcriptOffset;
@@ -369,7 +394,7 @@ class GeneAnnotation extends Object2D {
                 utr: [],
                 other: [],
             };
-            let transcriptAnnotation = new TranscriptAnnotation(emptyTranscript, gene.strand, trackPointerState, (e, f) => onAnnotationClicked(e, f, gene));
+            let transcriptAnnotation = new TranscriptAnnotation(sharedState, emptyTranscript, gene.strand, (e, f) => onAnnotationClicked(e, f, gene));
             transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
             transcriptAnnotation.y = 0;
             transcriptAnnotation.relativeW = 1;
@@ -394,19 +419,14 @@ class TranscriptAnnotation extends Object2D {
     protected _opacity: number = 1;
 
     constructor(
-        protected readonly transcript: Transcript, strand: Strand,
-        trackPointerState: TrackPointerState,
+        sharedState: AnnotationTrack['sharedState'],
+        protected readonly transcript: Transcript,
+        strand: Strand,
         onClick: (e: InteractionEvent, feature: GenomeFeature) => void,
     ) {
         super();
 
-        let transcriptColor = {
-            [TranscriptClass.Unspecified]: [0.5, 0.5, 0.5, 0.25],
-            [TranscriptClass.ProteinCoding]: [1, 0, 1, 0.25],
-            [TranscriptClass.NonProteinCoding]: [0, 1, 1, 0.25],
-        }
-
-        let backgroundColor = [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17]; // rgba(107, 109, 136, 0.17)
+        let backgroundColor = sharedState.colors['transcript'];
         let passiveOpacity = backgroundColor[3];
         let hoverOpacity = passiveOpacity * 3;
 
@@ -422,7 +442,7 @@ class TranscriptAnnotation extends Object2D {
         // highlight on mouse-over
         const springStrength = 300;
         background.addInteractionListener('pointermove', (e) => {
-            if (trackPointerState.pointerOver) {
+            if (sharedState.pointerOver) {
                 background.cursorStyle = 'pointer';
                 Animator.springTo(background.color, { 3: hoverOpacity }, springStrength);
             } else {
@@ -437,7 +457,7 @@ class TranscriptAnnotation extends Object2D {
 
         // callback on click
         background.addInteractionListener('pointerup', (e) => {
-            if (trackPointerState.pointerOver && e.isPrimary) {
+            if (sharedState.pointerOver && e.isPrimary) {
                 e.preventDefault();
                 e.stopPropagation();
                 onClick(e, transcript);
@@ -445,8 +465,8 @@ class TranscriptAnnotation extends Object2D {
         });
 
         /**/
-        let spanMarker = new TranscriptSpan(strand);
-        spanMarker.color.set([138 / 0xFF, 136 / 0xFF, 191 / 0xFF, 0.38]);
+        let spanMarker = new TranscriptSpan(sharedState, strand);
+        spanMarker.color = sharedState.colors['transcript-arrow'];
         spanMarker.h = 10;
         spanMarker.relativeW = 1;
         spanMarker.originY = -0.5;
@@ -458,7 +478,7 @@ class TranscriptAnnotation extends Object2D {
 
         // create exons
         for (let exonInfo of transcript.exon) {
-            let exon = new Exon();
+            let exon = new Exon(sharedState);
             exon.z = 0.25;
             exon.relativeH = 1;
             exon.relativeX = (exonInfo.startIndex - transcript.startIndex) / transcript.length;
@@ -468,7 +488,7 @@ class TranscriptAnnotation extends Object2D {
 
         // create untranslated regions
         for (let utrInfo of transcript.utr) {
-            let utr = new UTR();
+            let utr = new UTR(sharedState);
             utr.z = 0.5;
             utr.relativeH = 1;
             utr.relativeX = (utrInfo.startIndex - transcript.startIndex) / transcript.length;
@@ -487,7 +507,7 @@ class TranscriptAnnotation extends Object2D {
 
             let cdsInfo = transcript.cds[i];
 
-            let cds = new CDS(cdsInfo.length, cdsInfo.phase, strand, mRnaIndex);
+            let cds = new CDS(sharedState, cdsInfo.length, cdsInfo.phase, strand, mRnaIndex);
 
             cds.z = 0.75;
             cds.relativeH = 1;
@@ -504,9 +524,9 @@ class TranscriptAnnotation extends Object2D {
 
 class Exon extends Rect {
 
-    constructor() {
+    constructor(sharedState: AnnotationTrack['sharedState']) {
         super(0, 0);
-        this.color.set([82 / 0xff, 75 / 0xff, 165 / 0xff, 0.3]); // rgba(82, 75, 165, 0.3)
+        this.color = sharedState.colors['non-coding'];
         this.transparent = true;
     }
 
@@ -547,9 +567,9 @@ class Exon extends Rect {
 
 class UTR extends Rect {
 
-    constructor() {
+    constructor(sharedState: AnnotationTrack['sharedState']) {
         super(0, 0);
-        this.color.set([138/0xff, 136/0xff, 191/0xff, 0.38]); // rgba(138, 136, 191, 0.38)
+        this.color = sharedState.colors['untranslated'];
         this.transparent = true;
     }
 
@@ -606,6 +626,7 @@ class CDS extends Rect {
     protected phase: number;
 
     constructor(
+        sharedState: AnnotationTrack['sharedState'],
         protected length_bases: number,
         phase: number, // number of bases to substract from start to reach first complete codon
         strand: Strand,
@@ -626,7 +647,7 @@ class CDS extends Rect {
 
         this.reverse = strand === Strand.Negative ? 1.0 : 0.0;
 
-        this.color.set([26 / 0xff, 174 / 0xff, 222 / 0xff, 0.58]); // rgba(26, 174, 222, 0.58)
+        this.color = sharedState.colors['coding']; // rgba(26, 174, 222, 0.58)
         this.transparent = true;
         this.blendMode = BlendMode.PREMULTIPLIED_ALPHA;
     }
@@ -706,10 +727,10 @@ class CDS extends Rect {
 
 class TranscriptSpan extends Rect {
 
-    constructor(protected direction: Strand) {
+    constructor(sharedState: AnnotationTrack['sharedState'], protected direction: Strand) {
         super(0, 0);
 
-        this.color.set([0, 1, 0, 1]);
+        this.color = ([0, 1, 0, 1]);
     }
 
     draw(context: DrawContext) {

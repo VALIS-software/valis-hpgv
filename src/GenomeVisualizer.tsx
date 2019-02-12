@@ -44,7 +44,8 @@ interface CustomTileLoader<ModelType> {
 interface CustomTrackObject {
     new(model: TrackModel): TrackObject<TrackModel, any>;
 
-    defaultHeightPx?: number; // optionally override the default track height    
+    defaultHeightPx?: number; // optionally override the default track height
+    styleProxy?: React.ReactNode; // occasionally it might be useful to have sub nodes within a track's style proxy node
 }
 export class GenomeVisualizer {
 
@@ -291,11 +292,22 @@ export class GenomeVisualizer {
         width: null,
         height: null,
     }) {
-        if (props == null) {
-            ;
-        }
         let width = props.width == null ? 800 : props.width;
         let height = props.height == null ? 600 : props.height;
+
+        let trackStyleNodes = new Array<React.ReactNode>();
+        for (let trackType in GenomeVisualizer.trackTypes) {
+            let trackClass = GenomeVisualizer.trackTypes[trackType];
+
+            trackStyleNodes.push(
+                <div key={trackType} className={`hpgv_track hpgv_track-${trackType}`} ref={(node) => {
+                    this.trackViewer.setTrackStyleNode(trackType, node);
+                }}>
+                    {trackClass.trackObjectClass.styleProxy}
+                </div>
+            );
+        }
+
         return (<div>
             <AppCanvas
                 ref={(v) => {
@@ -304,7 +316,7 @@ export class GenomeVisualizer {
                 }}
                 width={width}
                 height={height}
-                className={'valis-genome-visualizer'}
+                className={'hpgv'}
                 content={this.trackViewer}
                 pixelRatio={props.pixelRatio || window.devicePixelRatio || 1}
                 style={{
@@ -315,9 +327,22 @@ export class GenomeVisualizer {
                 onWillUnmount={() => {
                     this.stopFrameLoop();
                 }}
-            />
-            <div className="hpgv_proxy hpgv_track"></div>
+            >
+                <div className="hpgv_style-proxies" style={{ display: 'none' }}>
+                    {trackStyleNodes}
+                </div>
+            </AppCanvas>
         </div>);
+    }
+
+    /**
+     * This method will update non-dom elements relying on CSS.
+     * Useful to call after the CSS changes, however, if the inline style on style proxy node changes then the update will happen automatically.
+     */
+    updateStyle() {
+        for (let trackType in GenomeVisualizer.trackTypes) {
+            this.trackViewer.updateStyle(trackType);
+        }
     }
 
     private _frameLoopHandle: number = 0;
@@ -367,8 +392,21 @@ export class GenomeVisualizer {
         return trackClass;
     }
 
-    static setBaseStyle(cssString: string) {
+    static setTheme(theme: 'light' | 'dark' | null) {
+        this.setBaseStyle(theme != null ? require('./styles/' + theme + '.css') : null);
+    }
+
+    private static setBaseStyle(cssString: string) {
         let hpgvStyleEl = document.head.querySelector('style#hpgv-base');
+
+        // if null, remove any existing base css
+        if (cssString == null) {
+            if (hpgvStyleEl != null) {
+                hpgvStyleEl.remove();
+            }
+            return;
+        }
+
         if (hpgvStyleEl == null) {
             // add hpgv style
             hpgvStyleEl = document.createElement('style');
@@ -378,7 +416,7 @@ export class GenomeVisualizer {
         hpgvStyleEl.innerHTML = cssString;
     }
 
-    static removeBaseStyle() {
+    private static removeBaseStyle() {
         let hpgvStyleEl = document.head.querySelector('style#hpgv-base');
         if (hpgvStyleEl != null) {
             hpgvStyleEl.remove();
@@ -402,6 +440,6 @@ GenomeVisualizer.registerTrackType('sequence', SequenceTileLoader, SequenceTrack
 GenomeVisualizer.registerTrackType('variant', VariantTileLoader, VariantTrack);
 GenomeVisualizer.registerTrackType('signal', SignalTileLoader, SignalTrack);
 
-GenomeVisualizer.setBaseStyle(require('./styles/default.css'));
+GenomeVisualizer.setTheme('dark');
 
 export default GenomeVisualizer;

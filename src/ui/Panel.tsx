@@ -142,7 +142,7 @@ export class Panel extends Object2D {
         this.remove(this.resizeHandle);
         if (v) this.add(this.resizeHandle);
         this.resizeHandle.cursorStyle = v ? 'col-resize' : null;
-        this.resizeHandle.color.set(v ? [0, 1, 0, 1] : [0.3, 0.3, 0.3, 1]);
+        this.resizeHandle.color = v ? [0, 1, 0, 1] : [0.3, 0.3, 0.3, 1];
     }
 
     addTrackView(trackView: TrackObject) {

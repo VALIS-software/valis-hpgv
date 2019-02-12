@@ -28,9 +28,19 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
         }
     }
 
-    protected _intervalTileCache = new UsageCache<IntervalInstances>();
-    protected _tileNodes = new UsageCache<Object2D>();
-    protected _labels = new UsageCache<IntervalTrackLabel>();
+    // @! needs releasing
+    protected _intervalTileCache = new UsageCache<IntervalInstances>(
+        null,
+        (instances) => instances.releaseGPUResources(),
+    );
+    protected _tileNodes = new UsageCache<IntervalInstances>(
+        null,
+        (t) => this.removeTileNode(t),
+    );
+    protected _labels = new UsageCache<IntervalTrackLabel>(
+        null,
+        (label) => this.removeLabel(label),
+    );
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
         this._tileNodes.markAllUnused();
         this._labels.markAllUnused();
@@ -56,8 +66,8 @@ export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel
             });
         }
 
-        this._tileNodes.removeUnused(this.removeTileNode);
-        this._labels.removeUnused(this.removeLabel);
+        this._tileNodes.removeUnused();
+        this._labels.removeUnused();
     }
 
     protected displayTileNode(tile: Tile<IntervalTilePayload>, z: number, continuousLodLevel: number) {

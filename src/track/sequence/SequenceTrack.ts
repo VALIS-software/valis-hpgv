@@ -21,7 +21,7 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
  
     constructor(model: Model) {
         super(model, SequenceTile);
-        this.color.set([0, 0, 0, 1]);
+        this.color = [0, 0, 0, 1];
         this.loadingIndicatorPadding = 0.5; // make it slower to appear then normal
     }
 
@@ -100,7 +100,10 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
         this.tile.markLastUsed();
     }
 
-    private _labelCache = new UsageCache<{container: Object2D, text: TextClone}>();
+    private _labelCache = new UsageCache<{container: Object2D, text: TextClone}>(
+        null,
+        (label) => this.deleteLabel(label),
+    );
     protected updateLabels() {
         let tile = this.tile;
         this._labelCache.markAllUnused();
@@ -167,7 +170,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
             }
         }
 
-        this._labelCache.removeUnused(this.deleteLabel);
+        this._labelCache.removeUnused();
     }
 
     protected createLabel = (baseCharacter: string) => {

@@ -1,4 +1,4 @@
-/// <reference types="react" />
+import * as React from "react";
 import UsageCache from "engine/ds/UsageCache";
 import InteractionEvent from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
@@ -9,6 +9,7 @@ import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GenomeFeature } from "./AnnotationTypes";
+import { StyleProxy } from "../../ui/util/StyleProxy";
 export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
     static defaultHeightPx: number;
     protected readonly macroLodBlendRange: number;
@@ -24,9 +25,28 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
         [Strand.None]: number;
     };
     protected macroModel: MacroAnnotationTrackModel;
-    protected pointerState: TrackPointerState;
     readonly compact: boolean;
+    protected colors: {
+        'transcript-arrow': number[];
+        'transcript': number[];
+        'coding': number[];
+        'non-coding': number[];
+        'untranslated': number[];
+        'text': number[];
+    };
+    protected sharedState: {
+        colors: {
+            'transcript-arrow': number[];
+            'transcript': number[];
+            'coding': number[];
+            'non-coding': number[];
+            'untranslated': number[];
+            'text': number[];
+        };
+        pointerOver: boolean;
+    };
     constructor(model: AnnotationTrackModel);
+    applyStyle(styleProxy: StyleProxy): void;
     protected _macroTileCache: UsageCache<IntervalInstances>;
     protected _annotationCache: UsageCache<{
         gene: GeneAnnotation;
@@ -43,21 +63,18 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
         name: Text;
     }) => void;
     protected annotationKey: (feature: {
-        soClass: import("react").Key;
+        soClass: React.ReactText;
         name?: string;
         startIndex: number;
         length: number;
     }) => string;
     protected onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void;
 }
-declare type TrackPointerState = {
-    pointerOver: boolean;
-};
 declare class GeneAnnotation extends Object2D {
     readonly compact: boolean;
     readonly gene: Gene;
     opacity: number;
     protected _opacity: number;
-    constructor(compact: boolean, gene: Gene, trackPointerState: TrackPointerState, onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void);
+    constructor(compact: boolean, gene: Gene, sharedState: AnnotationTrack['sharedState'], onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void);
 }
 export default AnnotationTrack;

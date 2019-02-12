@@ -4,6 +4,7 @@ import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
 import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
+import { StyleProxy } from "../ui/util/StyleProxy";
 export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>> extends Rect {
     protected readonly model: ModelType;
     protected displayLoadingIndicator: boolean;
@@ -35,13 +36,14 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     private _lastComputedWidth;
     applyTransformToSubNodes(root?: boolean): void;
     currentSamplingDensity(): number;
-    protected getTileLoader(): TileLoaderType;
-    protected _loadingTiles: UsageCache<Tile<any>>;
-    protected triggerDisplayUpdate(): void;
+    applyStyle(styleProxy: StyleProxy): void;
     /**
      * Override to handle drawing
      */
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
+    protected getTileLoader(): TileLoaderType;
+    protected _loadingTiles: UsageCache<Tile<any>>;
+    protected triggerDisplayUpdate(): void;
     /**
      * Show or hide the loading indicator via animation
      * This function can be safely called repeatedly without accounting for the current state of the indicator

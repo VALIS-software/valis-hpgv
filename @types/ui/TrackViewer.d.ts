@@ -9,6 +9,7 @@ import TrackObject from "../track/TrackObject";
 import ReactObject from "./core/ReactObject";
 import Panel from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
+import { StyleProxy } from "./util/StyleProxy";
 export declare class TrackViewer extends Object2D {
     readonly trackHeaderWidth: number;
     readonly panelHeaderHeight: number;
@@ -31,6 +32,9 @@ export declare class TrackViewer extends Object2D {
     protected dataSource: InternalDataSource;
     protected masks: Object2D[];
     protected nothingToDisplay: Text;
+    protected styleProxies: {
+        [trackType: string]: StyleProxy;
+    };
     constructor();
     setConfiguration(state: TrackViewerConfiguration): void;
     getConfiguration(): TrackViewerConfiguration;
@@ -43,6 +47,8 @@ export declare class TrackViewer extends Object2D {
     getPanels(): Set<Panel>;
     setNothingToDisplayText(string: string): void;
     resetNothingToDisplayText(): void;
+    setTrackStyleNode(trackType: string, node: HTMLElement): void;
+    updateStyle(trackType: string): void;
     protected onPanelsChanged(): void;
     /**
      * Removes the row from the scene and cleans up resources
@@ -101,6 +107,7 @@ export declare class Track {
     heightPx: number;
     protected rowObject: RowObject;
     constructor(model: TrackModel, _heightPx: number, onHeightChanged: () => void);
+    applyStyle(styleProxy: StyleProxy): void;
 }
 /**
  * RowObject is a pseudo Object2D used to layout a set of tracks vertically
@@ -125,6 +132,7 @@ declare class RowObject {
     protected _y: number;
     protected _h: number;
     protected _headerIsExpandedState: boolean | undefined;
+    protected styleProxy: StyleProxy;
     constructor(model: TrackModel, spacing: {
         x: number;
         y: number;
@@ -132,6 +140,7 @@ declare class RowObject {
     setResizable(v: boolean): void;
     addTrackView(trackView: TrackObject): void;
     removeTrackView(trackView: TrackObject): void;
+    applyStyle(styleProxy: StyleProxy): void;
     /**
      * A TrackRow isn't an Object2D so we manually layout track elements with the track row's y and height
      */

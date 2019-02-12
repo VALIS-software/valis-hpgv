@@ -8,6 +8,7 @@ import { Tile } from "../TileLoader";
 import { AxisPointer, AxisPointerStyle } from "../TrackObject";
 import { Text } from "engine";
 import TrackModel from "../TrackModel";
+import { StyleProxy } from "../../ui/util/StyleProxy";
 export declare class SignalTrack<Model extends TrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
     autoScale: boolean;
     autoScaleDelay_ms: number;
@@ -19,6 +20,7 @@ export declare class SignalTrack<Model extends TrackModel = SignalTrackModel> ex
     protected showSignalReading: boolean;
     protected _displayScale: number;
     constructor(model: Model);
+    applyStyle(styleProxy: StyleProxy): void;
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle): void;
     removeAxisPointer(id: string): void;
     setDisplayScale(scale: number): void;

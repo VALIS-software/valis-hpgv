@@ -22,6 +22,7 @@ interface CustomTileLoader<ModelType> {
 interface CustomTrackObject {
     new (model: TrackModel): TrackObject<TrackModel, any>;
     defaultHeightPx?: number;
+    styleProxy?: React.ReactNode;
 }
 export declare class GenomeVisualizer {
     protected trackViewer: TrackViewer;
@@ -41,6 +42,11 @@ export declare class GenomeVisualizer {
     clearCaches(): void;
     render(props: GenomeVisualizerRenderProps, container: HTMLElement): void;
     reactRender(props?: GenomeVisualizerRenderProps): JSX.Element;
+    /**
+     * This method will update non-dom elements relying on CSS.
+     * Useful to call after the CSS changes, however, if the inline style on style proxy node changes then the update will happen automatically.
+     */
+    updateStyle(): void;
     private _frameLoopHandle;
     protected startFrameLoop(): void;
     protected stopFrameLoop(): void;
@@ -50,6 +56,9 @@ export declare class GenomeVisualizer {
         tileLoaderClass: CustomTileLoader<TrackModel>;
         trackObjectClass: CustomTrackObject;
     };
+    static setTheme(theme: 'light' | 'dark' | null): void;
+    private static setBaseStyle;
+    private static removeBaseStyle;
     private static trackTypes;
 }
 export default GenomeVisualizer;

@@ -1,0 +1,82 @@
+<style>
+    body {
+        margin: 0;
+    }
+
+    .hpgv {
+        margin-top: -50px;
+    }
+
+    .hpgv_panel-header {
+        display: none;
+    }
+
+    .hpgv_track-sequence {
+        --nucleobase-a: #c3587f;
+        --nucleobase-t: #e8a06d;
+        --nucleobase-c: #4bd877;
+        --nucleobase-g: #289adc;
+    }
+</style>
+
+<body>
+
+<script src="../../dist/valis-hpgv.js"></script>
+
+<script>
+    let numberOfLevels = 5;
+    let visualizers = [];
+    let containers = [];
+    for (let i =0; i < 5; i++){
+        let container = document.createElement('div');
+        document.body.append(container);
+        containers.push(container);
+        visualizers.push(new GenomeVisualizer());
+    }
+
+    function sequenceConfig(x0, x1) {
+        return {
+            panels: [{
+                location: {
+                    contig: 'chr1',
+                    x0: x0,
+                    x1: x1,
+                }
+            }],
+            tracks: [{
+                type: 'sequence',
+                name: 'DNA',
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir'
+            }]
+        };
+    }
+
+    visualizers[0].setConfiguration(sequenceConfig(1e6, 1e6 + 10));
+    visualizers[1].setConfiguration(sequenceConfig(1e6, 1e6 + 100));
+    visualizers[2].setConfiguration(sequenceConfig(1e6, 1e6 + 2000));
+    visualizers[3].setConfiguration(sequenceConfig(1e6, 1e6 + 200000));
+    visualizers[4].setConfiguration(sequenceConfig(0, 1e6 + 248e6));
+
+    window.addEventListener('resize', update);
+
+    window.setInterval(() => {
+        for (let i = 0; i < visualizers.length; i++) {
+            visualizers[i].refreshStyle();
+        }
+    }, 100);
+
+    function update() {
+        for (let i = 0; i < visualizers.length; i++) {
+            visualizers[i].render({
+                width: window.innerWidth,
+                height: 150,
+                style: {
+                    zIndex: visualizers.length - i
+                },
+            }, containers[i]);
+        }
+    }
+
+    update();
+</script>
+</body>

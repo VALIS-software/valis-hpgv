@@ -1,4 +1,4 @@
-/// <reference types="react" />
+import React = require("react");
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
@@ -32,7 +32,8 @@ export declare class TrackViewer extends Object2D {
     protected dataSource: InternalDataSource;
     protected masks: Object2D[];
     protected nothingToDisplay: Text;
-    protected styleProxies: {
+    protected panelStyleProxy: StyleProxy;
+    protected trackStyleProxies: {
         [trackType: string]: StyleProxy;
     };
     constructor();
@@ -47,8 +48,12 @@ export declare class TrackViewer extends Object2D {
     getPanels(): Set<Panel>;
     setNothingToDisplayText(string: string): void;
     resetNothingToDisplayText(): void;
-    setTrackStyleNode(trackType: string, node: HTMLElement): void;
-    updateStyle(trackType: string): void;
+    refreshStyle(): void;
+    getStyleNodes(): React.ReactNode[];
+    protected setTrackStyleNode(trackType: string, node: HTMLElement): void;
+    protected setPanelStyleNode(node: HTMLElement): void;
+    protected refreshTrackStyle(type: string): void;
+    protected refreshPanelStyle(): void;
     protected onPanelsChanged(): void;
     /**
      * Removes the row from the scene and cleans up resources

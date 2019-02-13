@@ -6,6 +6,7 @@ import { Contig } from "../model";
 import TrackObject from "../track/TrackObject";
 import ReactObject from "./core/ReactObject";
 import Axis from "./Axis";
+import { StyleProxy } from "./util";
 declare enum DragMode {
     Move = 0,
     SelectRegion = 1
@@ -52,6 +53,7 @@ export declare class Panel extends Object2D {
         x: number;
         y: number;
     }, panelHeaderHeight: number, xAxisHeight: number, dataSource: InternalDataSource);
+    applyStyle(styleProxy: StyleProxy): void;
     setResizable(v: boolean): void;
     addTrackView(trackView: TrackObject): void;
     removeTrackView(trackView: TrackObject): void;

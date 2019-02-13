@@ -60,7 +60,8 @@ export class TrackViewer extends Object2D {
     protected masks = new Array<Object2D>();
     protected nothingToDisplay: Text;
 
-    protected styleProxies: { [trackType: string]: StyleProxy } = {};
+    protected panelStyleProxy: StyleProxy;
+    protected trackStyleProxies: { [trackType: string]: StyleProxy } = {};
     
     constructor() {
         super();
@@ -261,6 +262,11 @@ export class TrackViewer extends Object2D {
             rowObject.addTrackView(trackView);
         }
 
+        let styleProxy = this.trackStyleProxies[track.model.type];
+        if (styleProxy) {
+            track.applyStyle(styleProxy);
+        }
+
         this.tracks.push(track);
 
         rowObject.closeButton.relativeX = 1;
@@ -355,6 +361,10 @@ export class TrackViewer extends Object2D {
         panel.column = newColumnIndex; // @! should use array of panels instead of column field
         panel.relativeH = 1; // fill the full grid height
         this.grid.add(panel);
+
+        if (this.panelStyleProxy != null) {
+            panel.applyStyle(this.panelStyleProxy);
+        }
 
         // initialize tracks for this panel
        for (let track of this.tracks) {
@@ -457,27 +467,76 @@ export class TrackViewer extends Object2D {
         this.nothingToDisplay.string = 'Nothing to display';
     }
 
-    setTrackStyleNode(trackType: string, node: HTMLElement) {
-        // end any existing style proxy callbacks
-        if (this.styleProxies[trackType]) {
-            this.styleProxies[trackType].removeAllObservers();
-        }
-
-        let styleProxy = this.styleProxies[trackType] = new StyleProxy(node);
-
-        styleProxy.observeAllStyle(() => this.updateStyle(trackType));
-        this.updateStyle(trackType);
-    }
-
-    updateStyle(trackType: string) {
-        let styleProxy = this.styleProxies[trackType];
-        if (styleProxy == null) return;
+    refreshStyle() {
+        this.refreshPanelStyle();
 
         // update style for tracks if any of the style attributes are changed
         for (let track of this.tracks) {
-            if (track.model.type === trackType) {
+            let styleProxy = this.trackStyleProxies[track.model.type];
+            if (styleProxy == null) continue;
+            track.applyStyle(styleProxy);
+        }
+    }
+
+    getStyleNodes() {
+        // add style node for panel
+        let styleNodes = new Array<React.ReactNode>([
+            <div key="trackViewer-panel" className="hpgv_panel" ref={(node) => {
+                this.setPanelStyleNode(node);
+            }}></div>
+        ]);
+
+        // add track nodes
+        for (let trackType of GenomeVisualizer.getTrackTypes()) {
+            let trackClass = GenomeVisualizer.getTrackType(trackType).trackObjectClass;
+
+            styleNodes.push(
+                <div key={trackType} className={`hpgv_track hpgv_track-${trackType}`} ref={(node) => {
+                    this.setTrackStyleNode(trackType, node);
+                }}>
+                    {trackClass.styleNodes}
+                </div>
+            );
+        }
+
+        return styleNodes;
+    }
+
+    protected setTrackStyleNode(trackType: string, node: HTMLElement) {
+        // end any existing style proxy callbacks
+        if (this.trackStyleProxies[trackType] != null) {
+            this.trackStyleProxies[trackType].removeAllObservers();
+        }
+
+        let styleProxy = this.trackStyleProxies[trackType] = new StyleProxy(node);
+
+        styleProxy.observeAllStyle(() => this.refreshTrackStyle(trackType));
+        this.refreshTrackStyle(trackType);
+    }
+
+    protected setPanelStyleNode(node: HTMLElement) {
+        if (this.panelStyleProxy != null) {
+            this.panelStyleProxy.removeAllObservers();
+        }
+        this.panelStyleProxy = new StyleProxy(node);
+        this.panelStyleProxy.observeAllStyle(() => this.refreshPanelStyle());
+        this.refreshPanelStyle();
+    }
+
+    protected refreshTrackStyle(type: string) {
+        let styleProxy = this.trackStyleProxies[type];
+        if (styleProxy == null) return;;
+        for (let track of this.tracks) {
+            if (track.model.type === type) {
                 track.applyStyle(styleProxy);
             }
+        }
+    }
+
+    protected refreshPanelStyle() {
+        if (this.panelStyleProxy == null) return;
+        for (let panel of this.panels) {
+            panel.applyStyle(this.panelStyleProxy);
         }
     }
 

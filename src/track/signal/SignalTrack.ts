@@ -345,7 +345,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
 
     allocateGPUResources(device: GPUDevice) {
         // static initializations
-        this.gpuVertexState = SharedResources.quad1x1VertexState;
+        this.gpuVertexState = SharedResources.getQuad1x1VertexState(device);
         this.gpuProgram = SharedResources.getProgram(
             device,
             SignalTile.vertexShader,

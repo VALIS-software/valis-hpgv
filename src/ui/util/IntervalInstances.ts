@@ -63,12 +63,12 @@ export class IntervalInstances extends Object2DInstances<IntervalInstance> {
         instanceVertexAttributes: { [name: string]: VertexAttributeBuffer }
     ) {
         return device.createVertexState({
-            indexBuffer: SharedResources.quadIndexBuffer,
+            indexBuffer: SharedResources.getQuadIndexBuffer(device),
             attributeLayout: attributeLayout,
             attributes: {
                 // vertices
                 'position': {
-                    buffer: SharedResources.quad1x1VertexBuffer,
+                    buffer: SharedResources.getQuad1x1VertexBuffer(device),
                     offsetBytes: 0,
                     strideBytes: 2 * 4,
                 },

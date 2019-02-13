@@ -26,11 +26,9 @@
 }
 
 /* The following are draw via WebGL, so only the properties CSS used here can be changed */
-/*
 .hpgv_panel {
-    --axis-color: black;
+    --axis: black;
 }
-*/
 
 .hpgv_track {
     background-color: #191919;
@@ -47,4 +45,11 @@
     --coding: rgba(26, 174, 222, 0.58);
     --non-coding: rgba(82, 75, 165, 0.4);
     --untranslated: rgba(138, 136, 191, 0.38);
+}
+
+.hpgv_track-sequence {
+    --nucleobase-a: #371051;
+    --nucleobase-t: #333367;
+    --nucleobase-c: #0B8F9B;
+    --nucleobase-g: #12B98A;
 }

@@ -45,7 +45,7 @@ interface CustomTrackObject {
     new(model: TrackModel): TrackObject<TrackModel, any>;
 
     defaultHeightPx?: number; // optionally override the default track height
-    styleProxy?: React.ReactNode; // occasionally it might be useful to have sub nodes within a track's style proxy node
+    styleNodes?: React.ReactNode; // occasionally it might be useful to have sub nodes within a track's style proxy node
 }
 export class GenomeVisualizer {
 
@@ -101,7 +101,7 @@ export class GenomeVisualizer {
                                     });
                                 }
 
-                                if (this.getPanels().size === 0) {
+                                if (this.getPanels().length === 0) {
                                     this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
                                     this.setDataSource(new ManifestDataSource(manifest));
                                 }
@@ -126,7 +126,7 @@ export class GenomeVisualizer {
                                     contigs: json.contigs
                                 }
 
-                                if (this.getPanels().size === 0) {
+                                if (this.getPanels().length === 0) {
                                     this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
                                     this.setDataSource(new ManifestDataSource(manifest));
                                 }
@@ -275,7 +275,7 @@ export class GenomeVisualizer {
     }
 
     getPanels() {
-        return this.trackViewer.getPanels();
+        return Array.from(this.trackViewer.getPanels());
     }
 
     clearCaches() {
@@ -295,20 +295,7 @@ export class GenomeVisualizer {
         let width = props.width == null ? 800 : props.width;
         let height = props.height == null ? 600 : props.height;
 
-        let trackStyleNodes = new Array<React.ReactNode>();
-        for (let trackType in GenomeVisualizer.trackTypes) {
-            let trackClass = GenomeVisualizer.trackTypes[trackType];
-
-            trackStyleNodes.push(
-                <div key={trackType} className={`hpgv_track hpgv_track-${trackType}`} ref={(node) => {
-                    this.trackViewer.setTrackStyleNode(trackType, node);
-                }}>
-                    {trackClass.trackObjectClass.styleProxy}
-                </div>
-            );
-        }
-
-        return (<div>
+        return (<>
             <AppCanvas
                 ref={(v) => {
                     this.appCanvasRef = v;
@@ -329,20 +316,18 @@ export class GenomeVisualizer {
                 }}
             >
                 <div className="hpgv_style-proxies" style={{ display: 'none' }}>
-                    {trackStyleNodes}
+                    {this.trackViewer.getStyleNodes()}
                 </div>
             </AppCanvas>
-        </div>);
+        </>);
     }
 
     /**
      * This method will update non-dom elements relying on CSS.
      * Useful to call after the CSS changes, however, if the inline style on style proxy node changes then the update will happen automatically.
      */
-    updateStyle() {
-        for (let trackType in GenomeVisualizer.trackTypes) {
-            this.trackViewer.updateStyle(trackType);
-        }
+    refreshStyle() {
+        this.trackViewer.refreshStyle();
     }
 
     private _frameLoopHandle: number = 0;
@@ -392,8 +377,12 @@ export class GenomeVisualizer {
         return trackClass;
     }
 
-    static setTheme(theme: 'light' | 'dark' | null) {
-        this.setBaseStyle(theme != null ? require('./styles/' + theme + '.css') : null);
+    static getTrackTypes(): Array<string> {
+        return Object.keys(this.trackTypes);
+    }
+
+    static setTheme(theme: 'default' | 'light' | null) {
+        this.setBaseStyle(require('./styles/' + (theme || 'default') + '.css'));
     }
 
     private static setBaseStyle(cssString: string) {
@@ -440,6 +429,6 @@ GenomeVisualizer.registerTrackType('sequence', SequenceTileLoader, SequenceTrack
 GenomeVisualizer.registerTrackType('variant', VariantTileLoader, VariantTrack);
 GenomeVisualizer.registerTrackType('signal', SignalTileLoader, SignalTrack);
 
-GenomeVisualizer.setTheme('dark');
+GenomeVisualizer.setTheme('default');
 
 export default GenomeVisualizer;

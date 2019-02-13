@@ -12,12 +12,30 @@ import { ShaderTrack, ShaderTile } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
 import { Shaders } from "../../Shaders";
+import { StyleProxy } from "../../ui";
 
 export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel> extends ShaderTrack<Model, SequenceTileLoader> {
 
     static defaultHeightPx = 40;
 
     protected densityMultiplier = 2.0;
+    protected sharedState = {
+        colors: {
+            a: [0.216, 0.063, 0.318, 1.0],
+            t: [0.200, 0.200, 0.404, 1.0],
+            c: [0.043, 0.561, 0.608, 1.0],
+            g: [0.071, 0.725, 0.541, 1.0],
+        },
+        // we only need 1 text instance of each letter which we can render multiple times
+        // this saves reallocating new vertex buffers for each letter
+        baseTextInstances: ({
+            'A': new Text(OpenSansRegular, 'A', 1, [1, 1, 1, 1]),
+            'C': new Text(OpenSansRegular, 'C', 1, [1, 1, 1, 1]),
+            'G': new Text(OpenSansRegular, 'G', 1, [1, 1, 1, 1]),
+            'T': new Text(OpenSansRegular, 'T', 1, [1, 1, 1, 1]),
+            'N': new Text(OpenSansRegular, 'N', 1, [1, 1, 1, 1]),
+        } as { [letter: string]: Text })
+    }
  
     constructor(model: Model) {
         super(model, SequenceTile);
@@ -25,20 +43,38 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
         this.loadingIndicatorPadding = 0.5; // make it slower to appear then normal
     }
 
+    applyStyle(styleProxy: StyleProxy) {
+        this._tileNodeCache.removeAll();
+        this.displayNeedUpdate = true;
+
+        this.sharedState.colors.a = styleProxy.getColor('--nucleobase-a') || this.sharedState.colors.a;
+        this.sharedState.colors.t = styleProxy.getColor('--nucleobase-t') || this.sharedState.colors.t;
+        this.sharedState.colors.c = styleProxy.getColor('--nucleobase-c') || this.sharedState.colors.c;
+        this.sharedState.colors.g = styleProxy.getColor('--nucleobase-g') || this.sharedState.colors.g;
+    }
+
+    protected createTileNode(...args: Array<any>): SequenceTile {
+        return super.createTileNode(this.sharedState) as SequenceTile;
+    }
+
 }
 
 /**
  * - A TileNode render field should only be set to true if it's TileEntry is in the Complete state
  */
-const NUCLEOBASE_A_COLOR = new Float32Array([0.216, 0.063, 0.318, 1.0]); // #371051;
-const NUCLEOBASE_T_COLOR = new Float32Array([0.200, 0.200, 0.404, 1.0]); // #333367;
-const NUCLEOBASE_C_COLOR = new Float32Array([0.043, 0.561, 0.608, 1.0]); // #0B8F9B;
-const NUCLEOBASE_G_COLOR = new Float32Array([0.071, 0.725, 0.541, 1.0]); // #12B98A;
+// const NUCLEOBASE_A_COLOR = new Float32Array([0.216, 0.063, 0.318, 1.0]); // #371051;
+// const NUCLEOBASE_T_COLOR = new Float32Array([0.200, 0.200, 0.404, 1.0]); // #333367;
+// const NUCLEOBASE_C_COLOR = new Float32Array([0.043, 0.561, 0.608, 1.0]); // #0B8F9B;
+// const NUCLEOBASE_G_COLOR = new Float32Array([0.071, 0.725, 0.541, 1.0]); // #12B98A;
 
 class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
+
+    constructor(protected sharedState: SequenceTrack['sharedState']) {
+        super();
+    }
 
     setTile(tile: Tile<SequenceTilePayload>) {
         super.setTile(tile);
@@ -67,11 +103,11 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
     allocateGPUResources(device: GPUDevice) {
         // static initializations
-        this.gpuVertexState = SharedResources.quad1x1VertexState;
+        this.gpuVertexState = SharedResources.getQuad1x1VertexState(device);
         this.gpuProgram = SharedResources.getProgram(
             device,
             SequenceTile.vertexShader,
-            SequenceTile.fragmentShader,
+            SequenceTile.getFragmentShader(this.sharedState.colors),
             SequenceTile.attributeLayout
         );
 
@@ -174,7 +210,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
     }
 
     protected createLabel = (baseCharacter: string) => {
-        let textClone = new TextClone(SequenceTile.baseTextInstances[baseCharacter], [1, 1, 1, 1]);
+        let textClone = new TextClone(this.sharedState.baseTextInstances[baseCharacter], [1, 1, 1, 1]);
         textClone.additiveBlending = 1.0;
 
         textClone.originX = -0.5;
@@ -220,82 +256,85 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
         }
     `;
 
-    protected static fragmentShader = `
-        #version 100
+    protected static getFragmentShader(colors: { a: Array<number>, t: Array<number>, g: Array<number>, c: Array<number>}) {
+        return `
+            #version 100
 
-        precision mediump float;
-        uniform float opacity;
-        uniform sampler2D memoryBlock;
-        uniform vec3 offsetScaleLod;
+            precision mediump float;
+            uniform float opacity;
+            uniform sampler2D memoryBlock;
+            uniform vec3 offsetScaleLod;
 
-        varying vec2 texCoord;
-        varying vec2 vUv;
+            varying vec2 texCoord;
+            varying vec2 vUv;
 
-        float contrastCurve(float x, float s) {
-            float s2 = pow(2.0, s);
-            float px = pow(4.0, -s * x);
-            return ((s2 + 1.)/(s2*px + 1.0) - 1.) / (s2 - 1.0);
-        }
+            float contrastCurve(float x, float s) {
+                float s2 = pow(2.0, s);
+                float px = pow(4.0, -s * x);
+                return ((s2 + 1.)/(s2*px + 1.0) - 1.) / (s2 - 1.0);
+            }
 
-        ${Shaders.functions.palettes.viridis}
-        
-        void main() {
-            vec4 texRaw = texture2D(memoryBlock, texCoord);
-            // unpack data
-            vec4 acgt = texRaw * offsetScaleLod.y + offsetScaleLod.x;
+            vec3 brightnessContrast(vec3 value, float brightness, float contrast) {
+                return (value - 0.5) * contrast + 0.5 + brightness;
+            }
 
-            // micro-scale color
-            const vec3 aRgb = vec4(${NUCLEOBASE_A_COLOR.join(', ')}).rgb;
-            const vec3 tRgb = vec4(${NUCLEOBASE_T_COLOR.join(', ')}).rgb;
-            const vec3 cRgb = vec4(${NUCLEOBASE_C_COLOR.join(', ')}).rgb;
-            const vec3 gRgb = vec4(${NUCLEOBASE_G_COLOR.join(', ')}).rgb;
+            vec3 czm_saturation(vec3 rgb, float adjustment) {
+                // Algorithm from Chapter 16 of OpenGL Shading Language
+                const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+                vec3 intensity = vec3(dot(rgb, W));
+                return mix(intensity, rgb, adjustment);
+            }
 
-            vec3 colMicro = (
+            ${Shaders.functions.palettes.viridis}
+            
+            void main() {
+                vec4 texRaw = texture2D(memoryBlock, texCoord);
+                // unpack data
+                vec4 acgt = texRaw * offsetScaleLod.y + offsetScaleLod.x;
+
+                // micro-scale color
+                const vec3 aRgb = vec4(${colors.a.join(', ')}).rgb;
+                const vec3 tRgb = vec4(${colors.t.join(', ')}).rgb;
+                const vec3 cRgb = vec4(${colors.c.join(', ')}).rgb;
+                const vec3 gRgb = vec4(${colors.g.join(', ')}).rgb;
+
+                vec3 colMicro = (
                     acgt[0] * aRgb +
                     acgt[1] * cRgb +
                     acgt[2] * gRgb +
                     acgt[3] * tRgb
-            );
+                );
 
-            // blend into to macro-scale color
-            // macro-scale simulates g-banding with a non-linear response
-            float tileLodLevel = offsetScaleLod.z;
-            float q = tileLodLevel - 5.0;
-            float expectedSpan = min(pow(0.9, q), 1.0);
-            float expectedAvg = min(pow(0.8, q) * 0.25 + 0.25, 0.5);
-            vec4 acgtScaled = (acgt - expectedAvg) / expectedSpan + 0.5;
+                // blend into to macro-scale color
+                // macro-scale simulates g-banding with a non-linear response
+                float tileLodLevel = offsetScaleLod.z;
+                float q = tileLodLevel - 5.0;
+                float expectedSpan = min(pow(0.9, q), 1.0);
+                float expectedAvg = min(pow(0.8, q) * 0.25 + 0.25, 0.5);
+                vec4 acgtScaled = (acgt - expectedAvg) / expectedSpan + 0.5;
 
-            float gc = (acgtScaled[1] + acgtScaled[2]) * 0.5;
+                float gc = (acgtScaled[1] + acgtScaled[2]) * 0.5;
 
-            float gcCurved = (contrastCurve(gc, 4.) + 0.3 * gc * gc);
-            vec3 colMacro = (
-                viridis(gcCurved) +
-                vec3(30.) * pow(gc, 12.0) // tend to white at highest-density
-            );
+                float gcCurved = (contrastCurve(gc, 4.) + 0.3 * gc * gc);
+                vec3 colMacro = (
+                    viridis(gcCurved) +
+                    vec3(30.) * pow(gc, 12.0) // tend to white at highest-density
+                );
 
-            const float microScaleEndLod = 6.0;
-            float displayLodLevel = offsetScaleLod.z;
-            float microMacroMix = clamp((displayLodLevel - microScaleEndLod) / microScaleEndLod, 0., 1.0);
+                const float microScaleEndLod = 6.0;
+                float displayLodLevel = offsetScaleLod.z;
+                float microMacroMix = clamp((displayLodLevel - microScaleEndLod) / microScaleEndLod, 0., 1.0);
 
-            gl_FragColor = vec4(mix(colMicro, colMacro, microMacroMix), 1.0) * opacity;
+                gl_FragColor = vec4(mix(colMicro, colMacro, microMacroMix), 1.0) * opacity;
 
-            /**
-            // for debug: makes tiling visible
-            float debugMask = step(0.45, vUv.y) * step(vUv.y, 0.55);
-            vec4 debugColor = vec4(vUv.xxx, 1.0);
-            gl_FragColor = mix(gl_FragColor, debugColor, debugMask);
-            /**/
-        }
-    `;
-
-    // we only need 1 text instance of each letter which we can render multiple times
-    // this saves reallocating new vertex buffers for each letter
-    protected static baseTextInstances : { [key: string]: Text } = {
-        'A': new Text(OpenSansRegular, 'A', 1, [1, 1, 1, 1]),
-        'C': new Text(OpenSansRegular, 'C', 1, [1, 1, 1, 1]),
-        'G': new Text(OpenSansRegular, 'G', 1, [1, 1, 1, 1]),
-        'T': new Text(OpenSansRegular, 'T', 1, [1, 1, 1, 1]),
-        'N': new Text(OpenSansRegular, 'N', 1, [1, 1, 1, 1]),
+                /**
+                // for debug: makes tiling visible
+                float debugMask = step(0.45, vUv.y) * step(vUv.y, 0.55);
+                vec4 debugColor = vec4(vUv.xxx, 1.0);
+                gl_FragColor = mix(gl_FragColor, debugColor, debugMask);
+                /**/
+            }
+        `;
     }
 }
 

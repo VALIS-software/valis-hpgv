@@ -83,8 +83,6 @@ export class AppCanvas extends React.Component<Props, State> {
         this.device = new GPUDevice(gl);
         this.renderer = new Renderer(this.device);
 
-        SharedResources.initialize(this.device);
-
         this.addInputListeners();
 
         console.log(`AppCanvas created with device %c"${this.device.name}"`, 'font-weight: bold');
@@ -111,7 +109,7 @@ export class AppCanvas extends React.Component<Props, State> {
             if (node instanceof Renderable) node.releaseGPUResources();
         });
 
-        SharedResources.release();
+        SharedResources.release(this.device);
 
         this.device = null;
         this.renderer = null;

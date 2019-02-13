@@ -15,6 +15,7 @@ import { Contig } from "../model";
 import TrackObject, { AxisPointerStyle } from "../track/TrackObject";
 import ReactObject from "./core/ReactObject";
 import Axis from "./Axis";
+import { StyleProxy } from "./util";
 
 enum DragMode {
     Move,
@@ -135,6 +136,10 @@ export class Panel extends Object2D {
         this.setResizable(false);
 
         this.setDataSource(dataSource);
+    }
+
+    applyStyle(styleProxy: StyleProxy) {
+        this.xAxis.color = styleProxy.getColor('--axis') || this.xAxis.color;
     }
 
     setResizable(v: boolean) {

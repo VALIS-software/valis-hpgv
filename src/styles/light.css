@@ -1,0 +1,76 @@
+.hpgv {
+    color: #364565;
+    box-sizing: border-box;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+.hpgv_ui-block {
+    color: #364565;
+    background-color: #e8ebf1;
+    font-size: 12px;
+    border-radius: 4px;
+    box-shadow: 0px 1px 1px #09004a3b;
+    border: 1px #e1e6ef solid;
+}
+
+.hpgv_panel-header {
+    font-weight: 200;
+    font-size: 15px;
+}
+
+.hpgv_track-header {
+    font-size: 15px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.hpgv_track-close-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.hpgv_track-add-button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* The following are draw via WebGL, so only the properties CSS used here can be changed */
+.hpgv_panel {
+    color: #737d94;
+}
+
+.hpgv_track {
+    background-color: #e9f0f3;
+    --loading-indicator: #8ea1bf;
+    --cursor: #3645653b;
+    --secondary-cursor: rgba(52, 52, 52, 0.6);
+}
+
+.hpgv_track-annotation {
+    --transcript-arrow: #36456530;
+    --transcript:rgba(156, 163, 175, 0.13);
+    --coding: rgba(37, 110, 195, 0.79);
+    --non-coding: rgba(91, 51, 154, 0.79);
+    --untranslated: rgba(191, 184, 184, 0.53);
+}
+
+.hpgv_track-sequence {
+    --cursor: #ffffffcc;
+    --loading-indicator: white;
+
+    --nucleobase-a: #d06fa9;
+    --nucleobase-t: #e89188;
+    --nucleobase-g: #4bd897;
+    --nucleobase-c: #44a4dc;
+
+    --gc-banding-low: #d45591;
+    --gc-banding-high: #60ffff;
+
+    color: rgba(255, 255, 255, 0.7);
+    --text-additive-blending: 1.0; /* set to 0.0 for dark text colors */
+}
+
+.hpgv_track-signal {
+    --cursor: #ffffff6b;
+    --loading-indicator: white;
+}

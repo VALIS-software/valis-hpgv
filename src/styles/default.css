@@ -52,4 +52,10 @@
     --nucleobase-t: #333367;
     --nucleobase-c: #0B8F9B;
     --nucleobase-g: #12B98A;
+
+    --gc-banding-low: #490080;
+    --gc-banding-high: #1bffa0;
+
+    --text-color: rgba(255, 255, 255, 0.7);
+    --text-additive-blending: 1.0; /* set to 0.0 for dark text colors */
 }

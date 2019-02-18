@@ -25,15 +25,22 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
             t: [0.200, 0.200, 0.404, 1.0],
             c: [0.043, 0.561, 0.608, 1.0],
             g: [0.071, 0.725, 0.541, 1.0],
+            
+            gcBandingLow: [0.286, 0, 0.502, 1],
+            gcBandingHigh: [0.106, 1, 0.627, 1],
+
+            text: [1, 1, 1, 0.7],
+            textAdditiveBlendFactor: 1.0,
         },
+
         // we only need 1 text instance of each letter which we can render multiple times
         // this saves reallocating new vertex buffers for each letter
         baseTextInstances: ({
-            'A': new Text(OpenSansRegular, 'A', 1, [1, 1, 1, 1]),
-            'C': new Text(OpenSansRegular, 'C', 1, [1, 1, 1, 1]),
-            'G': new Text(OpenSansRegular, 'G', 1, [1, 1, 1, 1]),
-            'T': new Text(OpenSansRegular, 'T', 1, [1, 1, 1, 1]),
-            'N': new Text(OpenSansRegular, 'N', 1, [1, 1, 1, 1]),
+            'A': new Text(OpenSansRegular, 'A', 1),
+            'C': new Text(OpenSansRegular, 'C', 1),
+            'G': new Text(OpenSansRegular, 'G', 1),
+            'T': new Text(OpenSansRegular, 'T', 1),
+            'N': new Text(OpenSansRegular, 'N', 1),
         } as { [letter: string]: Text })
     }
  
@@ -51,6 +58,14 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
         this.sharedState.colors.t = styleProxy.getColor('--nucleobase-t') || this.sharedState.colors.t;
         this.sharedState.colors.c = styleProxy.getColor('--nucleobase-c') || this.sharedState.colors.c;
         this.sharedState.colors.g = styleProxy.getColor('--nucleobase-g') || this.sharedState.colors.g;
+        
+        this.sharedState.colors.gcBandingLow = styleProxy.getColor('--gc-banding-low') || this.sharedState.colors.gcBandingLow;
+        this.sharedState.colors.gcBandingHigh = styleProxy.getColor('--gc-banding-high') || this.sharedState.colors.gcBandingHigh;
+
+        this.sharedState.colors.text = styleProxy.getColor('--text-color') || this.sharedState.colors.text;
+        this.sharedState.colors.textAdditiveBlendFactor = styleProxy.getNumber('--text-additive-blending') || this.sharedState.colors.textAdditiveBlendFactor;
+
+        console.log(this.sharedState.colors)
     }
 
     protected createTileNode(...args: Array<any>): SequenceTile {
@@ -62,10 +77,6 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
 /**
  * - A TileNode render field should only be set to true if it's TileEntry is in the Complete state
  */
-// const NUCLEOBASE_A_COLOR = new Float32Array([0.216, 0.063, 0.318, 1.0]); // #371051;
-// const NUCLEOBASE_T_COLOR = new Float32Array([0.200, 0.200, 0.404, 1.0]); // #333367;
-// const NUCLEOBASE_C_COLOR = new Float32Array([0.043, 0.561, 0.608, 1.0]); // #0B8F9B;
-// const NUCLEOBASE_G_COLOR = new Float32Array([0.071, 0.725, 0.541, 1.0]); // #12B98A;
 
 class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
@@ -154,7 +165,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
                 const maxTextSize = 16;
                 const minTextSize = 5;
                 const padding = 3;
-                const maxOpacity = 0.7;
+                const maxOpacity = 1.0;
                 
                 let textSizePx = Math.min(baseDisplayWidth - padding, maxTextSize);
                 let textOpacity = Math.min(Math.max((textSizePx - minTextSize) / (maxTextSize - minTextSize), 0.0), 1.0) * maxOpacity;
@@ -199,7 +210,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
                         label.container.sx = label.container.sy = textSizePx;
 
                         label.text.mask = this.mask;
-                        label.text.color[3] = textOpacity;
+                        label.text.opacity = textOpacity;
                     }
                 }
                 
@@ -209,9 +220,9 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
         this._labelCache.removeUnused();
     }
 
-    protected createLabel = (baseCharacter: string) => {
-        let textClone = new TextClone(this.sharedState.baseTextInstances[baseCharacter], [1, 1, 1, 1]);
-        textClone.additiveBlending = 1.0;
+    protected createLabel = (baseCharacter: string) => {        
+        let textClone = new TextClone(this.sharedState.baseTextInstances[baseCharacter], this.sharedState.colors.text);
+        textClone.additiveBlending = this.sharedState.colors.textAdditiveBlendFactor;
 
         textClone.originX = -0.5;
         textClone.originY = -0.5;
@@ -256,7 +267,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
         }
     `;
 
-    protected static getFragmentShader(colors: { a: Array<number>, t: Array<number>, g: Array<number>, c: Array<number>}) {
+    protected static getFragmentShader(colors: SequenceTrack['sharedState']['colors']) {
         return `
             #version 100
 
@@ -267,23 +278,6 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
             varying vec2 texCoord;
             varying vec2 vUv;
-
-            float contrastCurve(float x, float s) {
-                float s2 = pow(2.0, s);
-                float px = pow(4.0, -s * x);
-                return ((s2 + 1.)/(s2*px + 1.0) - 1.) / (s2 - 1.0);
-            }
-
-            vec3 brightnessContrast(vec3 value, float brightness, float contrast) {
-                return (value - 0.5) * contrast + 0.5 + brightness;
-            }
-
-            vec3 czm_saturation(vec3 rgb, float adjustment) {
-                // Algorithm from Chapter 16 of OpenGL Shading Language
-                const vec3 W = vec3(0.2125, 0.7154, 0.0721);
-                vec3 intensity = vec3(dot(rgb, W));
-                return mix(intensity, rgb, adjustment);
-            }
 
             ${Shaders.functions.palettes.viridis}
             
@@ -297,6 +291,8 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
                 const vec3 tRgb = vec4(${colors.t.join(', ')}).rgb;
                 const vec3 cRgb = vec4(${colors.c.join(', ')}).rgb;
                 const vec3 gRgb = vec4(${colors.g.join(', ')}).rgb;
+                const vec3 gcBandingLow = vec4(${colors.gcBandingLow.join(', ')}).rgb;
+                const vec3 gcBandingHigh = vec4(${colors.gcBandingHigh.join(', ')}).rgb;
 
                 vec3 colMicro = (
                     acgt[0] * aRgb +
@@ -314,14 +310,14 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
                 vec4 acgtScaled = (acgt - expectedAvg) / expectedSpan + 0.5;
 
                 float gc = (acgtScaled[1] + acgtScaled[2]) * 0.5;
-
-                float gcCurved = (contrastCurve(gc, 4.) + 0.3 * gc * gc);
+                
                 vec3 colMacro = (
-                    viridis(gcCurved) +
-                    vec3(30.) * pow(gc, 12.0) // tend to white at highest-density
+                    mix(gcBandingLow, gcBandingHigh, gc)
+                    // tend to white at gc highest-density
+                    + vec3(30.) * pow(gc, 12.0)
                 );
 
-                const float microScaleEndLod = 6.0;
+                const float microScaleEndLod = 4.5;
                 float displayLodLevel = offsetScaleLod.z;
                 float microMacroMix = clamp((displayLodLevel - microScaleEndLod) / microScaleEndLod, 0., 1.0);
 

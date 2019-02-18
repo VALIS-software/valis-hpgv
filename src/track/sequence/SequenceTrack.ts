@@ -64,8 +64,6 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
 
         this.sharedState.colors.text = styleProxy.getColor('--text-color') || this.sharedState.colors.text;
         this.sharedState.colors.textAdditiveBlendFactor = styleProxy.getNumber('--text-additive-blending') || this.sharedState.colors.textAdditiveBlendFactor;
-
-        console.log(this.sharedState.colors)
     }
 
     protected createTileNode(...args: Array<any>): SequenceTile {

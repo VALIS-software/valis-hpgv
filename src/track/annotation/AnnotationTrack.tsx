@@ -22,7 +22,7 @@ const TRANSCRIPT_HEIGHT = 20;
 
 export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
 
-    static defaultHeightPx = 70;
+    static defaultHeightPx = 100;
 
     protected readonly macroLodBlendRange = 2;
     protected readonly macroLodThresholdLow = 7;
@@ -33,8 +33,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected readonly namesLodThresholdHigh = this.namesLodThresholdLow + this.namesLodBlendRange;
 
     protected readonly annotationY = {
-        [Strand.Positive]: -15,
-        [Strand.Negative]:  15,
+        [Strand.Positive]: -20,
+        [Strand.Negative]:  20,
         [Strand.Unknown]:  0,
         [Strand.None]:  0,
     };
@@ -44,16 +44,21 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     readonly compact: boolean;
 
     protected colors = {
-        'transcript-arrow': [138 / 0xff, 136 /0xff, 191 /0xff, 0.38],
-        'transcript': [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17],
-        'coding': [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4],
-        'non-coding': [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4],
-        'untranslated': [138 / 0xff, 136 / 0xff, 191 / 0xff, 0.38],
-        'text': [1, 1, 1, 1],
+        '--transcript-arrow': [138 / 0xff, 136 /0xff, 191 /0xff, 0.38],
+        '--transcript': [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17],
+        '--coding': [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4],
+        '--non-coding': [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4],
+        '--untranslated': [138 / 0xff, 136 / 0xff, 191 / 0xff, 0.38],
+        'color': [1, 1, 1, 1],
+        '--stroke': [1, 1, 1, 1],
     }
 
     protected sharedState = {
         colors: this.colors,
+        style: {
+            // 'font-size': 16,
+            '--stroke-width': 1,
+        },
         pointerOver: false,
     }
 
@@ -86,9 +91,16 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         this.displayNeedUpdate = true;
 
         for (let propertyName in this.colors) {
-            let color = styleProxy.getColor('--' + propertyName);
+            let color = styleProxy.getColor(propertyName);
             if (color != null) {
                 (this.colors as {[key: string]: Array<number>})[propertyName] = color;
+            }
+        }
+
+        for (let propertyName in this.sharedState.style) {
+            let num = styleProxy.getNumber(propertyName);
+            if (num !== null) {
+                (this.sharedState.style as { [key: string]: number })[propertyName] = num;
             }
         }
     }
@@ -155,15 +167,24 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.forEachSubNode((sub) => sub.mask = this);
 
                     // create name text
-                    let name = new Text(OpenSansRegular, gene.name, this.compact ? 11 : 16, this.colors['text']);
+                    let name = new Text(OpenSansRegular, gene.name, this.compact ? 11 : 16, this.colors['color']);
+                    // name.fontSizePx = this.sharedState.style['font-size'];
+                    name.strokeEnabled = (this.colors['--stroke'][3] > 0) && (this.sharedState.style['--stroke-width'] > 9);
+                    name.strokeColor = this.colors['--stroke'];
+                    name.strokeWidthPx = this.sharedState.style['--stroke-width'];
                     name.mask = this;
                     name.y = geneAnnotation.y;
                     name.relativeY = geneAnnotation.relativeY;
                     name.z = 5.0;
 
                     if (this.compact) {
-                        name.originY = -0.5;
+                        // name.originY = -0.5;
+                        name.y = geneAnnotation.y;
+                        name.relativeY = geneAnnotation.relativeY;
+                        name.originY = -1.75;
                     } else {
+                        name.y = geneAnnotation.y;
+                        name.relativeY = geneAnnotation.relativeY;
                         name.originY = -1;
                     }
 
@@ -247,7 +268,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 for (let gene of tile.payload) {
                     if (this.model.strand != null && gene.strand !== this.model.strand) continue;
 
-                    let color = gene.class === GeneClass.NonProteinCoding ? this.colors['non-coding'] : this.colors['coding'];
+                    let color = gene.class === GeneClass.NonProteinCoding ? this.colors['--non-coding'] : this.colors['--coding'];
 
                     let colorLowerAlpha = color.slice();
                     colorLowerAlpha[3] *= .689655172;
@@ -426,7 +447,7 @@ class TranscriptAnnotation extends Object2D {
     ) {
         super();
 
-        let backgroundColor = sharedState.colors['transcript'];
+        let backgroundColor = sharedState.colors['--transcript'].slice();
         let passiveOpacity = backgroundColor[3];
         let hoverOpacity = passiveOpacity * 3;
 
@@ -435,7 +456,9 @@ class TranscriptAnnotation extends Object2D {
         background.z = 0;
         background.transparent = true;
         background.relativeW = 1;
-        background.relativeH = 1;
+        background.relativeH = 0.75;
+        background.relativeY = 0.5;
+        background.originY = -0.5;
 
         this.add(background);
 
@@ -466,7 +489,7 @@ class TranscriptAnnotation extends Object2D {
 
         /**/
         let spanMarker = new TranscriptSpan(sharedState, strand);
-        spanMarker.color = sharedState.colors['transcript-arrow'];
+        spanMarker.color = sharedState.colors['--transcript-arrow'];
         spanMarker.h = 10;
         spanMarker.relativeW = 1;
         spanMarker.originY = -0.5;
@@ -526,7 +549,7 @@ class Exon extends Rect {
 
     constructor(sharedState: AnnotationTrack['sharedState']) {
         super(0, 0);
-        this.color = sharedState.colors['non-coding'];
+        this.color = sharedState.colors['--non-coding'];
         this.transparent = true;
     }
 
@@ -569,7 +592,7 @@ class UTR extends Rect {
 
     constructor(sharedState: AnnotationTrack['sharedState']) {
         super(0, 0);
-        this.color = sharedState.colors['untranslated'];
+        this.color = sharedState.colors['--untranslated'];
         this.transparent = true;
     }
 
@@ -647,7 +670,7 @@ class CDS extends Rect {
 
         this.reverse = strand === Strand.Negative ? 1.0 : 0.0;
 
-        this.color = sharedState.colors['coding']; // rgba(26, 174, 222, 0.58)
+        this.color = sharedState.colors['--coding']; // rgba(26, 174, 222, 0.58)
         this.transparent = true;
         this.blendMode = BlendMode.PREMULTIPLIED_ALPHA;
     }

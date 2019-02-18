@@ -103,8 +103,8 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     applyStyle(styleProxy: StyleProxy) {
         super.applyStyle(styleProxy);
 
-        this.yAxis.color = styleProxy.getColor('--text') || this.yAxis.color;
-        this.signalReading.color = styleProxy.getColor('--text') || this.signalReading.color;
+        this.yAxis.color = styleProxy.getColor('color') || this.yAxis.color;
+        this.signalReading.color = styleProxy.getColor('color') || this.signalReading.color;
     }
 
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle) {

@@ -321,7 +321,9 @@ export class TrackViewer extends Object2D {
             return;
         }
 
+        track.opacity = 0;
         trackInternal.closing = true;
+        rowObject.disableInteraction();
 
         rowObject.setResizable(false);
 
@@ -667,9 +669,9 @@ export class TrackViewer extends Object2D {
             let rowObject = (track as any as TrackInternal).rowObject;
             if (singleTrackRowOnly === undefined || (singleTrackRowOnly === rowObject)) {
                 if (animate) {
-                    Animator.springTo(rowObject, { y: y, h: h }, DEFAULT_SPRING);
+                    Animator.springTo(rowObject, { y: y, h: h, opacity: track.opacity }, DEFAULT_SPRING);
                 } else {
-                    Animator.stop(rowObject, ['y', 'h']);
+                    Animator.stop(rowObject, ['y', 'h', 'opacity']);
                     rowObject.y = y + this.rowOffsetY;
                     rowObject.h = h;
                 }
@@ -919,6 +921,7 @@ export class TrackViewer extends Object2D {
     public static TrackCloseButton(props: {
         onClick: (track: RowObject) => void,
         track: RowObject,
+        style: React.CSSProperties,
     }) {
         return <div
             className="hpgv_ui-block hpgv_track-close-button"
@@ -928,6 +931,7 @@ export class TrackViewer extends Object2D {
                 width: '100%',
                 overflow: 'hidden',
                 userSelect: 'none',
+                ...props.style
             }}
         >
             <div style={{
@@ -948,23 +952,23 @@ export class TrackViewer extends Object2D {
         model: TrackModel,
         setExpanded?: (state: boolean) => void,
         isExpanded: boolean,
+        style?: React.CSSProperties
     }) {
         const iconViewBoxSize = '0 0 32 32';
-        const style = {
-            marginTop: 8,
-            marginLeft: 16,
-            color: 'inherit'
-        }
         const headerContainerStyle: React.CSSProperties = {
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-start'
+            justifyContent: 'flex-start',
         };
 
         const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
 
         const expandArrow = (<ArrowElem
-            style={style}
+            style={{
+                marginTop: 8,
+                marginLeft: 16,
+                color: 'inherit',
+            }}
             viewBox={iconViewBoxSize}
         />);
         return <div
@@ -975,6 +979,7 @@ export class TrackViewer extends Object2D {
                 height: '100%',
                 overflow: 'hidden',
                 userSelect: 'none',
+                ...props.style,
             }}
         >
             <div style={{
@@ -1034,19 +1039,29 @@ export class Track {
 
     set heightPx(v: number) {
         this._heightPx = v;
-        this.onHeightChanged();
+        this.onFieldsChanged();
     }
 
     get heightPx() {
         return this._heightPx;
     }
 
+    set opacity(v: number) {
+        this._opacity = v;
+        this.onFieldsChanged();
+    }
+
+    get opacity() {
+        return this._opacity;
+    }
+
     protected rowObject: RowObject;
+    protected _opacity: number = 1.0;
 
     constructor(
         readonly model: TrackModel,
         protected _heightPx: number,
-        protected onHeightChanged: () => void
+        protected onFieldsChanged: () => void
     ) {
     }
 
@@ -1076,6 +1091,15 @@ class RowObject {
         this.layoutY();
     }
 
+    set opacity(v: number) {
+        this._opacity = v;
+        this.syncTrackViews();
+        this.updateHeader();
+    }
+    get opacity() {
+        return this._opacity;
+    }
+
     get title() {
         return this.model.name;
     }
@@ -1087,9 +1111,11 @@ class RowObject {
 
     protected _y: number;
     protected _h: number;
+    protected _opacity: number = 1.0;
 
     protected _headerIsExpandedState: boolean | undefined = undefined;
     protected styleProxy: StyleProxy;
+    protected interactionDisabled: boolean = false;
 
     constructor(
         protected model: TrackModel,
@@ -1117,9 +1143,7 @@ class RowObject {
     
     addTrackView(trackView: TrackObject) {
         this.trackViews.add(trackView);
-        if (this.styleProxy != null) {
-            trackView.applyStyle(this.styleProxy);
-        }
+        this.syncTrackView(trackView);
         this.layoutY();
     }
 
@@ -1130,9 +1154,25 @@ class RowObject {
     applyStyle(styleProxy: StyleProxy) {
         this.styleProxy = styleProxy;
 
+        this.syncTrackViews();
+    }
+
+    disableInteraction() {
+        this.interactionDisabled = false;
+        this.updateHeader();
+    }
+
+    protected syncTrackViews() {
         for (let view of this.trackViews) {
-            view.applyStyle(styleProxy);
+            this.syncTrackView(view);
         }
+    }
+
+    protected syncTrackView(trackView: TrackObject) {
+        if (this.styleProxy != null) {
+            trackView.applyStyle(this.styleProxy);
+        }
+        trackView.opacity = this.opacity;
     }
 
     /**
@@ -1166,15 +1206,31 @@ class RowObject {
     protected updateHeader() {
         this._headerIsExpandedState = this.isExpanded();
         this.header.content = (<TrackViewer.TrackHeader
-            model={this.model}
+            model={this.model}  
             isExpanded={this._headerIsExpandedState}
             setExpanded={(toggle: boolean) => {
+                if (this.interactionDisabled) return;
+
                 this.setHeight(toggle ? RowObject.expandedTrackHeight : RowObject.collapsedTrackHeight);
             }}
+            style={{
+                opacity: this._opacity,
+                pointerEvents: this.interactionDisabled ? 'none' : null
+            }}
         />);
-        this.closeButton.content = (<TrackViewer.TrackCloseButton track={this} onClick={() => {
-            this.onClose(this);
-        }} />);
+        this.closeButton.content = (<TrackViewer.TrackCloseButton
+            track={this}
+            onClick={() => {
+                if (this.interactionDisabled) return;
+
+                this.onClose(this);
+            }}
+            style={{
+                opacity: this._opacity,
+                pointerEvents: this.interactionDisabled ? 'none' : null
+            }}
+            />
+        );
     }
 
     protected isExpanded = () => {

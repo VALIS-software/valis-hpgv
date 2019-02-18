@@ -185,7 +185,11 @@ export class ShaderTile<TilePayload> extends Object2D {
         return this.tile;
     }
 
-    protected tileCompleteListener = () => {
+    protected tileCompleteListener = (completedTile: Tile<TilePayload>) => {
+        if (completedTile !== this.tile) {
+            // a bug in EventEmitter (or maybe V8?) is causing the removeEventListener when changing tile to not work properly
+            return;
+        }
         this.tile.removeEventListener('complete', this.tileCompleteListener);
         this.onTileComplete();
     }

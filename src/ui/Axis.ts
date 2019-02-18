@@ -26,6 +26,8 @@ export type AxisConfig = {
     fontPath: string,
     tickSpacingPx: number,
     maxTextLength: number,
+    tickSizePx: number,
+    tickOffsetPx: number,
 }
 
 export class Axis extends Object2D {
@@ -79,6 +81,8 @@ export class Axis extends Object2D {
 
     protected fontPath: string;
     protected tickSpacingPx: number;
+    protected tickSizePx: number;
+    protected tickOffsetPx: number;
     
     protected clip: boolean;
     protected _color: ArrayLike<number>;
@@ -118,6 +122,8 @@ export class Axis extends Object2D {
             fontPath: OpenSansRegular,
             tickSpacingPx: 30,
             maxTextLength: 4,
+            tickSizePx: 5,
+            tickOffsetPx: 3,
 
             ...options,
         };
@@ -136,6 +142,8 @@ export class Axis extends Object2D {
         this.fontPath = config.fontPath;
         this.tickSpacingPx = config.tickSpacingPx;
         this._maxTextLength = config.maxTextLength;
+        this.tickSizePx = config.tickSizePx;
+        this.tickOffsetPx = config.tickOffsetPx;
 
         this._labelsNeedUpdate = true;
 
@@ -274,7 +282,7 @@ export class Axis extends Object2D {
     }
 
     protected createLabel = (str: string) => {
-        let label = new Label(this.fontPath, str, this.fontSizePx, this.align);
+        let label = new Label(this.fontPath, str, this.fontSizePx, this.align, this.tickSizePx, this.tickOffsetPx);
         switch (this.align) {
             case 'top': 
                 label.relativeY = 0;
@@ -395,48 +403,47 @@ class Label extends Object2D {
     text: Text;
     tick: Rect;
 
-    constructor(fontPath: string, string: string, fontSizePx: number, align: AxisAlign) {
+    constructor(fontPath: string, string: string, fontSizePx: number, align: AxisAlign, tickSizePx: number, tickOffsetPx: number) {
         super();
-        let tickHeightPx = 5;
         let tickWidthPx = 1;
 
         this.text = new Text(fontPath, string, fontSizePx);
 
         switch (align) {
             case 'top': {
-                this.tick = new Rect(tickWidthPx, tickHeightPx);
+                this.tick = new Rect(tickWidthPx, tickSizePx);
                 this.tick.originX = -0.5;
                 this.tick.originY = 0;
                 this.text.originX = -0.5;
                 this.text.originY = 0;
-                this.text.y = tickHeightPx + 3;
+                this.text.y = tickSizePx + tickOffsetPx;
                 break;
             }
             case 'bottom': {
-                this.tick = new Rect(tickWidthPx, tickHeightPx);
+                this.tick = new Rect(tickWidthPx, tickSizePx);
                 this.tick.originX = -0.5;
                 this.tick.originY = -1;
                 this.text.originX = -0.5;
                 this.text.originY = -1;
-                this.text.y = -tickHeightPx - 3;
+                this.text.y = -tickSizePx - tickOffsetPx;
                 break;
             }
             case 'left': {
-                this.tick = new Rect(tickHeightPx, tickWidthPx);
+                this.tick = new Rect(tickSizePx, tickWidthPx);
                 this.tick.originX = 0;
                 this.tick.originY = -0.5;
                 this.text.originX = 0;
                 this.text.originY = -0.5;
-                this.text.x = tickHeightPx + 3;
+                this.text.x = tickSizePx + tickOffsetPx;
                 break;
             }
             case 'right': {
-                this.tick = new Rect(tickHeightPx, tickWidthPx);
+                this.tick = new Rect(tickSizePx, tickWidthPx);
                 this.tick.originX = -1;
                 this.tick.originY = -0.5;
                 this.text.originX = -1;
                 this.text.originY = -0.5;
-                this.text.x = -tickHeightPx - 3;
+                this.text.x = -tickSizePx - tickOffsetPx;
                 break;
             }
         }

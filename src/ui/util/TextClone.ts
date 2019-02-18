@@ -60,6 +60,7 @@ export class TextClone extends Object2D {
         textInternal.worldTransformMat4 = this.worldTransformMat4;
         this.text.color = this.color;
         this.text.additiveBlending = this.additiveBlending;
+        this.text.opacity =  this.opacity;
 
         this.text.draw(context);
     }

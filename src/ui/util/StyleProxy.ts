@@ -49,6 +49,15 @@ export class StyleProxy {
         }
     }
 
+    getNumber(propertyName: string, selector?: string) {
+        let css = this.getStyle(selector);
+        if (css != null) {
+            return parseFloat(css.getPropertyValue(propertyName));
+        } else {
+            return null;
+        }
+    }
+
     observeAllStyle(callback: (node: Node, style: CSSStyleDeclaration) => void) {
         return this.createMutationObserver(null, callback);
     }

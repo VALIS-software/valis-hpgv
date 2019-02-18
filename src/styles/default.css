@@ -3,6 +3,7 @@
     background-color: #171615;
     font-size: 12px;
     border-radius: 8px;
+    box-sizing: border-box;
 }
 
 .hpgv_panel-header {

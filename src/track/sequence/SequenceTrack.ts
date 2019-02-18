@@ -29,7 +29,7 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
             gcBandingLow: [0.286, 0, 0.502, 1],
             gcBandingHigh: [0.106, 1, 0.627, 1],
 
-            text: [1, 1, 1, 0.7],
+            color: [1, 1, 1, 0.7],
             textAdditiveBlendFactor: 1.0,
         },
 
@@ -62,8 +62,9 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
         this.sharedState.colors.gcBandingLow = styleProxy.getColor('--gc-banding-low') || this.sharedState.colors.gcBandingLow;
         this.sharedState.colors.gcBandingHigh = styleProxy.getColor('--gc-banding-high') || this.sharedState.colors.gcBandingHigh;
 
-        this.sharedState.colors.text = styleProxy.getColor('--text-color') || this.sharedState.colors.text;
-        this.sharedState.colors.textAdditiveBlendFactor = styleProxy.getNumber('--text-additive-blending') || this.sharedState.colors.textAdditiveBlendFactor;
+        this.sharedState.colors.color = styleProxy.getColor('color') || this.sharedState.colors.color;
+        let textAdditiveBlendFactor = styleProxy.getNumber('--text-additive-blending')
+        this.sharedState.colors.textAdditiveBlendFactor = (textAdditiveBlendFactor != null) ? textAdditiveBlendFactor : this.sharedState.colors.textAdditiveBlendFactor;
     }
 
     protected createTileNode(...args: Array<any>): SequenceTile {
@@ -219,7 +220,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
     }
 
     protected createLabel = (baseCharacter: string) => {        
-        let textClone = new TextClone(this.sharedState.baseTextInstances[baseCharacter], this.sharedState.colors.text);
+        let textClone = new TextClone(this.sharedState.baseTextInstances[baseCharacter], this.sharedState.colors.color);
         textClone.additiveBlending = this.sharedState.colors.textAdditiveBlendFactor;
 
         textClone.originX = -0.5;

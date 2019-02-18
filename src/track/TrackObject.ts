@@ -291,6 +291,8 @@ export class AxisPointer extends Rect {
             this.w = 1;
         }
 
+        this.transparent = true;
+
         this.setStyle(style);
     }
     

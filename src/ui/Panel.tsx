@@ -107,11 +107,13 @@ export class Panel extends Object2D {
             tickSpacingPx: 80,
             clip: true,
             color: [0, 0, 0],
-            fontSizePx: 11,
+            fontSizePx: 9,
+            tickOffsetPx: 2,
+            tickSizePx: 2,
         });
         this.xAxis.minDisplay = 0;
         this.xAxis.maxDisplay = Infinity;
-        this.xAxis.y = -this.spacing.y;
+        this.xAxis.y = -2;
         this.xAxis.h = this.xAxisHeight;
         this.xAxis.originY = -1;
         this.xAxis.z = 20;

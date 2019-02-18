@@ -139,7 +139,7 @@ export class Panel extends Object2D {
     }
 
     applyStyle(styleProxy: StyleProxy) {
-        this.xAxis.color = styleProxy.getColor('--axis') || this.xAxis.color;
+        this.xAxis.color = styleProxy.getColor('color') || this.xAxis.color;
     }
 
     setResizable(v: boolean) {

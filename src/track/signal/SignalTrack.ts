@@ -331,6 +331,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
 
     constructor(protected readonly sharedProperties: {
         displayScale: number,
+        color: ArrayLike<number> // background color of track
     }) {
         super();
     }
@@ -355,8 +356,11 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                 precision mediump float;
                 uniform float opacity;
                 uniform sampler2D memoryBlock;
-                uniform vec2 size;
                 uniform float scaleFactor;
+                uniform vec3 backgroundColor;
+
+                uniform vec2 viewportSize;
+                uniform vec2 uvSize;
 
                 varying vec2 texCoord;
                 varying vec2 vUv;
@@ -364,16 +368,13 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                 ${this.colorShaderFunction}
                 
                 void main() {
-                    vec4 textureSample = texture2D(memoryBlock, texCoord);
+                    vec4 textureSample = texture2D(memoryBlock, texCoord) * scaleFactor;
 
-                    vec3 col = color(textureSample * scaleFactor, vUv);
+                    vec4 col = vec4(viridis(textureSample.r * vUv.y), step(1.0 - textureSample.r, vUv.y));
 
-                    #if 0
-                    float debug = step((1.0 - vUv.y) * size.y, 5.);
-                    col = mix( col, vec3( 0., vUv.xy ), debug);
-                    #endif
-                    
-                    gl_FragColor = vec4(col, 1.0) * opacity;
+                    // manual premultiplied alpha blending
+                    const float blendFactor = 1.0;
+                    gl_FragColor = vec4(col.rgb * col.a + backgroundColor * (1.0 - col.a), blendFactor) * opacity;
                 }
             `,
             SignalTile.attributeLayout
@@ -391,6 +392,14 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
     }
 
     draw(context: DrawContext) {
+        // we can use viewport size to determine rendered pixel sizes and apply anti-aliasing
+        let pixelRatio = this.worldTransformMat4[0] * context.viewport.w * 0.5;
+        context.uniform2f('viewportSize', context.viewport.w, context.viewport.h);
+        context.uniform2f('uvSize', this.computedWidth * pixelRatio, this.computedHeight * pixelRatio);
+
+        let bgColor = this.sharedProperties.color; // assumed to be opaque
+        context.uniform3f('backgroundColor', bgColor[0], bgColor[1], bgColor[2]);
+
         context.uniform2f('size', this.computedWidth, this.computedHeight);
         context.uniformMatrix4fv('model', false, this.worldTransformMat4);
         context.uniform1f('opacity', this.opacity);

@@ -371,6 +371,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                     float signalGradient = dFdx(signalTop_px);
                     float pixelSignalDist_px = signalTop_px - gl_FragCoord.y;
 
+                    // cheap antialiasing by estimating pixel coverage (using rotatable pixel model)
                     float d = pixelSignalDist_px/sqrt(signalGradient * signalGradient + 1.0);
                     float signalAlpha = clamp(0.5 + d, 0.0, 1.0);
 

@@ -95,6 +95,7 @@ export class AppCanvas extends React.Component<Props, State> {
         printExtensionSupport('Instancing', this.device.capabilities.instancing);
         printExtensionSupport('Float Textures', this.device.capabilities.floatTextures);
         printExtensionSupport('Float Textures Linear Filtering', this.device.capabilities.floatTexturesLinearFiltering);
+        printExtensionSupport('Standard Derivatives', this.device.capabilities.standardDerivatives);
 
         if (!this.device.capabilities.instancing) {
             // support is expected on 100% of desktops and ~95% of mobile devices

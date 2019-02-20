@@ -278,7 +278,7 @@ export class AxisPointer extends Rect {
 
     readonly style: AxisPointerStyle;
 
-    constructor(style: AxisPointerStyle, readonly activeColor: ArrayLike<number>, readonly secondaryColor: ArrayLike<number>, axis: 'x' | 'y') {
+    constructor(style: AxisPointerStyle, public activeColor: ArrayLike<number>, public secondaryColor: ArrayLike<number>, axis: 'x' | 'y') {
         super(0, 0);
 
         if (axis === 'y') {

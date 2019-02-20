@@ -79,12 +79,12 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         // y-positioning handled in setSignalReading
         this.add(this.signalReading);
 
-        this.yAxisPointer = new AxisPointer(AxisPointerStyle.Active, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
+        this.yAxisPointer = new AxisPointer(AxisPointerStyle.Secondary, this.activeAxisPointerColor, this.secondaryAxisPointerColor, 'y');
         this.yAxisPointer.render = false;
         this.yAxisPointer.x = 0;
         this.yAxisPointer.y = 0;
         this.yAxisPointer.z = 2;
-        this.yAxisPointer.opacity = 0.3;
+        // this.yAxisPointer.opacity = 0.3;
         this.yAxisPointer.mask = this;
         this.add(this.yAxisPointer);
 
@@ -105,6 +105,10 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
         this.yAxis.color = styleProxy.getColor('color') || this.yAxis.color;
         this.signalReading.color = styleProxy.getColor('color') || this.signalReading.color;
+
+        this.yAxisPointer.activeColor = this.activeAxisPointerColor;
+        this.yAxisPointer.secondaryColor = this.secondaryAxisPointerColor;
+        this.yAxisPointer.setStyle(this.yAxisPointer.style);
     }
 
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle) {

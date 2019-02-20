@@ -58,8 +58,8 @@ export declare enum AxisPointerStyle {
     Secondary = 1
 }
 export declare class AxisPointer extends Rect {
-    readonly activeColor: ArrayLike<number>;
-    readonly secondaryColor: ArrayLike<number>;
+    activeColor: ArrayLike<number>;
+    secondaryColor: ArrayLike<number>;
     readonly style: AxisPointerStyle;
     constructor(style: AxisPointerStyle, activeColor: ArrayLike<number>, secondaryColor: ArrayLike<number>, axis: 'x' | 'y');
     setStyle(style: AxisPointerStyle): void;

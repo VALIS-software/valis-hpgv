@@ -27,21 +27,26 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     protected macroModel: MacroAnnotationTrackModel;
     readonly compact: boolean;
     protected colors: {
-        'transcript-arrow': number[];
-        'transcript': number[];
-        'coding': number[];
-        'non-coding': number[];
-        'untranslated': number[];
-        'text': number[];
+        '--transcript-arrow': number[];
+        '--transcript': number[];
+        '--coding': number[];
+        '--non-coding': number[];
+        '--untranslated': number[];
+        'color': number[];
+        '--stroke': number[];
     };
     protected sharedState: {
         colors: {
-            'transcript-arrow': number[];
-            'transcript': number[];
-            'coding': number[];
-            'non-coding': number[];
-            'untranslated': number[];
-            'text': number[];
+            '--transcript-arrow': number[];
+            '--transcript': number[];
+            '--coding': number[];
+            '--non-coding': number[];
+            '--untranslated': number[];
+            'color': number[];
+            '--stroke': number[];
+        };
+        style: {
+            '--stroke-width': number;
         };
         pointerOver: boolean;
     };

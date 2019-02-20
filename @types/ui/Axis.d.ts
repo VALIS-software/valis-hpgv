@@ -18,6 +18,8 @@ export declare type AxisConfig = {
     fontPath: string;
     tickSpacingPx: number;
     maxTextLength: number;
+    tickSizePx: number;
+    tickOffsetPx: number;
 };
 export declare class Axis extends Object2D {
     maxTextLength: number;
@@ -36,6 +38,8 @@ export declare class Axis extends Object2D {
     protected startFrom: number;
     protected fontPath: string;
     protected tickSpacingPx: number;
+    protected tickSizePx: number;
+    protected tickOffsetPx: number;
     protected clip: boolean;
     protected _color: ArrayLike<number>;
     protected _fontSizePx: number;
@@ -73,7 +77,7 @@ export declare class Axis extends Object2D {
 declare class Label extends Object2D {
     text: Text;
     tick: Rect;
-    constructor(fontPath: string, string: string, fontSizePx: number, align: AxisAlign);
+    constructor(fontPath: string, string: string, fontSizePx: number, align: AxisAlign, tickSizePx: number, tickOffsetPx: number);
     setColor(r: number, g: number, b: number, a: number): void;
     setMask(mask: Renderable<any>): void;
     releaseGPUResources(): void;

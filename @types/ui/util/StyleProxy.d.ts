@@ -16,6 +16,7 @@ export declare class StyleProxy {
     getRoot(): HTMLElement;
     getStyle(selector?: string): CSSStyleDeclaration | null;
     getColor(propertyName: string, selector?: string): number[];
+    getNumber(propertyName: string, selector?: string): number;
     observeAllStyle(callback: (node: Node, style: CSSStyleDeclaration) => void): MutationObserver;
     observeDescendantStyle(selector: string, callback: (node: Node, style: CSSStyleDeclaration) => void): MutationObserver;
     removeObserver(observer: MutationObserver): boolean;

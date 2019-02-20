@@ -17,10 +17,15 @@ export declare class SequenceTrack<Model extends SequenceTrackModel = SequenceTr
             t: number[];
             c: number[];
             g: number[];
+            gcBandingLow: number[];
+            gcBandingHigh: number[];
+            color: number[];
+            textAdditiveBlendFactor: number;
         };
         baseTextInstances: {
             [letter: string]: Text;
         };
+        backgroundColor: ArrayLike<number>;
     };
     constructor(model: Model);
     applyStyle(styleProxy: StyleProxy): void;
@@ -57,11 +62,6 @@ declare class SequenceTile extends ShaderTile<SequenceTilePayload> {
         type: AttributeType;
     }[];
     protected static vertexShader: string;
-    protected static getFragmentShader(colors: {
-        a: Array<number>;
-        t: Array<number>;
-        g: Array<number>;
-        c: Array<number>;
-    }): string;
+    protected static getFragmentShader(colors: SequenceTrack['sharedState']['colors']): string;
 }
 export default SequenceTrack;

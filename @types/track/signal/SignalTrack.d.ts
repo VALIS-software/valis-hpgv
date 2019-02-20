@@ -12,13 +12,17 @@ import { StyleProxy } from "../../ui/util/StyleProxy";
 export declare class SignalTrack<Model extends TrackModel = SignalTrackModel> extends ShaderTrack<Model, SignalTileLoader, SignalTilePayload> {
     autoScale: boolean;
     autoScaleDelay_ms: number;
-    protected displayScale: number;
+    displayScale: number;
     protected yAxis: Axis;
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;
     readonly signalReadingSnapX: boolean;
     protected showSignalReading: boolean;
     protected _displayScale: number;
+    protected sharedState: {
+        track: SignalTrack<Model>;
+        signalColor: number[];
+    };
     constructor(model: Model);
     applyStyle(styleProxy: StyleProxy): void;
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle): void;
@@ -40,15 +44,11 @@ export declare class SignalTrack<Model extends TrackModel = SignalTrackModel> ex
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
 }
 export declare class SignalTile extends ShaderTile<SignalTilePayload> {
-    protected readonly sharedProperties: {
-        displayScale: number;
-    };
+    protected readonly sharedState: SignalTrack['sharedState'];
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
     protected colorShaderFunction: string;
-    constructor(sharedProperties: {
-        displayScale: number;
-    });
+    constructor(sharedState: SignalTrack['sharedState']);
     setTile(tile: Tile<SignalTilePayload>): void;
     allocateGPUResources(device: GPUDevice): void;
     releaseGPUResources(): void;

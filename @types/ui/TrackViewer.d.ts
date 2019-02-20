@@ -94,11 +94,13 @@ export declare class TrackViewer extends Object2D {
     static TrackCloseButton(props: {
         onClick: (track: RowObject) => void;
         track: RowObject;
+        style: React.CSSProperties;
     }): JSX.Element;
     static TrackHeader(props: {
         model: TrackModel;
         setExpanded?: (state: boolean) => void;
         isExpanded: boolean;
+        style?: React.CSSProperties;
     }): JSX.Element;
     static AddPanelButton(props: {
         onClick: () => void;
@@ -107,11 +109,13 @@ export declare class TrackViewer extends Object2D {
 export declare class Track {
     readonly model: TrackModel;
     protected _heightPx: number;
-    protected onHeightChanged: () => void;
+    protected onFieldsChanged: () => void;
     readonly closing: boolean;
     heightPx: number;
+    opacity: number;
     protected rowObject: RowObject;
-    constructor(model: TrackModel, _heightPx: number, onHeightChanged: () => void);
+    protected _opacity: number;
+    constructor(model: TrackModel, _heightPx: number, onFieldsChanged: () => void);
     applyStyle(styleProxy: StyleProxy): void;
 }
 /**
@@ -133,11 +137,14 @@ declare class RowObject {
     readonly trackViews: Set<TrackObject<TrackModel, import("../track/TileLoader").TileLoader<any, any>>>;
     y: number;
     h: number;
+    opacity: number;
     title: string;
     protected _y: number;
     protected _h: number;
+    protected _opacity: number;
     protected _headerIsExpandedState: boolean | undefined;
     protected styleProxy: StyleProxy;
+    protected interactionDisabled: boolean;
     constructor(model: TrackModel, spacing: {
         x: number;
         y: number;
@@ -146,6 +153,9 @@ declare class RowObject {
     addTrackView(trackView: TrackObject): void;
     removeTrackView(trackView: TrackObject): void;
     applyStyle(styleProxy: StyleProxy): void;
+    disableInteraction(): void;
+    protected syncTrackViews(): void;
+    protected syncTrackView(trackView: TrackObject): void;
     /**
      * A TrackRow isn't an Object2D so we manually layout track elements with the track row's y and height
      */

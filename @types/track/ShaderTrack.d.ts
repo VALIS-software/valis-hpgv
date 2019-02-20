@@ -25,7 +25,7 @@ export declare class ShaderTile<TilePayload> extends Object2D {
     constructor();
     setTile(tile: Tile<TilePayload>): void;
     getTile(): Tile<TilePayload>;
-    protected tileCompleteListener: () => void;
+    protected tileCompleteListener: (completedTile: Tile<TilePayload>) => void;
     protected onTileComplete(): void;
 }
 export default ShaderTrack;

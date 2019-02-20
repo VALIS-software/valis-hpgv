@@ -32,6 +32,24 @@ export declare class GenomeVisualizer {
     setDataSource(dataSourceArg: IDataSource | string | undefined): void;
     setConfiguration(configuration: GenomeVisualizerConfiguration): void;
     getConfiguration(): import("./ui/TrackViewerConfiguration").TrackViewerConfiguration;
+    /**
+     * Sets the current displayed genomic location (contig, region) of the first open panel
+     * @param genomicLocation `{contig: string, x0: number, x1: number}`
+     */
+    setLocation(genomicLocation: GenomicLocation): void;
+    /**
+     * Sets the current displayed contig of the first open panel
+     * Use with `setRange()` to specify a complete location
+     * @param contig id of contig within available data
+     */
+    setContig(contig: string): void;
+    /**
+     * Sets the current displayed region of the first open panel
+     * Spanned length = x1 - x0
+     * @param x0 left base index (starting at 0)
+     * @param x1 right base index
+     */
+    setRange(x0: number, x1: number): void;
     addTrack(model: TrackModel, animateIn?: boolean): Track;
     addTrackFromFilePath(path: string, animateIn: boolean): Track;
     addPanel(location: GenomicLocation, animateIn: boolean): void;

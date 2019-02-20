@@ -43,7 +43,7 @@
     background-color: #e9f0f3;
     --loading-indicator: #8ea1bf;
     --cursor: #3645653b;
-    --secondary-cursor: rgba(52, 52, 52, 0.6);
+    --secondary-cursor: #55668c1f;
 }
 
 .hpgv_track-annotation {
@@ -71,4 +71,5 @@
 }
 
 .hpgv_track-signal {
+
 }

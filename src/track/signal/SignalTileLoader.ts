@@ -209,8 +209,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
             }
         });
         return bigWigReader.getHeader().then((header) => {
-            console.log('Header loaded', header);
-
             let lookupTables = this.generateLodLookups(header);
             return {
                 ...lookupTables,

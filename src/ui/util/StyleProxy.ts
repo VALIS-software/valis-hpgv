@@ -43,7 +43,8 @@ export class StyleProxy {
     getColor(propertyName: string, selector?: string) {
         let css = this.getStyle(selector);
         if (css != null) {
-            return CSSUtil.parseColor(css.getPropertyValue(propertyName));
+            let valueString = css.getPropertyValue(propertyName);
+            return valueString === '' ? null : CSSUtil.parseColor(css.getPropertyValue(propertyName));
         } else {
             return null;
         }

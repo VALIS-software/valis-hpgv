@@ -353,28 +353,34 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
             `
                 #version 100
 
+                #extension GL_OES_standard_derivatives : enable
+
                 precision mediump float;
                 uniform float opacity;
                 uniform sampler2D memoryBlock;
                 uniform float scaleFactor;
                 uniform vec3 backgroundColor;
 
-                uniform vec2 viewportSize;
-                uniform vec2 uvSize;
-
                 varying vec2 texCoord;
-                varying vec2 vUv;
-
-                ${this.colorShaderFunction}
+                varying vec4 rect_px; // x, y, width, height
                 
                 void main() {
                     vec4 textureSample = texture2D(memoryBlock, texCoord) * scaleFactor;
+                    float signalHeight_uv = textureSample.r;
+                    float signalTop_px = signalHeight_uv * rect_px[3] + rect_px[1];
+                    float signalGradient = dFdx(signalTop_px);
+                    float pixelSignalDist_px = signalTop_px - gl_FragCoord.y;
 
-                    vec4 col = vec4(viridis(textureSample.r * vUv.y), step(1.0 - textureSample.r, vUv.y));
+                    float d = pixelSignalDist_px/sqrt(signalGradient * signalGradient + 1.0);
+                    float signalAlpha = clamp(0.5 + d, 0.0, 1.0);
+
+                    vec3 signalColor = vec3(0.3, 0.8, 1.0);
+                    // vec3 signalColor = vec3(max(signalGradient, 0.), min(signalGradient, 0.), 1.0);
+                    // vec3 signalColor = vec3(step(25., abs(signalGradient)), 0., 0.);
 
                     // manual premultiplied alpha blending
                     const float blendFactor = 1.0;
-                    gl_FragColor = vec4(col.rgb * col.a + backgroundColor * (1.0 - col.a), blendFactor) * opacity;
+                    gl_FragColor = vec4(signalColor * signalAlpha + backgroundColor * (1.0 - signalAlpha), blendFactor) * opacity;
                 }
             `,
             SignalTile.attributeLayout
@@ -393,9 +399,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
 
     draw(context: DrawContext) {
         // we can use viewport size to determine rendered pixel sizes and apply anti-aliasing
-        let pixelRatio = this.worldTransformMat4[0] * context.viewport.w * 0.5;
-        context.uniform2f('viewportSize', context.viewport.w, context.viewport.h);
-        context.uniform2f('uvSize', this.computedWidth * pixelRatio, this.computedHeight * pixelRatio);
+        context.uniform2f('viewport', context.viewport.w, context.viewport.h);
 
         let bgColor = this.sharedProperties.color; // assumed to be opaque
         context.uniform3f('backgroundColor', bgColor[0], bgColor[1], bgColor[2]);
@@ -424,13 +428,26 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
         uniform vec2 size;
         uniform float memoryBlockY;
 
+        uniform vec2 viewport;
+
         varying vec2 texCoord;
-        varying vec2 vUv;
+
+        varying vec4 rect_px; // x, y, width, height
 
         void main() {
             texCoord = vec2(position.x, memoryBlockY);
-            vUv = position;
+
             gl_Position = model * vec4(position * size, 0., 1.0);
+
+            // we store the rect coordinates in viewport pixels so we can compute pixel offset for anti-aliasing
+            // account for y-flip in the model
+            vec2 rectBL_px = ((model * vec4(vec2(0.0, 1.0) * size, 0., 1.0)).xy + 1.0) * 0.5 * viewport;
+            vec2 rectTL_px = ((model * vec4(vec2(1.0, 0.0) * size, 0., 1.0)).xy + 1.0) * 0.5 * viewport;
+
+            rect_px = vec4(
+                rectBL_px,
+                rectTL_px - rectBL_px
+            );
         }
     `;
 

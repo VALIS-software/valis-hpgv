@@ -58,12 +58,6 @@ export class GenomeVisualizer {
 
         this.setDataSource(dataSource);
 
-        // default configuration
-        this.setConfiguration({
-            panels: [{location: {contig: 'chr1', x0: 0, x1: 10}}],
-            tracks: [],
-        });
-
         if (Array.isArray(configuration)) {
             if (configuration.length > 0) {
 
@@ -106,10 +100,11 @@ export class GenomeVisualizer {
                                         span: header.chromTree.chromSize[contigId]
                                     });
                                 }
-    
-                                this.setDataSource(new ManifestDataSource(manifest));
-                                this.getPanels()[0].setContig(manifest.contigs[0].id);
-                                this.getPanels()[0].setRange(0, manifest.contigs[0].span);
+
+                                if (this.getPanels().length === 0) {
+                                    this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
+                                    this.setDataSource(new ManifestDataSource(manifest));
+                                }
                             }).catch((reason) => {
                                 this.trackViewer.setNothingToDisplayText('Error loading bigwig header (see browser console)');
                                 console.error(`Error loading bigwig header: ${reason}`);
@@ -131,9 +126,10 @@ export class GenomeVisualizer {
                                     contigs: json.contigs
                                 }
 
-                                this.setDataSource(new ManifestDataSource(manifest));
-                                this.getPanels()[0].setContig(manifest.contigs[0].id);
-                                this.getPanels()[0].setRange(0, manifest.contigs[0].span);
+                                if (this.getPanels().length === 0) {
+                                    this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
+                                    this.setDataSource(new ManifestDataSource(manifest));
+                                }
                             })
                             .catch((reason) => {
                                 this.trackViewer.setNothingToDisplayText('Error loading manifest (see browser console)');
@@ -217,7 +213,9 @@ export class GenomeVisualizer {
      * @param contig id of contig within available data
      */
     setContig(contig: string) {
-        this.getPanels()[0].setContig(contig);
+        if (this.getPanels().length > 0) {
+            this.getPanels()[0].setContig(contig);
+        }
     }
     
     /**
@@ -227,7 +225,9 @@ export class GenomeVisualizer {
      * @param x1 right base index
      */
     setRange(x0: number, x1: number) {
-        this.getPanels()[0].setRange(x0, x1);
+        if (this.getPanels().length > 0) {
+            this.getPanels()[0].setRange(x0, x1);
+        }
     }
 
     addTrack(model: TrackModel, animateIn: boolean = true) {

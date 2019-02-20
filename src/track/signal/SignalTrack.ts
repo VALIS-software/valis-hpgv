@@ -19,11 +19,11 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     autoScale = true;
     autoScaleDelay_ms = 300;
 
-    protected get displayScale() {
+    get displayScale() {
         return this._displayScale;
     }
 
-    protected set displayScale(value: number) {
+    set displayScale(value: number) {
         this._displayScale = value;
         this.yAxis.setRange(0, 1 / value);
         this.updateAxisPointerSample();
@@ -39,8 +39,19 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
     protected _displayScale = 1;
 
+    protected sharedState = {
+        track: (null as SignalTrack<Model>),
+        signalColor: [0.0, 1.0, 0.0],
+    }
+
     constructor(model: Model) {
         super(model, SignalTile);
+
+        this.sharedState.track = this;
+
+        if (model.color != null) {
+            this.sharedState.signalColor = model.color;
+        }
 
         this.yAxis = new Axis({
             x0: 0,
@@ -105,6 +116,10 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
         this.yAxis.color = styleProxy.getColor('color') || this.yAxis.color;
         this.signalReading.color = styleProxy.getColor('color') || this.signalReading.color;
+
+        this.sharedState.signalColor = this.model.color || styleProxy.getColor('--signal-color') || this.sharedState.signalColor;
+
+        console.log(this.sharedState.signalColor);
 
         this.yAxisPointer.activeColor = this.activeAxisPointerColor;
         this.yAxisPointer.secondaryColor = this.secondaryAxisPointerColor;
@@ -197,7 +212,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
     protected tileNodes = new Set<SignalTile>();
     protected createTileNode(): ShaderTile<SignalTilePayload> {
         // create empty tile node
-        let tileNode = super.createTileNode(this) as SignalTile;
+        let tileNode = super.createTileNode(this.sharedState) as SignalTile;
         this.tileNodes.add(tileNode);
         return tileNode;
     }
@@ -333,10 +348,7 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
         }
     `;
 
-    constructor(protected readonly sharedProperties: {
-        displayScale: number,
-        color: ArrayLike<number> // background color of track
-    }) {
+    constructor(protected readonly sharedState: SignalTrack['sharedState']) {
         super();
     }
 
@@ -360,10 +372,12 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                 #extension GL_OES_standard_derivatives : enable
 
                 precision mediump float;
+
                 uniform float opacity;
                 uniform sampler2D memoryBlock;
                 uniform float scaleFactor;
                 uniform vec3 backgroundColor;
+                uniform vec3 signalColor;
 
                 varying vec2 texCoord;
                 varying vec4 rect_px; // x, y, width, height
@@ -372,16 +386,20 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                     vec4 textureSample = texture2D(memoryBlock, texCoord) * scaleFactor;
                     float signalHeight_uv = textureSample.r;
                     float signalTop_px = signalHeight_uv * rect_px[3] + rect_px[1];
+
+                    #ifdef GL_OES_standard_derivatives
                     float signalGradient = dFdx(signalTop_px);
+                    #else
+                    // we could compute this by sampling left and right texels in memoryBlock
+                    // (a value of 0 limits antialiasing)
+                    float signalGradient = 0.0;
+                    #endif
+
                     float pixelSignalDist_px = signalTop_px - gl_FragCoord.y;
 
                     // cheap antialiasing by estimating pixel coverage (using rotatable pixel model)
                     float d = pixelSignalDist_px/sqrt(signalGradient * signalGradient + 1.0);
                     float signalAlpha = clamp(0.5 + d, 0.0, 1.0);
-
-                    vec3 signalColor = vec3(0.3, 0.8, 1.0);
-                    // vec3 signalColor = vec3(max(signalGradient, 0.), min(signalGradient, 0.), 1.0);
-                    // vec3 signalColor = vec3(step(25., abs(signalGradient)), 0., 0.);
 
                     // manual premultiplied alpha blending
                     const float blendFactor = 1.0;
@@ -406,15 +424,19 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
         // we can use viewport size to determine rendered pixel sizes and apply anti-aliasing
         context.uniform2f('viewport', context.viewport.w, context.viewport.h);
 
-        let bgColor = this.sharedProperties.color; // assumed to be opaque
+        // background color used required because tiles may be opaque (for performance) and opacity = 0 won't work
+        let bgColor = this.sharedState.track.color; // assumed to be opaque
         context.uniform3f('backgroundColor', bgColor[0], bgColor[1], bgColor[2]);
+
+        let signalColor = this.sharedState.signalColor;
+        context.uniform3f('signalColor', signalColor[0], signalColor[1], signalColor[2]);
 
         context.uniform2f('size', this.computedWidth, this.computedHeight);
         context.uniformMatrix4fv('model', false, this.worldTransformMat4);
         context.uniform1f('opacity', this.opacity);
         context.uniform1f('memoryBlockY', this.memoryBlockY);
         context.uniformTexture2D('memoryBlock', this.gpuTexture);
-        context.uniform1f('scaleFactor', this.sharedProperties.displayScale * this.tile.payload.textureUnpackMultiplier);
+        context.uniform1f('scaleFactor', this.sharedState.track.displayScale * this.tile.payload.textureUnpackMultiplier);
         context.draw(DrawMode.TRIANGLES, 6, 0);
 
         this.tile.markLastUsed();

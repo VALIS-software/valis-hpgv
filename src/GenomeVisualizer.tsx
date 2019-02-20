@@ -198,6 +198,34 @@ export class GenomeVisualizer {
         return this.trackViewer.getConfiguration();
     }
 
+    /**
+     * Sets the current displayed genomic location (contig, region) of the first open panel
+     * @param genomicLocation `{contig: string, x0: number, x1: number}`
+     */
+    setLocation(genomicLocation: GenomicLocation) {
+        this.setContig(genomicLocation.contig);
+        this.setRange(genomicLocation.x0, genomicLocation.x1);
+    }
+
+    /**
+     * Sets the current displayed contig of the first open panel
+     * Use with `setRange()` to specify a complete location
+     * @param contig id of contig within available data
+     */
+    setContig(contig: string) {
+        this.getPanels()[0].setContig(contig);
+    }
+    
+    /**
+     * Sets the current displayed region of the first open panel
+     * Spanned length = x1 - x0
+     * @param x0 left base index (starting at 0)
+     * @param x1 right base index
+     */
+    setRange(x0: number, x1: number) {
+        this.getPanels()[0].setRange(x0, x1);
+    }
+
     addTrack(model: TrackModel, animateIn: boolean = true) {
         return this.trackViewer.addTrack(model, animateIn);
     }

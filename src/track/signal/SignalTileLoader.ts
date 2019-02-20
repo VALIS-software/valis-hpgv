@@ -35,7 +35,6 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
     ready: boolean = false;
 
     protected bigWigLoader: BigWigLoader;
-    protected _logarithmicDisplay: boolean = false; // @! needs a proper design pass
 
     protected readonly nChannels = 4;
 
@@ -125,7 +124,8 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
         if (this._initializationPromise == null) {
             this._initializationPromise = this.getBigWigLoader(this.model.path).then((loader) => {
                 this.bigWigLoader = loader;
-
+                
+                /*
                 // determine scale factor
                 let maxLod = loader.lodMap[loader.lodMap.length - 1];
                 let maxZoomIndex = loader.lodZoomIndexMap[maxLod];
@@ -136,7 +136,8 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     this.contig,
                     loader.header.chromTree.chromSize[this.contig],
                     maxZoomIndex,
-                ).then((entries) => {
+                ).then(
+                (entries) => {
                     // console.log('maxZoom', entries);
 
                     let maxValue = -Infinity;
@@ -155,7 +156,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     let maxDisparity = maxValue / maxAvg;
 
                     // this._logarithmicDisplay = maxDisparity > 10;
-                    this._logarithmicDisplay = false;
+                    // this._logarithmicDisplay = true;
 
                     // console.log(maxValue, maxAvg, weightedAveraged);
 
@@ -163,6 +164,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                     // ideally find some decent mid scale that doesn't necessarily capture all the peaks but makes the overall shape of the data visible
                     // this._dataMultiplier = this._logarithmicDisplay ? (1 / Math.log2(weightedAveraged)) : (1 / (weightedAveraged * 5));
                 });
+                */
             });
         }
 

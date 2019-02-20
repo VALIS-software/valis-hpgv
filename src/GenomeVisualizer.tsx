@@ -413,8 +413,9 @@ export class GenomeVisualizer {
         return Object.keys(this.trackTypes);
     }
 
-    static setTheme(theme: 'default' | 'light' | null) {
-        this.setBaseStyle(require('./styles/' + (theme || 'default') + '.css'));
+    static setTheme(theme: 'dark' | 'light' | null) {
+        let defaultTheme = 'light';
+        this.setBaseStyle(require('./styles/' + (theme || defaultTheme) + '.css'));
     }
 
     private static setBaseStyle(cssString: string) {

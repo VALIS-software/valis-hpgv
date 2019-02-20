@@ -41,7 +41,9 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
             'G': new Text(OpenSansRegular, 'G', 1),
             'T': new Text(OpenSansRegular, 'T', 1),
             'N': new Text(OpenSansRegular, 'N', 1),
-        } as { [letter: string]: Text })
+        } as { [letter: string]: Text }),
+
+        backgroundColor: this.color,
     }
  
     constructor(model: Model) {
@@ -65,6 +67,8 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
         this.sharedState.colors.color = styleProxy.getColor('color') || this.sharedState.colors.color;
         let textAdditiveBlendFactor = styleProxy.getNumber('--text-additive-blending')
         this.sharedState.colors.textAdditiveBlendFactor = (textAdditiveBlendFactor != null) ? textAdditiveBlendFactor : this.sharedState.colors.textAdditiveBlendFactor;
+
+        this.sharedState.backgroundColor = this.color;
     }
 
     protected createTileNode(...args: Array<any>): SequenceTile {
@@ -134,6 +138,9 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
 
     draw(context: DrawContext) {
         let payload = this.tile.payload;
+
+        let bgColor = this.sharedState.backgroundColor; // assumed to be opaque
+        context.uniform3f('backgroundColor', bgColor[0], bgColor[1], bgColor[2]);
 
         context.uniform2f('size', this.computedWidth, this.computedHeight);
         context.uniformMatrix4fv('model', false, this.worldTransformMat4);
@@ -274,6 +281,7 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
             uniform float opacity;
             uniform sampler2D memoryBlock;
             uniform vec3 offsetScaleLod;
+            uniform vec3 backgroundColor;
 
             varying vec2 texCoord;
             varying vec2 vUv;
@@ -281,7 +289,13 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
             ${Shaders.functions.palettes.viridis}
             
             void main() {
+                // %a,%c,%g,%t
                 vec4 texRaw = texture2D(memoryBlock, texCoord);
+
+                float sum = dot(abs(texRaw), vec4(1.0));
+                // when a texel has valid data, it should sum to ~1
+                float dataAvailable = step(0.5, sum);
+
                 // unpack data
                 vec4 acgt = texRaw * offsetScaleLod.y + offsetScaleLod.x;
 
@@ -320,7 +334,12 @@ class SequenceTile extends ShaderTile<SequenceTilePayload> {
                 float displayLodLevel = offsetScaleLod.z;
                 float microMacroMix = clamp((displayLodLevel - microScaleEndLod) / microScaleEndLod, 0., 1.0);
 
-                gl_FragColor = vec4(mix(colMicro, colMacro, microMacroMix), 1.0) * opacity;
+                gl_FragColor = vec4(mix(colMicro, colMacro, microMacroMix), 1.0) * opacity * dataAvailable;
+                
+                // display nothing (background color) if there's no data
+                // we use the background color rather than just opacity 0 because the tile may have opaque blending
+                gl_FragColor = mix(vec4(backgroundColor, 1.0), gl_FragColor, dataAvailable);
+
 
                 /**
                 // for debug: makes tiling visible

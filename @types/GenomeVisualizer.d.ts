@@ -75,7 +75,7 @@ export declare class GenomeVisualizer {
         trackObjectClass: CustomTrackObject;
     };
     static getTrackTypes(): Array<string>;
-    static setTheme(theme: 'default' | 'light' | null): void;
+    static setTheme(theme: 'dark' | 'light' | null): void;
     private static setBaseStyle;
     private static removeBaseStyle;
     private static trackTypes;

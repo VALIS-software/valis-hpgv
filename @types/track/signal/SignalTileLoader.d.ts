@@ -31,7 +31,6 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected readonly contig: string;
     ready: boolean;
     protected bigWigLoader: BigWigLoader;
-    protected _logarithmicDisplay: boolean;
     protected readonly nChannels: number;
     static cacheKey(model: SignalTrackModel): string;
     static requestIndex: number;

@@ -153,7 +153,7 @@ export class TileLoader<TilePayload, BlockPayload> {
         for (let lod of this.lods) {
             for (let blockId in lod) {
                 let block = lod[blockId];
-                if (block === undefined || block.payload === undefined) {
+                if (block === undefined || block.payload == null) {
                     continue;
                 }
                 this.releaseBlockPayload(block.payload);

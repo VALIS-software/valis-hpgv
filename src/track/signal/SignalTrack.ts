@@ -119,8 +119,6 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
         this.sharedState.signalColor = this.model.color || styleProxy.getColor('--signal-color') || this.sharedState.signalColor;
 
-        console.log(this.sharedState.signalColor);
-
         this.yAxisPointer.activeColor = this.activeAxisPointerColor;
         this.yAxisPointer.secondaryColor = this.secondaryAxisPointerColor;
         this.yAxisPointer.setStyle(this.yAxisPointer.style);

@@ -461,6 +461,6 @@ GenomeVisualizer.registerTrackType('sequence', SequenceTileLoader, SequenceTrack
 GenomeVisualizer.registerTrackType('variant', VariantTileLoader, VariantTrack);
 GenomeVisualizer.registerTrackType('signal', SignalTileLoader, SignalTrack);
 
-GenomeVisualizer.setTheme('default');
+GenomeVisualizer.setTheme('light');
 
 export default GenomeVisualizer;

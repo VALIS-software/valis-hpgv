@@ -40,8 +40,7 @@ export class InternalDataSource {
 
             // set maximumX when we have access to contig info
             this.dataSource.getContigs().then((contigInfoArray) => {
-                let matchingContigInfo = contigInfoArray.find((c) => c.id === key);
-
+                let matchingContigInfo = contigInfoArray.find((c) => c.id === contig);
                 if (matchingContigInfo != null) {
                     tileLoader.maximumX = matchingContigInfo.span - 1;
                 }

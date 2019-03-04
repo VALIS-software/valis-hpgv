@@ -1,0 +1,116 @@
+<html>
+	<head>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			.log-container {
+				position: relative;
+				width: 800px;
+			}
+
+			.log-container::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				box-shadow: inset 0px 3px 4px #00000012;
+				pointer-events: none;
+			}
+
+			#log {
+				font-family: sans-serif;
+				font-weight: lighter;
+				max-height: 100px;
+				overflow: scroll;
+		
+				display: flex;
+				flex-direction: column-reverse;
+				border: 1px solid rgba(0, 0, 0, 0.1);
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+			
+		
+			#log .entry {
+				display: block;
+				margin-bottom: 10px;
+			}
+		
+			#log .entry .arg {
+				font-weight: bolder;
+				border-radius: 3px;
+				border: 1px solid rgba(0, 0, 0, 0.1);
+				display: inline-block;
+				padding: 5px;
+				margin: 0 5px 0 5px;
+				background: white;
+			}
+
+			#log .entry .arg.component {
+				color: #3a404e;
+				background: #e9f3f5;
+			}
+
+			#log .entry .arg.gene {
+				background: #dff1df;
+				color: #3d633d;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		
+		<script src="../../dist/valis-hpgv.js"></script>
+		
+		<script>
+			// initialize the viewer at a specific location (chr1:89256617-89274809)
+			let visualizer = new GenomeVisualizer({
+				panels: [{
+					location: {
+						contig: 'chr1',
+						x0: 89256617,
+						x1: 89274809,
+					}
+				}],
+				tracks: []
+			});
+			visualizer.setDataSource('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir/manifest.json');
+			visualizer.addTrackFromFilePath('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir', 'DNA');
+			visualizer.addTrackFromFilePath('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vgenes-dir', 'Annotation');
+
+			visualizer.addEventListener('annotation-clicked', (e) => {
+				// log the annotation that was clicked
+				console.log('Annotation clicked', e.type);
+
+				let logElement = document.querySelector('#log');
+
+				let logHTML = `
+				<div class="entry">
+					<span class="arg component">${e.feature.soClass}</span>
+					${e.feature.name != null ? '"' + e.feature.name + '"' : ''}
+					in gene
+					<span class="arg gene">${e.gene.name}</span>
+				</div>
+				`;
+
+				logElement.innerHTML = logHTML + logElement.innerHTML;
+			});
+
+			let container = document.getElementById('container');
+
+			visualizer.render({ width: 800, height: 250 }, container);
+		</script>
+
+		<div class="log-container">
+			<div id="log">
+				<div class="entry" style="text-align: center; color: grey">Click on annotations</div>
+			</div>
+		</div>
+
+	</body>
+</html>

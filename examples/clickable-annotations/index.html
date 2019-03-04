@@ -80,21 +80,31 @@
 				tracks: []
 			});
 			visualizer.setDataSource('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir/manifest.json');
-			visualizer.addTrackFromFilePath('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir', 'DNA');
-			visualizer.addTrackFromFilePath('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vgenes-dir', 'Annotation');
+			visualizer.addTrackFromFilePath('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir', 'DNA', false);
+			visualizer.addTrackFromFilePath('https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vgenes-dir', 'Annotation', false);
 
 			visualizer.addEventListener('annotation-clicked', (e) => {
-				// log the annotation that was clicked
-				console.log('Annotation clicked', e.type);
+				// e.type is the event type string, in this case it is 'annotation-clicked'
+				let eventType = e.type;
+				// e.feature is an object containing information the specific feature that was clicked
+				let feature = e.feature;
+				// e.gene is an object containing information about the gene the feature is part of
+				let gene = e.gene;
+				// e.target is the UI element that represents the feature that was clicked
+				let target = e.target;
+				// e.trackObject is the UI element that represents the track view that was clicked
+				let trackObject = e.trackObject;
+
+				console.log('Annotation clicked event', e, 'feature:', feature, 'in gene', gene);
 
 				let logElement = document.querySelector('#log');
 
 				let logHTML = `
 				<div class="entry">
-					<span class="arg component">${e.feature.soClass}</span>
-					${e.feature.name != null ? '"' + e.feature.name + '"' : ''}
+					<span class="arg component">${feature.soClass}</span>
+					${feature.name != null ? '"' + feature.name + '"' : ''}
 					in gene
-					<span class="arg gene">${e.gene.name}</span>
+					<span class="arg gene">${gene.name}</span>
 				</div>
 				`;
 

@@ -28,6 +28,7 @@ import TrackViewerConfiguration from "./TrackViewerConfiguration";
 import { DEFAULT_SPRING } from "./UIConstants";
 import { OpenSansRegular } from "./font";
 import { StyleProxy } from "./util/StyleProxy";
+import { TrackEvent } from "../track/TrackEvent";
 
 export class TrackViewer extends Object2D {
 
@@ -231,9 +232,9 @@ export class TrackViewer extends Object2D {
 
     // track-viewer state deltas
     addTrack(model: TrackModel, animate: boolean = true): Track {
-        const trackViewClass = GenomeVisualizer.getTrackType(model.type).trackObjectClass;
+        const trackObjectClass = GenomeVisualizer.getTrackType(model.type).trackObjectClass;
 
-        let defaultTrackHeight = trackViewClass.defaultHeightPx != null ? trackViewClass.defaultHeightPx : 100;
+        let defaultTrackHeight = trackObjectClass.defaultHeightPx != null ? trackObjectClass.defaultHeightPx : 100;
         let heightPx = model.heightPx != null ? model.heightPx : defaultTrackHeight;
 
         // create a track and add the header element to the grid
@@ -257,9 +258,7 @@ export class TrackViewer extends Object2D {
 
         // add track tile to all panels
         for (let panel of this.panels) {
-            var trackView = new trackViewClass(model);
-            panel.addTrackView(trackView);
-            rowObject.addTrackView(trackView);
+            this.createTrackObject(model, panel, rowObject);
         }
 
         let styleProxy = this.trackStyleProxies[track.model.type];
@@ -369,11 +368,9 @@ export class TrackViewer extends Object2D {
         }
 
         // initialize tracks for this panel
-       for (let track of this.tracks) {
-           var trackView = new (GenomeVisualizer.getTrackType(track.model.type).trackObjectClass)(track.model);
-           panel.addTrackView(trackView);
-           (track as any as TrackInternal).rowObject.addTrackView(trackView);
-       }
+        for (let track of this.tracks) {
+            this.createTrackObject(track.model, panel, (track as any as TrackInternal).rowObject);
+        }
 
         this.panels.add(panel);
         this.onPanelsChanged();
@@ -490,18 +487,31 @@ export class TrackViewer extends Object2D {
 
         // add track nodes
         for (let trackType of GenomeVisualizer.getTrackTypes()) {
-            let trackClass = GenomeVisualizer.getTrackType(trackType).trackObjectClass;
+            let trackObjectClass = GenomeVisualizer.getTrackType(trackType).trackObjectClass;
 
             styleNodes.push(
                 <div key={trackType} className={`hpgv_track hpgv_track-${trackType}`} ref={(node) => {
                     this.setTrackStyleNode(trackType, node);
                 }}>
-                    {trackClass.styleNodes}
+                    {trackObjectClass.styleNodes}
                 </div>
             );
         }
 
         return styleNodes;
+    }
+
+    protected createTrackObject(model: TrackModel, panel: Panel, rowObject: RowObject) {
+        const trackObjectClass = GenomeVisualizer.getTrackType(model.type).trackObjectClass;
+        let trackObject = new trackObjectClass(model);
+        panel.addTrackView(trackObject);
+        rowObject.addTrackView(trackObject);
+        
+        // unwrap and forward track events, so you can do, trackViewer.addEventListener(<track-event>, ...)
+        trackObject.addEventListener('track-event', (eventData: TrackEvent) => {
+            this.emit('track-event', eventData);
+            this.emit(eventData.type, eventData);
+        });
     }
 
     protected setTrackStyleNode(trackType: string, node: HTMLElement) {

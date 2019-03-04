@@ -8,6 +8,7 @@ import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { Scalar } from "engine/math/Scalar";
 import { StyleProxy } from "../ui/util/StyleProxy";
+import { TrackEvent } from "./TrackEvent";
 
 export class TrackObject<
     ModelType extends TrackModel = TrackModel,
@@ -174,6 +175,11 @@ export class TrackObject<
         this.loadingIndicator.color = styleProxy.getColor('--loading-indicator') || this.loadingIndicator.color;
         this.activeAxisPointerColor = styleProxy.getColor('--cursor') || this.activeAxisPointerColor;
         this.secondaryAxisPointerColor = styleProxy.getColor('--secondary-cursor') || this.secondaryAxisPointerColor;
+    }
+
+    emitTrackEvent(eventData: TrackEvent) {
+        this.emit('track-event', eventData);
+        this.emit(eventData.type, eventData);
     }
 
     /**

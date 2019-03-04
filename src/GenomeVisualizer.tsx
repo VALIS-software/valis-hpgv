@@ -316,6 +316,14 @@ export class GenomeVisualizer {
         }
     }
 
+    addEventListener(event: string, listener: (...args: any[]) => void) {
+        this.trackViewer.addEventListener(event, listener);
+    }
+
+    removeEventListener(event: string, listener: (...args: any[]) => void) {
+        this.trackViewer.removeEventListener(event, listener);
+    }
+
     render(props: GenomeVisualizerRenderProps, container: HTMLElement) {
         ReactDOM.render(this.reactRender(props), container);
     }

@@ -15,7 +15,7 @@ import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
 import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
-import { GeneClass, GenomeFeature, TranscriptClass, GenomeFeatureType } from "./AnnotationTypes";
+import { GeneClass, GenomeFeature, TranscriptClass, GenomeFeatureType, TranscriptComponentInfo } from "./AnnotationTypes";
 import { StyleProxy } from "../../ui/util/StyleProxy";
 
 const TRANSCRIPT_HEIGHT = 20;
@@ -355,7 +355,13 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected onAnnotationClicked = (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => {
-        // override this to handle annotation interactions
+        this.emitTrackEvent({
+            ...e,
+            type: 'annotation-clicked',
+            trackObject: this,
+            feature: feature,
+            gene: gene,
+        });
     }
 
 }
@@ -443,7 +449,7 @@ class TranscriptAnnotation extends Object2D {
         sharedState: AnnotationTrack['sharedState'],
         protected readonly transcript: Transcript,
         strand: Strand,
-        onClick: (e: InteractionEvent, feature: GenomeFeature) => void,
+        onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void,
     ) {
         super();
 
@@ -483,7 +489,7 @@ class TranscriptAnnotation extends Object2D {
             if (sharedState.pointerOver && e.isPrimary) {
                 e.preventDefault();
                 e.stopPropagation();
-                onClick(e, transcript);
+                onAnnotationClicked(e, transcript);
             }
         });
 
@@ -501,7 +507,7 @@ class TranscriptAnnotation extends Object2D {
 
         // create exons
         for (let exonInfo of transcript.exon) {
-            let exon = new Exon(sharedState);
+            let exon = new Exon(sharedState, exonInfo, onAnnotationClicked);
             exon.z = 0.25;
             exon.relativeH = 1;
             exon.relativeX = (exonInfo.startIndex - transcript.startIndex) / transcript.length;
@@ -511,7 +517,7 @@ class TranscriptAnnotation extends Object2D {
 
         // create untranslated regions
         for (let utrInfo of transcript.utr) {
-            let utr = new UTR(sharedState);
+            let utr = new UTR(sharedState, utrInfo, onAnnotationClicked);
             utr.z = 0.5;
             utr.relativeH = 1;
             utr.relativeX = (utrInfo.startIndex - transcript.startIndex) / transcript.length;
@@ -530,7 +536,7 @@ class TranscriptAnnotation extends Object2D {
 
             let cdsInfo = transcript.cds[i];
 
-            let cds = new CDS(sharedState, cdsInfo.length, cdsInfo.phase, strand, mRnaIndex);
+            let cds = new CDS(sharedState, cdsInfo, onAnnotationClicked, strand, mRnaIndex);
 
             cds.z = 0.75;
             cds.relativeH = 1;
@@ -545,10 +551,50 @@ class TranscriptAnnotation extends Object2D {
 
 }
 
-class Exon extends Rect {
+class TranscriptComponent extends Rect {
 
-    constructor(sharedState: AnnotationTrack['sharedState']) {
+    constructor(sharedState: AnnotationTrack['sharedState'], info: TranscriptComponentInfo, onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void) {
         super(0, 0);
+
+        this.addInteractionListener('pointerup', (e) => {
+            if (sharedState.pointerOver && e.isPrimary) {
+                e.preventDefault();
+                e.stopPropagation();
+                onAnnotationClicked(e, info);
+            }
+        });
+
+        let hoverOverlay = new Rect(0, 0, [1, 1, 1, 1]);
+        hoverOverlay.relativeW = 1;
+        hoverOverlay.relativeH = 1;
+        hoverOverlay.opacity = 0;
+        hoverOverlay.additiveBlending = 0.5;
+        this.add(hoverOverlay)
+
+        // highlight on mouse-over
+        const springStrength = 300;
+        this.addInteractionListener('pointermove', (e) => {
+            e.stopPropagation();
+            if (sharedState.pointerOver) {
+                this.cursorStyle = 'pointer';
+                Animator.springTo(hoverOverlay, { opacity: 0.3 }, springStrength);
+            } else {
+                this.cursorStyle = null;
+                Animator.springTo(hoverOverlay, { opacity: 0 }, springStrength);
+            }
+        });
+        this.addInteractionListener('pointerleave', () => {
+            this.cursorStyle = null;
+            Animator.springTo(hoverOverlay, { opacity: 0 }, springStrength);
+        });
+    }
+
+}
+
+class Exon extends TranscriptComponent {
+
+    constructor(sharedState: AnnotationTrack['sharedState'], info: TranscriptComponentInfo, onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void) {
+        super(sharedState, info, onAnnotationClicked);
         this.color = sharedState.colors['--non-coding'];
         this.transparent = true;
     }
@@ -588,10 +634,10 @@ class Exon extends Rect {
 
 }
 
-class UTR extends Rect {
+class UTR extends TranscriptComponent {
 
-    constructor(sharedState: AnnotationTrack['sharedState']) {
-        super(0, 0);
+    constructor(sharedState: AnnotationTrack['sharedState'], info: TranscriptComponentInfo, onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void) {
+        super(sharedState, info, onAnnotationClicked);
         this.color = sharedState.colors['--untranslated'];
         this.transparent = true;
     }
@@ -643,22 +689,26 @@ class UTR extends Rect {
 
 }
 
-class CDS extends Rect {
+class CDS extends TranscriptComponent {
 
     protected reverse: number;
     protected phase: number;
+    protected length_bases: number;
 
     constructor(
         sharedState: AnnotationTrack['sharedState'],
-        protected length_bases: number,
-        phase: number, // number of bases to substract from start to reach first complete codon
+        info: TranscriptComponentInfo,
+        onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature) => void,
+
         strand: Strand,
         mRnaIndex: number,
     ) {
-        super(0, 0);
-        this.phase = phase;
+        super(sharedState, info, onAnnotationClicked);
 
-        let defaultStartTone = phase > 0 ? 1 : 0;
+        this.length_bases = info.length;
+        this.phase = info.phase; // number of bases to substract from start to reach first complete codon
+
+        let defaultStartTone = this.phase > 0 ? 1 : 0;
 
         // we determine which 'tone' the first codon is by its position in the mRNA sequence (after splicing)
         let startTone = Math.floor(mRnaIndex / 3) % 2; // 0 = A, 1 = B

@@ -574,9 +574,9 @@ class TranscriptComponent extends Rect {
         // highlight on mouse-over
         const springStrength = 300;
         this.addInteractionListener('pointerenter', (e) => {
-            e.stopPropagation();
+            // e.stopPropagation();
             this.cursorStyle = 'pointer';
-            Animator.springTo(hoverOverlay, { opacity: 0.3 }, springStrength);
+            Animator.springTo(hoverOverlay, { opacity: 0.1 }, springStrength);
         });
         this.addInteractionListener('pointerleave', () => {
             this.cursorStyle = null;

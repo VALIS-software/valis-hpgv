@@ -10,7 +10,7 @@ import { Text } from "engine/ui/Text";
  */
 export class TextClone extends Object2D {
 
-    color = new Float32Array(4);
+    color: ArrayLike<number>;
     additiveBlending: number = 0.0;
 
     set _w(v: number) { }
@@ -24,7 +24,7 @@ export class TextClone extends Object2D {
 
     constructor(readonly text: Text, color: ArrayLike<number> = [0, 0, 0, 1]) {
         super();
-        this.color.set(color);
+        this.color = color;
         this.transparent = true;
         this.blendMode = text.blendMode;
     }

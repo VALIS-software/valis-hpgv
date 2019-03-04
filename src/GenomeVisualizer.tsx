@@ -63,7 +63,7 @@ export class GenomeVisualizer {
 
                 // add tracks from path list
                 for (let path of configuration) {
-                    this.addTrackFromFilePath(path, false);
+                    this.addTrackFromFilePath(path, undefined, false);
                 }
 
                 let foundContigs = false;
@@ -234,7 +234,7 @@ export class GenomeVisualizer {
         return this.trackViewer.addTrack(model, animateIn);
     }
 
-    addTrackFromFilePath(path: string, animateIn: boolean) {
+    addTrackFromFilePath(path: string, name?: string, animateIn?: boolean) {
         // we don't know what contigs are available so we must read the first file for this
         let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
         let basename = path.split('/').pop().split('\\').pop();
@@ -242,11 +242,13 @@ export class GenomeVisualizer {
         parts.pop();
         let filename = parts.join('.');
 
+        let trackName = (name != null ? name : filename);
+
         switch (fileType) {
             case 'bigwig': {
                 let model: SignalTrackModel = {
                     type: 'signal',
-                    name: filename,
+                    name: trackName,
                     path: path,
                 };
                 return this.addTrack(model, animateIn);
@@ -254,7 +256,7 @@ export class GenomeVisualizer {
             case 'vgenes-dir': {
                 let model: AnnotationTrackModel = {
                     type: 'annotation',
-                    name: filename,
+                    name: trackName,
                     path: path,
                 };
                 return this.addTrack(model, animateIn);
@@ -262,7 +264,7 @@ export class GenomeVisualizer {
             case 'vdna-dir': {
                 let model: SequenceTrackModel = {
                     type: 'sequence',
-                    name: filename,
+                    name: trackName,
                     path: path,
                 };
                 return this.addTrack(model, animateIn);
@@ -270,7 +272,7 @@ export class GenomeVisualizer {
             case 'vvariants-dir': {
                 let model: VariantTrackModel = {
                     type: 'variant',
-                    name: filename,
+                    name: trackName,
                     path: path,
                 };
                 return this.addTrack(model, animateIn);

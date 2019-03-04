@@ -5,6 +5,7 @@ import { InternalDataSource } from "../data-source/InternalDataSource";
 import { Tile, TileLoader } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { StyleProxy } from "../ui/util/StyleProxy";
+import { TrackEvent } from "./TrackEvent";
 export declare class TrackObject<ModelType extends TrackModel = TrackModel, TileLoaderType extends TileLoader<any, any> = TileLoader<any, any>> extends Rect {
     protected readonly model: ModelType;
     protected displayLoadingIndicator: boolean;
@@ -37,6 +38,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     applyTransformToSubNodes(root?: boolean): void;
     currentSamplingDensity(): number;
     applyStyle(styleProxy: StyleProxy): void;
+    emitTrackEvent(eventData: TrackEvent): void;
     /**
      * Override to handle drawing
      */

@@ -51,13 +51,15 @@ export declare class GenomeVisualizer {
      */
     setRange(x0: number, x1: number): void;
     addTrack(model: TrackModel, animateIn?: boolean): Track;
-    addTrackFromFilePath(path: string, animateIn: boolean): Track;
+    addTrackFromFilePath(path: string, name?: string, animateIn?: boolean): Track;
     addPanel(location: GenomicLocation, animateIn: boolean): void;
     closeTrack(track: Track, animateOut?: boolean, onComplete?: () => void): void;
     closePanel(panel: Panel, animateOut: boolean, onComplete?: () => void): void;
     getTracks(): Track[];
     getPanels(): Panel[];
     clearCaches(): void;
+    addEventListener(event: string, listener: (...args: any[]) => void): void;
+    removeEventListener(event: string, listener: (...args: any[]) => void): void;
     render(props: GenomeVisualizerRenderProps, container: HTMLElement): void;
     reactRender(props?: GenomeVisualizerRenderProps): JSX.Element;
     /**

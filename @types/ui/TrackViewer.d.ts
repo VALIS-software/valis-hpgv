@@ -50,6 +50,7 @@ export declare class TrackViewer extends Object2D {
     resetNothingToDisplayText(): void;
     refreshStyle(): void;
     getStyleNodes(): React.ReactNode[];
+    protected createTrackObject(model: TrackModel, panel: Panel, rowObject: RowObject): void;
     protected setTrackStyleNode(trackType: string, node: HTMLElement): void;
     protected setPanelStyleNode(node: HTMLElement): void;
     protected refreshTrackStyle(type: string): void;

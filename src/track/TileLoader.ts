@@ -14,6 +14,9 @@ import { EventEmitter } from "events";
  */
 export class TileLoader<TilePayload, BlockPayload> {
 
+    // for internal use (only to be used by TrackObject)
+    _lowestTouchedLod: number = Infinity;
+
     // cached tile data
     protected lods = new Array<Blocks<TilePayload, BlockPayload>>();
     protected readonly blockSize: number;
@@ -215,6 +218,9 @@ export class TileLoader<TilePayload, BlockPayload> {
         let blocks = this.getBlocks(lodLevel);
         let blockId = this.blockId(blockIndex);
         let block = blocks[blockId];
+
+        // this assumes that getBlock is _always_ used before accessing tiles
+        this._lowestTouchedLod = Math.min(lodLevel, this._lowestTouchedLod);
 
         if (block === undefined) {
             // create block

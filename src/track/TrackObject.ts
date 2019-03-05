@@ -205,14 +205,16 @@ export class TrackObject<
         let samplingDensity = this.currentSamplingDensity();
         let continuousLodLevel = Scalar.log2(Math.max(samplingDensity, 1));
         let lodLevel = Math.floor(continuousLodLevel);
+        
+        let tileLoader = this.getTileLoader();
+
+        tileLoader._lowestTouchedLod = Infinity;
 
         this.updateDisplay(samplingDensity, continuousLodLevel, span, widthPx);
 
         // display loading indicator if any tiles in the current range are loading
-
-        let tileLoader = this.getTileLoader();
         let topLod = tileLoader.topTouchedLod();
-        let lowestVisibleLod = tileLoader.mapLodLevel(lodLevel);
+        let lowestVisibleLod = tileLoader._lowestTouchedLod;
 
         let _lastMappedLod = -1;
         for (let l = lowestVisibleLod; l <= topLod; l++) {

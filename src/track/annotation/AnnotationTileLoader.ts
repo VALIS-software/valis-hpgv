@@ -2,6 +2,7 @@ import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
+import TrackModel from "../TrackModel";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
@@ -97,21 +98,43 @@ function transformAnnotations(flatFeatures: Array<GenomeFeature>) {
     return payload;
 }
 
-export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
+enum AnnotationFormat {
+    ValisGenes,
+    BigBed,
+}
 
-    protected macro: boolean = false;
+class BaseAnnotationLoader extends TileLoader<TilePayload, void> {
 
-    static cacheKey(model: AnnotationTrackModel): string {
+    protected annotationFileFormat?: AnnotationFormat = null;
+
+    static cacheKey(model: TrackModel): string {
         return model.path;
     }
 
     constructor(
         protected readonly dataSource: IDataSource,
-        protected readonly model: AnnotationTrackModel,
+        protected readonly model: TrackModel,
         protected readonly contig: string,
         tileSize: number = 1 << 20,
+        protected readonly macro: boolean,
     ) {
         super(tileSize, 1);
+
+        // determine annotation file format
+        if (model.path != null) {
+            let fileType = model.path.substr(model.path.lastIndexOf('.') + 1).toLowerCase();
+
+            switch (fileType) {
+                case 'vgenes-dir':
+                    this.annotationFileFormat = AnnotationFormat.ValisGenes;
+                    break;
+                case 'bigbed':
+                case 'bbed':
+                case 'bb':
+                    this.annotationFileFormat = AnnotationFormat.BigBed;
+                    break;
+            }
+        }
     }
 
     mapLodLevel(l: number) {
@@ -120,14 +143,21 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
         if (this.model.path != null) {
-            // using path override
-            return AnnotationTileLoader.loadAnnotations(this.model.path, this.contig, tile.x, tile.span, false).then(transformAnnotations);
+            switch (this.annotationFileFormat) {
+                case AnnotationFormat.ValisGenes: {
+                    // using path override
+                    return BaseAnnotationLoader.loadValisGenesAnnotations(this.model.path, this.contig, tile.x, tile.span, this.macro).then(transformAnnotations);
+                }
+                case AnnotationFormat.BigBed: {
+                    return [];
+                }
+            }
         } else {
-            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, false).then(transformAnnotations);
+            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, this.macro).then(transformAnnotations);
         }
     }
 
-    static loadAnnotations(
+    static loadValisGenesAnnotations(
         path: string,
         contig: string,
         startBaseIndex: number,
@@ -155,13 +185,20 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
 }
 
-export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
+export class AnnotationTileLoader extends BaseAnnotationLoader {
 
-    protected annotationCache: AnnotationTileLoader;
-
-    static cacheKey(model: MacroAnnotationTrackModel): string {
-        return model.path;
+    constructor(
+        dataSource: IDataSource,
+        model: AnnotationTrackModel,
+        contig: string,
+        tileSize: number = 1 << 20,
+    ) {
+        super(dataSource, model, contig, tileSize, false);
     }
+
+}
+
+export class MacroAnnotationTileLoader extends BaseAnnotationLoader {
 
     constructor(
         protected readonly dataSource: IDataSource,
@@ -169,20 +206,7 @@ export class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
         protected readonly contig: string,
         tileSize: number = 1 << 25,
     ) {
-        super(tileSize, 1);
-    }
-
-    mapLodLevel(l: number) {
-        return 0;
-    }
-
-    protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
-        if (this.model.path != null) {
-            // using path override
-            return AnnotationTileLoader.loadAnnotations(this.model.path, this.contig, tile.x, tile.span, true).then(transformAnnotations);
-        } else {
-            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, true).then(transformAnnotations);
-        }
+        super(dataSource, model, contig, tileSize, true);
     }
 
 }

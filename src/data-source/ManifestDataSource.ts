@@ -73,7 +73,7 @@ export class ManifestDataSource implements IDataSource {
         macro: boolean,
     ): Promise<Array<GenomeFeature>> {
         let path = `${this.pathRoot}/`; // @! need to find path from manifest
-        return AnnotationTileLoader.loadAnnotations(path, contig, startBaseIndex, span, macro);
+        return AnnotationTileLoader.loadValisGenesAnnotations(path, contig, startBaseIndex, span, macro);
     }
 
 }

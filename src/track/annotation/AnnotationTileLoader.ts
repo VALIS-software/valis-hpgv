@@ -1,6 +1,5 @@
 import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
-import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
 
@@ -103,9 +102,15 @@ enum AnnotationFormat {
     BigBed,
 }
 
-class BaseAnnotationLoader extends TileLoader<TilePayload, void> {
+export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
     protected annotationFileFormat?: AnnotationFormat = null;
+
+    readonly macroLod = 5;
+
+    protected readonly macroLodBlendRange = 2;
+    protected readonly macroLodThresholdLow = 7;
+    protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
     static cacheKey(model: TrackModel): string {
         return model.path;
@@ -115,8 +120,7 @@ class BaseAnnotationLoader extends TileLoader<TilePayload, void> {
         protected readonly dataSource: IDataSource,
         protected readonly model: TrackModel,
         protected readonly contig: string,
-        tileSize: number = 1 << 20,
-        protected readonly macro: boolean,
+        tileSize: number = 1 << 20
     ) {
         super(tileSize, 1);
 
@@ -138,22 +142,27 @@ class BaseAnnotationLoader extends TileLoader<TilePayload, void> {
     }
 
     mapLodLevel(l: number) {
-        return 0;
+        if (l < this.macroLod) {
+            return 0;
+        } else {
+            return this.macroLod;
+        }
     }
 
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload {
+        let isMacro = tile.lodLevel >= this.macroLod;
         if (this.model.path != null) {
             switch (this.annotationFileFormat) {
                 case AnnotationFormat.ValisGenes: {
                     // using path override
-                    return BaseAnnotationLoader.loadValisGenesAnnotations(this.model.path, this.contig, tile.x, tile.span, this.macro).then(transformAnnotations);
+                    return AnnotationTileLoader.loadValisGenesAnnotations(this.model.path, this.contig, tile.x, tile.span, isMacro).then(transformAnnotations);
                 }
                 case AnnotationFormat.BigBed: {
                     return [];
                 }
             }
         } else {
-            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, this.macro).then(transformAnnotations);
+            return this.dataSource.loadAnnotations(this.contig, tile.x, tile.span, isMacro).then(transformAnnotations);
         }
     }
 
@@ -181,32 +190,6 @@ class BaseAnnotationLoader extends TileLoader<TilePayload, void> {
             }
             request.send();
         });
-    }
-
-}
-
-export class AnnotationTileLoader extends BaseAnnotationLoader {
-
-    constructor(
-        dataSource: IDataSource,
-        model: AnnotationTrackModel,
-        contig: string,
-        tileSize: number = 1 << 20,
-    ) {
-        super(dataSource, model, contig, tileSize, false);
-    }
-
-}
-
-export class MacroAnnotationTileLoader extends BaseAnnotationLoader {
-
-    constructor(
-        protected readonly dataSource: IDataSource,
-        protected readonly model: MacroAnnotationTrackModel,
-        protected readonly contig: string,
-        tileSize: number = 1 << 25,
-    ) {
-        super(dataSource, model, contig, tileSize, true);
     }
 
 }

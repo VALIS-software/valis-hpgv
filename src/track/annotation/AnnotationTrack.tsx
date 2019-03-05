@@ -13,7 +13,7 @@ import { OpenSansRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
-import { AnnotationTileLoader, Gene, MacroAnnotationTileLoader, Transcript } from "./AnnotationTileLoader";
+import { AnnotationTileLoader, Gene, Transcript } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GeneClass, GenomeFeature, TranscriptClass, GenomeFeatureType, TranscriptComponentInfo } from "./AnnotationTypes";
 import { StyleProxy } from "../../ui/util/StyleProxy";
@@ -134,7 +134,9 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
 
-        this.getTileLoader().forEachTile(x0, x1, samplingDensity, true, (tile) => {
+        let microSamplingDensity = 1;
+
+        this.getTileLoader().forEachTile(x0, x1, microSamplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 return;
             }
@@ -251,7 +253,9 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected updateMacroAnnotations(x0: number, x1: number, span: number, samplingDensity: number, opacity: number) {
-        (this.dataSource.getTileLoader(this.macroModel, this.contig) as MacroAnnotationTileLoader).forEachTile(x0, x1, samplingDensity, true, (tile) => {
+        let tileLoader = this.getTileLoader();
+        let macroSamplingDensity = 1 << tileLoader.macroLod;
+        tileLoader.forEachTile(x0, x1, macroSamplingDensity, true, (tile) => {
             if (tile.state !== TileState.Complete) {
                 // if the tile is incomplete then wait until complete and call updateAnnotations() again
                 this._loadingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));

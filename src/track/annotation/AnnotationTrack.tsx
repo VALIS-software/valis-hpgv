@@ -799,15 +799,35 @@ class CDS extends TranscriptComponent {
 
 class TranscriptSpan extends Rect {
 
+    // -1 for Strand.Negative
+    //  1 for Strand.Positive
+    //  0 otherwise
+    protected directionNumber: number = 0;
+
     constructor(sharedState: AnnotationTrack['sharedState'], protected direction: Strand) {
         super(0, 0);
+
+        switch (direction) {
+            case Strand.Negative: {
+                this.directionNumber = -1;
+                break;
+            }
+            case Strand.Positive: {
+                this.directionNumber =  1;
+                break;
+            }
+            default: {
+                this.directionNumber =  0;
+                break;
+            }
+        }
 
         this.color = ([0, 1, 0, 1]);
     }
 
     draw(context: DrawContext) {
         context.uniform2f('pixelSize', 1/context.viewport.w, 1/context.viewport.h);
-        context.uniform1f('reverse', this.direction === Strand.Negative ? 1 : 0);
+        context.uniform1f('direction', (this.directionNumber + 1.0) * 0.5);
         super.draw(context);
     }
 
@@ -819,7 +839,7 @@ class TranscriptSpan extends Rect {
 
             uniform vec2 pixelSize;
             uniform vec2 size;
-            uniform float reverse;
+            uniform float direction; // 0 = negative, 1 = positive, 0.5 = neutral
 
             uniform vec4 color;
 
@@ -841,7 +861,7 @@ class TranscriptSpan extends Rect {
             void main() {
                 vec2 x = vec2(vUv.x, vUv.y - 0.5);
 
-                x.x = mix(x.x, 1.0 - x.x, reverse);
+                x.x = mix(x.x, 1.0 - x.x, direction);
 
                 float n = 2.0;
                 x *= n; x.x = fract(x.x);

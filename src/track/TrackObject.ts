@@ -76,7 +76,7 @@ export class TrackObject<
 
         this.focusRegionRectLeft.opacity = this.focusRegionRectRight.opacity = focusRegionOpacity;
         this.focusRegionRectLeft.relativeH = this.focusRegionRectRight.relativeH = 1.0;
-        this.focusRegionRectLeft.z = this.focusRegionRectRight.z = 1.9;
+        this.focusRegionRectLeft.z = this.focusRegionRectRight.z = 10.0;
         this.add(this.focusRegionRectLeft);
         this.add(this.focusRegionRectRight);
         // disabled by default

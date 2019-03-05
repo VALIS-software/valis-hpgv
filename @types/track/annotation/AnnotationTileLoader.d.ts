@@ -1,7 +1,7 @@
 import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
-import { AnnotationTrackModel, MacroAnnotationTrackModel } from "./AnnotationTrackModel";
 import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
+import TrackModel from "../TrackModel";
 export declare type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
 };
@@ -12,25 +12,23 @@ export declare type Transcript = TranscriptInfo & {
     other: Array<TranscriptComponentInfo>;
 };
 declare type TilePayload = Array<Gene>;
+declare enum AnnotationFormat {
+    ValisGenes = 0,
+    BigBed = 1
+}
 export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly dataSource: IDataSource;
-    protected readonly model: AnnotationTrackModel;
+    protected readonly model: TrackModel;
     protected readonly contig: string;
-    protected macro: boolean;
-    static cacheKey(model: AnnotationTrackModel): string;
-    constructor(dataSource: IDataSource, model: AnnotationTrackModel, contig: string, tileSize?: number);
-    mapLodLevel(l: number): number;
+    protected annotationFileFormat?: AnnotationFormat;
+    readonly macroLod: number;
+    protected readonly macroLodBlendRange: number;
+    protected readonly macroLodThresholdLow: number;
+    protected readonly macroLodThresholdHigh: number;
+    static cacheKey(model: TrackModel): string;
+    constructor(dataSource: IDataSource, model: TrackModel, contig: string, tileSize?: number);
+    mapLodLevel(l: number): 0 | 5;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
-    static loadAnnotations(path: string, contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<TilePayload>;
-}
-export declare class MacroAnnotationTileLoader extends TileLoader<TilePayload, void> {
-    protected readonly dataSource: IDataSource;
-    protected readonly model: MacroAnnotationTrackModel;
-    protected readonly contig: string;
-    protected annotationCache: AnnotationTileLoader;
-    static cacheKey(model: MacroAnnotationTrackModel): string;
-    constructor(dataSource: IDataSource, model: MacroAnnotationTrackModel, contig: string, tileSize?: number);
-    mapLodLevel(l: number): number;
-    protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
+    static loadValisGenesAnnotations(path: string, contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<TilePayload>;
 }
 export default AnnotationTileLoader;

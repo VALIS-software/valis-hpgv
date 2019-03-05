@@ -15,6 +15,7 @@ export declare class TileLoader<TilePayload, BlockPayload> {
     readonly tileWidth: number;
     readonly tilesPerBlock: number;
     maximumX: number;
+    _lowestTouchedLod: number;
     protected lods: Blocks<TilePayload, BlockPayload>[];
     protected readonly blockSize: number;
     protected requestManager: TileRequestManager;

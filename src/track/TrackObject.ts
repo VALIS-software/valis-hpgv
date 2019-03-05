@@ -212,10 +212,10 @@ export class TrackObject<
 
         let tileLoader = this.getTileLoader();
         let topLod = tileLoader.topTouchedLod();
-        let visibleLod = tileLoader.mapLodLevel(lodLevel);
+        let lowestVisibleLod = tileLoader.mapLodLevel(lodLevel);
 
         let _lastMappedLod = -1;
-        for (let l = visibleLod; l <= topLod; l++) {
+        for (let l = lowestVisibleLod; l <= topLod; l++) {
             let mappedLod = tileLoader.mapLodLevel(l);
 
             if (_lastMappedLod != mappedLod) {

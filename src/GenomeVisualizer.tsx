@@ -25,6 +25,7 @@ import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel, VariantTrac
 import { GenomicLocation } from "./model";
 import { Panel } from "./ui";
 import Axios from "axios";
+import { Formats, GenomicFileFormat } from "./formats/Formats";
 
 export interface GenomeVisualizerRenderProps {
     width: number,
@@ -72,12 +73,14 @@ export class GenomeVisualizer {
                 for (let path of configuration) {
 
                     // we don't know what contigs are available so we must read the first file for this
-                    let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
+                    let format = Formats.determineFormat(path);
 
                     this.trackViewer.setNothingToDisplayText('Loading');
 
-                    switch (fileType) {
-                        case 'bigwig': {
+                    switch (format) {
+                        case GenomicFileFormat.BigWig:
+                        case GenomicFileFormat.BigBed:
+                        {
                             foundContigs = true;
 
                             let bigwigReader = new BigWigReader(new AxiosDataLoader(path));
@@ -112,9 +115,10 @@ export class GenomeVisualizer {
                             break;
                         }
 
-                        case 'vgenes-dir':
-                        case 'vdna-dir':
-                        case 'vvariants-dir': {
+                        case GenomicFileFormat.ValisDna:
+                        case GenomicFileFormat.ValisGenes:
+                        case GenomicFileFormat.ValisVariants:
+                        {
                             foundContigs = true;
 
                             Axios.get(path + '/manifest.json')
@@ -236,7 +240,6 @@ export class GenomeVisualizer {
 
     addTrackFromFilePath(path: string, name?: string, animateIn?: boolean) {
         // we don't know what contigs are available so we must read the first file for this
-        let fileType = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
         let basename = path.split('/').pop().split('\\').pop();
         let parts = basename.split('.');
         parts.pop();
@@ -244,8 +247,10 @@ export class GenomeVisualizer {
 
         let trackName = (name != null ? name : filename);
 
-        switch (fileType) {
-            case 'bigwig': {
+        let format = Formats.determineFormat(path);
+
+        switch (format) {
+            case GenomicFileFormat.BigWig: {
                 let model: SignalTrackModel = {
                     type: 'signal',
                     name: trackName,
@@ -253,7 +258,9 @@ export class GenomeVisualizer {
                 };
                 return this.addTrack(model, animateIn);
             }
-            case 'vgenes-dir': {
+            case GenomicFileFormat.ValisGenes:
+            case GenomicFileFormat.BigBed:
+            {
                 let model: AnnotationTrackModel = {
                     type: 'annotation',
                     name: trackName,
@@ -261,7 +268,7 @@ export class GenomeVisualizer {
                 };
                 return this.addTrack(model, animateIn);
             }
-            case 'vdna-dir': {
+            case GenomicFileFormat.ValisDna: {
                 let model: SequenceTrackModel = {
                     type: 'sequence',
                     name: trackName,
@@ -269,7 +276,7 @@ export class GenomeVisualizer {
                 };
                 return this.addTrack(model, animateIn);
             }
-            case 'vvariants-dir': {
+            case GenomicFileFormat.ValisVariants: {
                 let model: VariantTrackModel = {
                     type: 'variant',
                     name: trackName,
@@ -284,7 +291,7 @@ export class GenomeVisualizer {
             case 'gff3': { break; }
             */
             default: {
-                console.error(`Error adding track: Unsupported fileType "${fileType}"`);
+                console.error(`Error adding track: Unsupported file "${path}"`);
                 break;
             }
         }

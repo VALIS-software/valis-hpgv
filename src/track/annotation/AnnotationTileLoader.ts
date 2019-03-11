@@ -4,6 +4,7 @@ import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponent
 import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
 import { BigBedData } from "bigwig-reader";
+import { Formats, GenomicFileFormat } from "../../formats/Formats";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
@@ -48,15 +49,13 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
         // determine annotation file format
         if (model.path != null) {
-            let fileType = model.path.substr(model.path.lastIndexOf('.') + 1).toLowerCase();
+            let format = Formats.determineFormat(model.path);
 
-            switch (fileType) {
-                case 'vgenes-dir':
+            switch (format) {
+                case GenomicFileFormat.ValisGenes:
                     this.annotationFileFormat = AnnotationFormat.ValisGenes;
                     break;
-                case 'bigbed':
-                case 'bbed':
-                case 'bb':
+                case GenomicFileFormat.BigBed:
                     this.annotationFileFormat = AnnotationFormat.BigBed;
                     break;
             }
@@ -99,6 +98,9 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                             return []
                         }
                     });
+                }
+                default: {
+                    return [];
                 }
             }
         } else {

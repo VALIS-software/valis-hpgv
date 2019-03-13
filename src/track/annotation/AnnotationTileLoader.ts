@@ -1,5 +1,5 @@
 import IDataSource from "../../data-source/IDataSource";
-import { Tile, TileLoader } from "../TileLoader";
+import { Tile, TileLoader, TileState } from "../TileLoader";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
@@ -88,7 +88,27 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                 }
                 case AnnotationFormat.BigBed: {
                     return this.getBigLoader().then(loader => {
-                        // @! if the data has already been loaded into a higher LOD tile then we can just get it from there
+                        // THIS ONLY WORKS IF WE'RE NOT USING ZOOM LEVELS:
+                        // if the data has already been loaded into a higher LOD tile then we can just get it from there
+                        // we can happily take all entries that cross the tiles span because the deduplication is done in the track renderer
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedData(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBed);
+                        }
+
+                        /*
                         let zoomIndex: number | null  = loader.lodZoomIndexMap[tile.lodLevel];
 
                         if (zoomIndex == null || true) {
@@ -108,6 +128,7 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                                 zoomIndex
                             ).then(transformAnnotationsBigZoom);
                         }
+                        */
                     });
                 }
                 default: {

@@ -62,6 +62,10 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         pointerOver: false,
     }
 
+    protected debugOptions = {
+        showTileBoundaries: false
+    }
+
     constructor(model: AnnotationTrackModel) {
         super(model);
 
@@ -137,6 +141,18 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         let microSamplingDensity = 1;
 
         this.getTileLoader().forEachTile(x0, x1, microSamplingDensity, true, (tile) => {
+            // debug: draw red lines at tile boundaries
+            if (this.debugOptions.showTileBoundaries) {
+                let tileBoundaryKey = tile.key + ':boundary';
+                let tileBoundary = this._onStageAnnotations.get(tileBoundaryKey, () => {
+                    let tileBoundary = new Rect(2, 0, [1, 0, 0, 1]);
+                    tileBoundary.relativeH = 1;
+                    this.add(tileBoundary);
+                    return tileBoundary;
+                });
+                tileBoundary.relativeX = (tile.x - x0) / span;
+            }
+
             if (tile.state !== TileState.Complete) {
                 return;
             }
@@ -256,6 +272,18 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         let tileLoader = this.getTileLoader();
         let macroSamplingDensity = 1 << tileLoader.macroLod;
         tileLoader.forEachTile(x0, x1, macroSamplingDensity, true, (tile) => {
+            // debug: draw green lines at tile boundaries
+            if (this.debugOptions.showTileBoundaries) {
+                let tileBoundaryKey = tile.key + ':boundary';
+                let tileBoundary = this._onStageAnnotations.get(tileBoundaryKey, () => {
+                    let tileBoundary = new Rect(2, 0, [0, 1, 0, 1]);
+                    tileBoundary.relativeH = 1;
+                    this.add(tileBoundary);
+                    return tileBoundary;
+                });
+                tileBoundary.relativeX = (tile.x - x0) / span;
+            }
+
             if (tile.state !== TileState.Complete) {
                 // if the tile is incomplete then wait until complete and call updateAnnotations() again
                 this._loadingTiles.get(this.contig + ':' + tile.key, () => this.createTileLoadingDependency(tile));
@@ -359,6 +387,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected onAnnotationClicked = (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => {
+        console.log('click');
         this.emitTrackEvent({
             ...e,
             type: 'annotation-clicked',

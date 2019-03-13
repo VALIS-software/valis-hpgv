@@ -3,7 +3,7 @@ import { Tile, TileLoader } from "../TileLoader";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
-import { BigBedData } from "bigwig-reader";
+import { BigBedData, BigZoomData } from "bigwig-reader";
 import { Formats, GenomicFileFormat } from "../../formats/Formats";
 
 // Tile payload is a list of genes extended with nesting
@@ -88,14 +88,25 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                 }
                 case AnnotationFormat.BigBed: {
                     return this.getBigLoader().then(loader => {
+                        // @! if the data has already been loaded into a higher LOD tile then we can just get it from there
                         let zoomIndex: number | null  = loader.lodZoomIndexMap[tile.lodLevel];
 
-                        if (zoomIndex == null) {
-                            // @! request range is off by 1
+                        if (zoomIndex == null || true) {
+                            // @! request range is off by 1!!
                             return loader.reader.readBigBedData(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBed);
                         } else {
-                            console.log('using zoomIndex', zoomIndex);
-                            return []
+                            // I haven't found a file in the wild where using zoom index tiles actually helps
+                            // we lose strand information so the macro/micro transition doesn't feel great
+                            // it's useful if macro tiles require lots of data but so far that doesn't seem to be the case
+                            console.log('BigBED using zoomIndex', zoomIndex);
+                            // @! request range is off by 1!!
+                            return loader.reader.readZoomData(
+                                this.contig,
+                                tile.x,
+                                this.contig,
+                                tile.x + tile.span,
+                                zoomIndex
+                            ).then(transformAnnotationsBigZoom);
                         }
                     });
                 }
@@ -155,6 +166,28 @@ function transformAnnotationsBigBed(dataset: Array<BigBedData>): TilePayload {
             transcripts: [
                 
             ],
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigZoom(dataset: Array<BigZoomData>): TilePayload {
+    return dataset.map((data) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: undefined,
+
+            // @! these are off by 1!
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: Strand.None,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+
+            transcriptCount: 0,
+            transcripts: [],
         };
         return gene;
     });

@@ -387,7 +387,6 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     }
 
     protected onAnnotationClicked = (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => {
-        console.log('click');
         this.emitTrackEvent({
             ...e,
             type: 'annotation-clicked',

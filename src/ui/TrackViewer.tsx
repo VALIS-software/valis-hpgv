@@ -501,6 +501,10 @@ export class TrackViewer extends Object2D {
         return styleNodes;
     }
 
+    getContentHeight() {
+        return this.grid.y + this.getTotalRowHeight() + this.spacing.y;
+    }
+
     protected createTrackObject(model: TrackModel, panel: Panel, rowObject: RowObject) {
         const trackObjectClass = GenomeVisualizer.getTrackType(model.type).trackObjectClass;
         let trackObject = new trackObjectClass(model);
@@ -760,6 +764,15 @@ export class TrackViewer extends Object2D {
         // (grid height is set dynamically when laying out tracks)
     }
 
+    protected getTotalRowHeight() {
+        // compute total row-height
+        let rowHeight = 0;
+        for (let row of this.tracks) {
+            rowHeight += row.heightPx;
+        }
+        return rowHeight;
+    }
+
     // limits rowOffsetY to only overflow region
     protected applyOverflowLimits() {
         let maxOffset = 0;
@@ -769,14 +782,10 @@ export class TrackViewer extends Object2D {
         let trackViewerHeight = this.getComputedHeight();
         let gridViewportHeight = trackViewerHeight - this.grid.y;
         
-        // compute total row-height
-        let rowHeight = 0;
-        for (let row of this.tracks) {
-            rowHeight += row.heightPx;
-        }
+        let totoalRowHeight = this.getTotalRowHeight();
 
         const padding = this.spacing.y;
-        let overflow = rowHeight - gridViewportHeight + padding;
+        let overflow = totoalRowHeight - gridViewportHeight + padding;
         let minOffset = -overflow;
 
         this.rowOffsetY = Math.min(Math.max(this.rowOffsetY, minOffset), maxOffset);

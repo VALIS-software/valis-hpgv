@@ -50,6 +50,7 @@ export declare class TrackViewer extends Object2D {
     resetNothingToDisplayText(): void;
     refreshStyle(): void;
     getStyleNodes(): React.ReactNode[];
+    getContentHeight(): number;
     protected createTrackObject(model: TrackModel, panel: Panel, rowObject: RowObject): void;
     protected setTrackStyleNode(trackType: string, node: HTMLElement): void;
     protected setPanelStyleNode(node: HTMLElement): void;
@@ -79,6 +80,7 @@ export declare class TrackViewer extends Object2D {
     protected onRemoved(): void;
     protected onAnimationStep: () => void;
     protected layoutGridContainer(): void;
+    protected getTotalRowHeight(): number;
     protected applyOverflowLimits(): void;
     protected onResize: (e: Event) => void;
     protected initializeDragPanning(): void;

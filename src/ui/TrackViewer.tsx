@@ -897,6 +897,10 @@ export class TrackViewer extends Object2D {
 
             if (resized) {
                 this.layoutTrackRows(false);
+
+                for (let entry of this._resizingTracks) {
+                    this.emit('track-resize', entry.track);
+                }
             }
         });
 
@@ -924,6 +928,8 @@ export class TrackViewer extends Object2D {
             track: track,
             initialHeightPx: track.heightPx,
         });
+
+        this.emit('track-resize-start', track);
     }
 
     protected endResizingTrack(track: Track) {
@@ -935,6 +941,8 @@ export class TrackViewer extends Object2D {
 
         this.applyOverflowLimits();
         this.layoutTrackRows(false);
+
+        this.emit('track-resize-end', track);
     }
 
     public static TrackCloseButton(props: {

@@ -58,6 +58,15 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                 case GenomicFileFormat.BigBed:
                     this.annotationFileFormat = AnnotationFormat.BigBed;
                     break;
+                default:
+                    // we have to guess
+                    if (/bigbed/ig.test(model.path)) {
+                        this.annotationFileFormat = AnnotationFormat.BigBed;
+                    } else if (/vdna/ig.test(model.path)){
+                        this.annotationFileFormat = AnnotationFormat.ValisGenes;
+                    } else {
+                        this.annotationFileFormat = AnnotationFormat.BigBed;
+                    }
             }
         }
     }
@@ -168,16 +177,13 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
 function transformAnnotationsBigBed(dataset: Array<BigBedData>): TilePayload {
     return dataset.map((data: BigBedData) => {
-        let startIndex = data.start;
-        let span = data.end - data.start;
-        
         let gene: Gene = {
             type: GenomeFeatureType.Gene,
 
-            name: data.name,
+            name: data.name === '.' ? undefined : data.name,
 
-            startIndex: startIndex,
-            length: span,
+            startIndex: data.start,
+            length: data.end - data.start,
 
             strand: data.strand as Strand,
             class: GeneClass.Unspecified,
@@ -186,8 +192,10 @@ function transformAnnotationsBigBed(dataset: Array<BigBedData>): TilePayload {
             transcriptCount: 0,
             transcripts: [{
                 type: GenomeFeatureType.Transcript,
-                startIndex: startIndex,
-                length: span,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
                 class: TranscriptClass.Unspecified,
                 soClass: 'transcript',
                 exon: data.exons == null ? [] : data.exons.map((exon) => {

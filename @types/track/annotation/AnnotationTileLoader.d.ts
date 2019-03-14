@@ -2,6 +2,7 @@ import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
+import { BigLoader } from "../../formats";
 export declare type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
 };
@@ -28,6 +29,8 @@ export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> 
     static cacheKey(model: TrackModel): string;
     constructor(dataSource: IDataSource, model: TrackModel, contig: string, tileSize?: number);
     mapLodLevel(l: number): 0 | 5;
+    protected _bigLoaderPromise: Promise<BigLoader>;
+    protected getBigLoader(): Promise<BigLoader>;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<TilePayload> | TilePayload;
     static loadValisGenesAnnotations(path: string, contig: string, startBaseIndex: number, span: number, macro: boolean): Promise<TilePayload>;
 }

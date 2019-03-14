@@ -1,6 +1,6 @@
 import { BigWigReader, HeaderData } from "bigwig-reader";
 import { Tile } from "../track";
-declare type BigLoader = {
+export declare type BigLoader = {
     header: HeaderData;
     reader: BigWigReader;
     lodMap: Array<number>;
@@ -11,7 +11,7 @@ export declare class UCSCBig {
      * Generate a BigWig loader instance for a given BigWig file path
      */
     private static _requestIndex;
-    static getBigLoader(path: string): Promise<BigLoader>;
+    static getBigLoader(path: string, forceAvoidCaching?: boolean): Promise<BigLoader>;
     /**
      * Given a BigWig loader instance, load BigWig data to cover *tile* into texture ArrayBuffer *buffer*.
      * Copies values into *targetChannel* assuming *nChannels* texture channels.
@@ -25,4 +25,3 @@ export declare class UCSCBig {
         lodZoomIndexMap: Array<number>;
     };
 }
-export {};

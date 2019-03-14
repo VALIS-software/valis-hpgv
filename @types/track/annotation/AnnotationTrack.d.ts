@@ -50,6 +50,9 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
         };
         pointerOver: boolean;
     };
+    protected debugOptions: {
+        showTileBoundaries: boolean;
+    };
     constructor(model: AnnotationTrackModel);
     applyStyle(styleProxy: StyleProxy): void;
     protected _macroTileCache: UsageCache<IntervalInstances>;

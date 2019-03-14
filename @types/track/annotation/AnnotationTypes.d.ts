@@ -27,6 +27,7 @@ export interface GeneInfo extends GenomeFeature {
     class: GeneClass;
     soClass: keyof SoGeneClass;
     transcriptCount: number;
+    score?: number;
 }
 export declare enum TranscriptClass {
     Unspecified = 0,
@@ -67,10 +68,10 @@ export declare class SoGeneClass {
 }
 export declare class SoTranscriptClass {
     [key: string]: undefined | TranscriptClass;
+    readonly 'transcript': TranscriptClass;
     readonly 'lnc_RNA': TranscriptClass;
     readonly 'mRNA': TranscriptClass;
     readonly 'pseudogenic_transcript': TranscriptClass;
-    readonly 'transcript': TranscriptClass;
     readonly 'miRNA': TranscriptClass;
     readonly 'ncRNA': TranscriptClass;
     readonly 'rRNA': TranscriptClass;

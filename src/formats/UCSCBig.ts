@@ -14,14 +14,15 @@ export class UCSCBig {
      * Generate a BigWig loader instance for a given BigWig file path
      */
     private static _requestIndex = 0;
-    static getBigLoader(path: string): Promise<BigLoader> {
+    static getBigLoader(path: string, forceAvoidCaching = true): Promise<BigLoader> {
         // we use a custom loader so we can explicitly disable caching (which with range requests is bug prone in many browsers)
         let bigWigReader = new BigWigReader({
             load: (start: number, size?: number) => {
                 return new Promise<ArrayBuffer>((resolve, reject) => {
                     let request = new XMLHttpRequest();
                     // disable caching (because of common browser bugs)
-                    request.open('GET', path + '?cacheAvoid=' + this._requestIndex++, true);
+                    let url = path + (forceAvoidCaching ? ('?cacheAvoid=' + this._requestIndex++) : '');
+                    request.open('GET', url, true);
                     request.setRequestHeader('Range', `bytes=${start}-${size ? start + size - 1 : ""}`);
 
                     request.responseType = 'arraybuffer';

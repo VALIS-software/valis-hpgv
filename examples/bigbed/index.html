@@ -31,29 +31,29 @@
             {
                 name: '8988t Duke Affy Exon',
                 type: 'annotation',
-                path: 'http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeDukeAffyExon/wgEncodeDukeAffyExon8988tSimpleSignalRep1V2.bigBed',
+                path: './example-files/wgEncodeDukeAffyExon8988tSimpleSignalRep1V2.bigBed',
             },
-            /**/
+            /**
             {
                 name: 'NarrowPeak',
                 type: 'annotation',
                 path: './example-files/narrowpeak.bigBed',
-                heightPx: 40,
+                heightPx: 60,
             },
             /**/
-            /**/
+            /**
             {
                 name: 'BroadPeak',
                 type: 'annotation',
                 path: './example-files/broadpeak.bigBed',
-                heightPx: 40,
+                heightPx: 60,
             },
-            /**/
+            /**
             {
                 name: 'IDR Peaks',
                 type: 'annotation',
                 path: './example-files/GSE105392_ENCFF119SYV_optimal_idr_thresholded_peaks_hg19.bigBed',
-                heightPx: 40,
+                heightPx: 60,
             },
             /**/
         ],
@@ -65,6 +65,7 @@
     }
 
     let visualizer = new GenomeVisualizer(config);
+    visualizer.addEventListener('track-resize-end', update);
 
     let container = document.getElementById('container');
 
@@ -73,7 +74,7 @@
     function update() {
         visualizer.render({
             width: window.innerWidth,
-            height: 500
+            height: visualizer.trackViewer.getContentHeight()
         }, container);
     }
 

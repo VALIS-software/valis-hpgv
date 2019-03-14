@@ -112,13 +112,13 @@ export declare class TrackViewer extends Object2D {
 export declare class Track {
     readonly model: TrackModel;
     protected _heightPx: number;
-    protected onFieldsChanged: () => void;
+    protected onFieldsChanged: (name: keyof Track) => void;
     readonly closing: boolean;
     heightPx: number;
     opacity: number;
     protected rowObject: RowObject;
     protected _opacity: number;
-    constructor(model: TrackModel, _heightPx: number, onFieldsChanged: () => void);
+    constructor(model: TrackModel, _heightPx: number, onFieldsChanged: (name: keyof Track) => void);
     applyStyle(styleProxy: StyleProxy): void;
 }
 /**

@@ -14,7 +14,7 @@ The quickest way to get started is to use [`valis-hpgv.js`](dist/valis-hpgv.js) 
 <script src="valis-hpgv.js"></script>
 ```
 
-- The visualizer can then be initialized with a list of files. The current supported file types are: `bigwig`, `vdna-dir`, `vgene-dir` with more types including `BAM`, `gff3` and `VCF` planned in the [roadmap](#Roadmap):
+- The visualizer can then be initialized with a list of files. The current supported file types are: `bigWig`, `bigBed`, `vdna-dir`, `vgene-dir` with more types including `BAM`, `gff3` and `VCF` planned in the [roadmap](#Roadmap):
 ```javascript
 // pass a list of files to visualize in an array, the viewer will determine the best visualization to use
 let hpgv = new GenomeVisualizer([

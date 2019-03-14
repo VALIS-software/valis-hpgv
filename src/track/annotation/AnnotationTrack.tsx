@@ -886,6 +886,23 @@ class TranscriptSpan extends Rect {
                 return smoothstep(r - e, r + e, f);
             }
 
+            float arrow(vec2 p) {
+                return lineSegment(
+                    p + vec2(-size.x * 0.5, 0.0),
+                    vec2(-10.0, -10.0) * 0.75,
+                    vec2(  0.0,   0.0),
+                    1.0,
+                    pixelSize
+                ) *
+                lineSegment(
+                    p + vec2(-size.x * 0.5, 0.0),
+                    vec2(-10.0, 10.0) * 0.75,
+                    vec2(  0.0,  0.0),
+                    1.0,
+                    pixelSize
+                );
+            }
+
             void main() {
                 vec2 x = vec2(vUv.x, vUv.y - 0.5);
 
@@ -897,22 +914,13 @@ class TranscriptSpan extends Rect {
                 vec2 p = x * size;
 
                 float m = 1.0 - (
-                    // arrow
-                    lineSegment(
-                        p + vec2(-size.x * 0.5, 0.0),
-                        vec2(-10.0, -10.0) * 0.75,
-                        vec2(  0.0,   0.0),
+                    // disable arrow if direction = 0.5
+                    mix(
+                        arrow(p),
                         1.0,
-                        pixelSize
+                        step(direction, 0.75) * step(0.25, direction)
                     ) *
-                    lineSegment(
-                        p + vec2(-size.x * 0.5, 0.0),
-                        vec2(-10.0, 10.0) * 0.75,
-                        vec2(  0.0,  0.0),
-                        1.0,
-                        pixelSize
-                    ) *
-
+                    
                     // middle line
                     lineSegment(x, vec2(0), vec2(1.0, 0.), 0.1, pixelSize)
                 );

@@ -333,6 +333,10 @@ export class GenomeVisualizer {
         this.trackViewer.removeEventListener(event, listener);
     }
 
+    getContentHeight() {
+        return this.trackViewer.getContentHeight();
+    }
+
     render(props: GenomeVisualizerRenderProps, container: HTMLElement) {
         ReactDOM.render(this.reactRender(props), container);
     }

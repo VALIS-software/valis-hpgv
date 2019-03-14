@@ -929,37 +929,6 @@ class TranscriptSpan extends Rect {
                 float a = m * color.a;
 
                 gl_FragColor = vec4(rgb, 1.0) * a; return;
-
-
-                /*
-
-                float h = 0.1;
-                float l = lineSegment(
-                    uv,
-                    vec2(0.5 - w * 0.5,  0.5),
-                    vec2(0.5 + w * 0.5,  0.5),
-                    h,
-                    pixelSize
-                );
-
-                gl_FragColor = vec4(0., 0., l, 1.); return;
-
-                float r = size.x / size.y;
-
-                vec2 x = vec2(vUv.x, vUv.y - 0.5);
-                x.x *= r;
-                x *= 1.0; x.x = fract(x.x);
-
-                vec2 lx = vec2(x.x - 0.5, x.y);
-                float lines = 1.0 - (
-                    lineSegment(lx, vec2(-0.25,  0.25), vec2(0), 0.05, pixelSize) *
-                    lineSegment(lx, vec2(-0.25, -0.25), vec2(0), 0.05, pixelSize)
-                );
-
-                // gl_FragColor = vec4(lx, 0., 1.); return;
-
-                gl_FragColor = vec4(vec3(lines), 1.);
-                */
             }
         `;
     }

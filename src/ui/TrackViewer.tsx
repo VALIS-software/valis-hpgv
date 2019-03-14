@@ -241,7 +241,10 @@ export class TrackViewer extends Object2D {
         let track: Track = new Track(
             model,
             heightPx,
-            () => {
+            (name) => {
+                if (name === 'heightPx') {
+                    this.emit('track-resize', track);
+                } 
                 this.layoutTrackRows(true);
             }
         );
@@ -1066,7 +1069,7 @@ export class Track {
 
     set heightPx(v: number) {
         this._heightPx = v;
-        this.onFieldsChanged();
+        this.onFieldsChanged('heightPx');
     }
 
     get heightPx() {
@@ -1075,7 +1078,7 @@ export class Track {
 
     set opacity(v: number) {
         this._opacity = v;
-        this.onFieldsChanged();
+        this.onFieldsChanged('opacity');
     }
 
     get opacity() {
@@ -1088,7 +1091,7 @@ export class Track {
     constructor(
         readonly model: TrackModel,
         protected _heightPx: number,
-        protected onFieldsChanged: () => void
+        protected onFieldsChanged: (name: keyof Track) => void
     ) {
     }
 

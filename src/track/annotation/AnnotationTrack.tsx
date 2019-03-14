@@ -310,7 +310,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                             x: 0,
                             y: (this.annotationY[gene.strand]) - TRANSCRIPT_HEIGHT * 0.5,
                             z: 0,
-                            w: 0,
+                            w: 1,
                             h: TRANSCRIPT_HEIGHT,
 
                             relativeX: (gene.startIndex - tile.x) / tile.span,
@@ -327,7 +327,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                             x: 0,
                             y: 0,
                             z: 0,
-                            w: 0,
+                            w: 1,
                             h: height,
 
                             relativeX: (gene.startIndex - tile.x) / tile.span,

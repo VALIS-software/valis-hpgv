@@ -60,6 +60,7 @@ export declare class GenomeVisualizer {
     clearCaches(): void;
     addEventListener(event: string, listener: (...args: any[]) => void): void;
     removeEventListener(event: string, listener: (...args: any[]) => void): void;
+    getContentHeight(): number;
     render(props: GenomeVisualizerRenderProps, container: HTMLElement): void;
     reactRender(props?: GenomeVisualizerRenderProps): JSX.Element;
     /**

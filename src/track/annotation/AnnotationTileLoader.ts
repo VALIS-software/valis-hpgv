@@ -1,6 +1,6 @@
 import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader, TileState } from "../TileLoader";
-import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass } from "./AnnotationTypes";
+import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass, TranscriptClass } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
 import { BigBedData, BigZoomData } from "bigwig-reader";
@@ -112,14 +112,12 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                         let zoomIndex: number | null  = loader.lodZoomIndexMap[tile.lodLevel];
 
                         if (zoomIndex == null || true) {
-                            // @! request range is off by 1!!
                             return loader.reader.readBigBedData(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBed);
                         } else {
                             // I haven't found a file in the wild where using zoom index tiles actually helps
                             // we lose strand information so the macro/micro transition doesn't feel great
                             // it's useful if macro tiles require lots of data but so far that doesn't seem to be the case
                             console.log('BigBED using zoomIndex', zoomIndex);
-                            // @! request range is off by 1!!
                             return loader.reader.readZoomData(
                                 this.contig,
                                 tile.x,
@@ -170,23 +168,43 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
 
 function transformAnnotationsBigBed(dataset: Array<BigBedData>): TilePayload {
     return dataset.map((data: BigBedData) => {
+        let startIndex = data.start;
+        let span = data.end - data.start;
+        
         let gene: Gene = {
             type: GenomeFeatureType.Gene,
 
             name: data.name,
 
-            // @! these are off by 1!
-            startIndex: data.start,
-            length: data.end - data.start,
+            startIndex: startIndex,
+            length: span,
 
             strand: data.strand as Strand,
             class: GeneClass.Unspecified,
             soClass: 'gene',
             
             transcriptCount: 0,
-            transcripts: [
-                
-            ],
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+                startIndex: startIndex,
+                length: span,
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: data.exons == null ? [] : data.exons.map((exon) => {
+                    let transcriptComponent: TranscriptComponentInfo = {
+                        type: GenomeFeatureType.TranscriptComponent,
+                        startIndex: exon.start,
+                        length: exon.end - exon.start,
+                        class: TranscriptComponentClass.Exon,
+                        soClass: 'exon'
+                    }
+                    return transcriptComponent;
+                }),
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score
         };
         return gene;
     });
@@ -199,7 +217,6 @@ function transformAnnotationsBigZoom(dataset: Array<BigZoomData>): TilePayload {
 
             name: undefined,
 
-            // @! these are off by 1!
             startIndex: data.start,
             length: data.end - data.start,
 

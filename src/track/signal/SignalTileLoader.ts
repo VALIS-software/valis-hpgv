@@ -336,7 +336,7 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
                 this.contig,
                 tile.x,
                 this.contig,
-                tile.x + tile.span, // @! needs checking,
+                tile.x + tile.span,
             ).then((rawData) => {
                 for (let entry of rawData) {
                     let x0 = entry.start - tile.x;

@@ -37,6 +37,7 @@
 /* The following are draw via WebGL, so only the properties CSS used here can be changed */
 .hpgv_panel {
     color: #737d94;
+    font-size: 11px;
 }
 
 .hpgv_track {

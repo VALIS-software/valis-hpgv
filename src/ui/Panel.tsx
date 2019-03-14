@@ -107,7 +107,7 @@ export class Panel extends Object2D {
             tickSpacingPx: 80,
             clip: true,
             color: [0, 0, 0],
-            fontSizePx: 9,
+            fontSizePx: 11,
             tickOffsetPx: 2,
             tickSizePx: 2,
         });
@@ -142,6 +142,7 @@ export class Panel extends Object2D {
 
     applyStyle(styleProxy: StyleProxy) {
         this.xAxis.color = styleProxy.getColor('color') || this.xAxis.color;
+        this.xAxis.fontSizePx = styleProxy.getNumber('font-size') || this.xAxis.fontSizePx;
     }
 
     setResizable(v: boolean) {

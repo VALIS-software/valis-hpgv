@@ -249,7 +249,7 @@ export class TrackViewer extends Object2D {
                             contig: contigs[0].id,
                             x0: contigs[0].startIndex,
                             x1: contigs[0].startIndex + contigs[0].span
-                        });
+                        }, false);
                     }
                 });
             }

@@ -125,6 +125,23 @@ export class UCSCBig {
         return dataPromise;
     }
 
+    static getContigs(header: HeaderData) {
+        let contigs = [];
+        let availableChromosomes = header.chromTree.idToChrom;
+        availableChromosomes.sort((a, b) => {
+            return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+        });
+
+        for (let contigId of availableChromosomes) {
+            contigs.push({
+                id: contigId,
+                startIndex: 0,
+                span: header.chromTree.chromSize[contigId]
+            });
+        }
+        return contigs;
+    }
+
     /**
      * Convert a BigWig zoom levels header into maps so we can lookup the zoom level for any given lod
      */

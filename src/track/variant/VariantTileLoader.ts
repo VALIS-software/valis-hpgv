@@ -2,6 +2,7 @@ import { IDataSource } from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
 import Axios from "axios";
+import { Contig } from "../..";
 
 export type VariantTilePayload = Array<{
     id: string,
@@ -14,6 +15,21 @@ export class VariantTileLoader extends TileLoader<VariantTilePayload, void> {
 
     static cacheKey(model: VariantTrackModel) {
         return JSON.stringify(model.query);
+    }
+
+    static getAvailableContigs(model: VariantTrackModel): Promise<Array<Contig>> {
+        let contigs = new Array<Contig>();
+        if (model.path != null) {
+            return Axios.get(model.path + '/manifest.json')
+                .then((response) => {
+                    // create a manifest that lists the available contigs
+                    contigs = contigs.concat(response.data.contigs);
+                })
+                .catch((reason) => {
+                    console.error(`Error loading manifest: ${reason}`);
+                }).then(_ => contigs);
+        }
+        return Promise.resolve(contigs);
     }
 
     constructor(

@@ -1,6 +1,7 @@
 import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
+import { Contig } from "../..";
 
 export type IntervalTilePayload = {
     intervals: Float32Array,
@@ -26,6 +27,11 @@ export class IntervalTileLoader extends TileLoader<IntervalTilePayload, void> {
 
     static cacheKey(model: IntervalTrackModel): string {
         return null;
+    }
+
+    static getAvailableContigs(model: IntervalTrackModel): Promise<Array<Contig>> {
+        let contigs = new Array<Contig>();
+        return Promise.resolve(contigs);
     }
 
     constructor(

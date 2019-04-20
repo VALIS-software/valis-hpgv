@@ -4,6 +4,7 @@ import { SignalTrackModel } from "./SignalTrackModel";
 import { BigWigReader, HeaderData } from  "bigwig-reader";
 import { TileLoader, Tile, TileState } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
+import { Contig, UCSCBig } from "../..";
 
 export type SignalTilePayload = {
     textureUnpackMultiplier: number,
@@ -40,6 +41,14 @@ export class SignalTileLoader extends TileLoader<SignalTilePayload, BlockPayload
 
     static cacheKey(model: SignalTrackModel) {
         return model.path;
+    }
+
+    static getAvailableContigs(model: SignalTrackModel): Promise<Array<Contig>> {
+        let contigs = new Array<Contig>();
+        if (model.path != null) {
+            return UCSCBig.getBigLoader(model.path).then(b => UCSCBig.getContigs(b.header));
+        }
+        return Promise.resolve(contigs);
     }
 
     static requestIndex = 0;

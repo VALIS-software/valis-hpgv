@@ -3,6 +3,8 @@ import TileLoader, { Tile } from "../TileLoader";
 import { SequenceTrackModel } from "./SequenceTrackModel";
 import { IDataSource } from "../../data-source/IDataSource";
 import axios, { CancelToken } from 'axios';
+import { Contig } from "../..";
+import Axios from "axios";
 
 type TilePayload = {
     array: Uint8Array,
@@ -25,6 +27,21 @@ export class SequenceTileLoader extends TileLoader<TilePayload, BlockPayload> {
 
     static cacheKey(model: SequenceTrackModel): string {
         return model.path;
+    }
+
+    static getAvailableContigs(model: SequenceTrackModel): Promise<Array<Contig>> {
+        let contigs = new Array<Contig>();
+        if (model.path != null) {
+            return Axios.get(model.path + '/manifest.json')
+                .then((response) => {
+                    // create a manifest that lists the available contigs
+                    contigs = contigs.concat(response.data.contigs);
+                })
+                .catch((reason) => {
+                    console.error(`Error loading manifest: ${reason}`);
+                }).then(_ => contigs);
+        }
+        return Promise.resolve(contigs);
     }
 
     constructor(

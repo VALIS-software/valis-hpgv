@@ -5,6 +5,8 @@ import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
 import { BigBedData, BigZoomData } from "bigwig-reader";
 import { Formats, GenomicFileFormat } from "../../formats/Formats";
+import { Contig, AnnotationTrackModel } from "../..";
+import Axios from "axios";
 
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
@@ -35,40 +37,72 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly macroLodThresholdLow = 7;
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
-    static cacheKey(model: TrackModel): string {
+    static cacheKey(model: AnnotationTrackModel): string {
         return model.path;
     }
 
-    constructor(
-        protected readonly dataSource: IDataSource,
-        protected readonly model: TrackModel,
-        protected readonly contig: string,
-        tileSize: number = 1 << 20
-    ) {
-        super(tileSize, 1);
-
+    static getAnnotationFormat(model: AnnotationTrackModel) {
         // determine annotation file format
         if (model.path != null) {
             let format = Formats.determineFormat(model.path);
 
             switch (format) {
                 case GenomicFileFormat.ValisGenes:
-                    this.annotationFileFormat = AnnotationFormat.ValisGenes;
-                    break;
+                    return AnnotationFormat.ValisGenes;
                 case GenomicFileFormat.BigBed:
-                    this.annotationFileFormat = AnnotationFormat.BigBed;
-                    break;
+                    return AnnotationFormat.BigBed;
                 default:
                     // we have to guess
                     if (/bigbed/ig.test(model.path)) {
-                        this.annotationFileFormat = AnnotationFormat.BigBed;
+                        return AnnotationFormat.BigBed;
                     } else if (/vdna/ig.test(model.path)){
-                        this.annotationFileFormat = AnnotationFormat.ValisGenes;
+                        return AnnotationFormat.ValisGenes;
                     } else {
-                        this.annotationFileFormat = AnnotationFormat.BigBed;
+                        return AnnotationFormat.BigBed;
                     }
             }
         }
+
+        return null;
+    }
+
+    static getAvailableContigs(model: AnnotationTrackModel): Promise<Array<Contig>> {
+        let contigs = new Array<Contig>();
+
+        let format = this.getAnnotationFormat(model);
+        if (format != null) {
+            switch (format) {
+                case AnnotationFormat.ValisGenes:
+                    if (model.path != null) {
+                        return Axios.get(model.path + '/manifest.json')
+                            .then((response) => {
+                                // create a manifest that lists the available contigs
+                                contigs = contigs.concat(response.data.contigs);
+                            })
+                            .catch((reason) => {
+                                console.error(`Error loading manifest: ${reason}`);
+                            }).then(_ => contigs);
+                    }
+                    break;
+                case AnnotationFormat.BigBed:
+                    if (model.path != null) {
+                        return UCSCBig.getBigLoader(model.path).then(b => UCSCBig.getContigs(b.header));
+                    }
+                    break;
+            }
+        }
+
+        return Promise.resolve(contigs);
+    }
+
+    constructor(
+        protected readonly dataSource: IDataSource,
+        protected readonly model: AnnotationTrackModel,
+        protected readonly contig: string,
+        tileSize: number = 1 << 20
+    ) {
+        super(tileSize, 1);
+        this.annotationFileFormat = AnnotationTileLoader.getAnnotationFormat(model);
     }
 
     mapLodLevel(l: number) {

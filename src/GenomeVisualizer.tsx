@@ -22,7 +22,7 @@ import { SignalTileLoader } from "./track/signal/SignalTileLoader";
 import { SignalTrack } from "./track/signal/SignalTrack";
 import { BigWigReader, AxiosDataLoader } from "bigwig-reader";
 import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel, VariantTrackModel } from "./track";
-import { GenomicLocation } from "./model";
+import { GenomicLocation, Contig } from "./model";
 import { Panel } from "./ui";
 import Axios from "axios";
 import { Formats, GenomicFileFormat } from "./formats/Formats";
@@ -40,6 +40,7 @@ interface CustomTileLoader<ModelType> {
 
     // produce a key differentiates models that require a separate tile loader / data cache instance
     cacheKey (model: ModelType): string | null;
+    getAvailableContigs(model: ModelType): Promise<Array<Contig>>;
 }
 
 interface CustomTrackObject {
@@ -61,114 +62,13 @@ export class GenomeVisualizer {
 
         if (Array.isArray(configuration)) {
             if (configuration.length > 0) {
-
                 // add tracks from path list
                 for (let path of configuration) {
                     this.addTrackFromFilePath(path, undefined, false);
                 }
-
-                let foundContigs = false;
-
-                // we determine a GenomeVisualizerConfiguration by inspecting the files in the list
-                for (let path of configuration) {
-
-                    // we don't know what contigs are available so we must read the first file for this
-                    let format = Formats.determineFormat(path);
-
-                    this.trackViewer.setNothingToDisplayText('Loading');
-
-                    switch (format) {
-                        case GenomicFileFormat.BigWig:
-                        case GenomicFileFormat.BigBed:
-                        {
-                            foundContigs = true;
-
-                            let bigwigReader = new BigWigReader(new AxiosDataLoader(path));
-                            bigwigReader.getHeader().then((header) => {
-                                this.trackViewer.resetNothingToDisplayText();
-                                // create a manifest that lists the available contigs
-                                let manifest: Manifest = {
-                                    contigs: []
-                                }
-
-                                let availableChromosomes = header.chromTree.idToChrom;
-                                availableChromosomes.sort((a, b) => {
-                                    return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-                                });
-
-                                for (let contigId of availableChromosomes) {
-                                    manifest.contigs.push({
-                                        id: contigId,
-                                        startIndex: 0,
-                                        span: header.chromTree.chromSize[contigId]
-                                    });
-                                }
-
-                                if (this.getPanels().length === 0) {
-                                    this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
-                                    this.setDataSource(new ManifestDataSource(manifest));
-                                }
-                            }).catch((reason) => {
-                                this.trackViewer.setNothingToDisplayText('Error loading bigwig header (see browser console)');
-                                console.error(`Error loading bigwig header: ${reason}`);
-                            });
-                            break;
-                        }
-
-                        case GenomicFileFormat.ValisDna:
-                        case GenomicFileFormat.ValisGenes:
-                        case GenomicFileFormat.ValisVariants:
-                        {
-                            foundContigs = true;
-
-                            Axios.get(path + '/manifest.json')
-                            .then((response) => {
-                                let json = response.data;
-
-                                // create a manifest that lists the available contigs
-                                let manifest: Manifest = {
-                                    contigs: json.contigs
-                                }
-
-                                if (this.getPanels().length === 0) {
-                                    this.addPanel({ contig: manifest.contigs[0].id, x0: 0, x1: manifest.contigs[0].span }, false);
-                                    this.setDataSource(new ManifestDataSource(manifest));
-                                }
-                            })
-                            .catch((reason) => {
-                                this.trackViewer.setNothingToDisplayText('Error loading manifest (see browser console)');
-                                console.error(`Error loading vdna-dir manifest: ${reason}`);
-                            });
-                            break;
-                        }
-
-                        // case 'bam': { break; }
-                        // case 'vcf': { break; }
-                        // case 'fasta': { break; }
-                        // case 'gff3': { break; }
-
-                        default: {
-                            this.trackViewer.resetNothingToDisplayText();
-                        }
-                    }
-
-                    if (foundContigs) break;
-                }
-
-                if (!foundContigs) {
-                    console.error(`Could not determine contigs from supplied files`);
-                    this.addPanel({ contig: 'chr1', x0: 0, x1: 100 }, false);
-                }
             }
         } else {
             if (configuration != null) {
-                // default panel if none is set
-                if (configuration.panels == null) {
-                    configuration.panels = [{
-                        location: { contig: 'chr1', x0: 0, x1: 249e6 }
-                    }];
-                }
-
                 this.setConfiguration(configuration);
             }
         }

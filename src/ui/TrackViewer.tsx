@@ -131,6 +131,8 @@ export class TrackViewer extends Object2D {
     }
 
     setConfiguration(state: TrackViewerConfiguration) {
+        let panels = state.panels || [];
+
         // hide/show add panel button
         this.allowNewPanels = state.allowNewPanels === undefined ? false : state.allowNewPanels;
         this.grid.toggleChild(this.addPanelButton, this.allowNewPanels);
@@ -149,16 +151,16 @@ export class TrackViewer extends Object2D {
         }
 
         // create panels
-        for (let i = 0; i < state.panels.length; i++) {
-            let panelState = state.panels[i];
+        for (let i = 0; i < panels.length; i++) {
+            let panelState = panels[i];
             this.addPanel(panelState.location, false);
         }
 
         // determine what width to set panels that have no width specified
         let unassignedWidthRemaining = 1;
         let unassignedWidthCount = 0;
-        for (let i = 0; i < state.panels.length; i++) {
-            let panelState = state.panels[i];
+        for (let i = 0; i < panels.length; i++) {
+            let panelState = panels[i];
             if (panelState.width != null) {
                 unassignedWidthRemaining -= panelState.width;
             } else {
@@ -169,8 +171,8 @@ export class TrackViewer extends Object2D {
 
         // set panel edges from state widths
         let e = 0;
-        for (let i = 0; i < state.panels.length; i++) {
-            let panelState = state.panels[i];
+        for (let i = 0; i < panels.length; i++) {
+            let panelState = panels[i];
             this.panelEdges[i] = e;
 
             if (panelState.width != null) {
@@ -183,8 +185,10 @@ export class TrackViewer extends Object2D {
         this.layoutPanels(false);
 
         // create rows
-        for (let track of state.tracks) {
-            this.addTrack(track, false);
+        if (state.tracks != null) {
+            for (let track of state.tracks) {
+                this.addTrack(track, false);
+            }
         }
 
         this.layoutTrackRows(false);
@@ -232,9 +236,26 @@ export class TrackViewer extends Object2D {
 
     // track-viewer state deltas
     addTrack(model: TrackModel, animate: boolean = true): Track {
-        const trackObjectClass = GenomeVisualizer.getTrackType(model.type).trackObjectClass;
+        let trackClasses = GenomeVisualizer.getTrackType(model.type);
 
-        let defaultTrackHeight = trackObjectClass.defaultHeightPx != null ? trackObjectClass.defaultHeightPx : 100;
+        trackClasses.tileLoaderClass.getAvailableContigs(model).then(contigs => {
+            for(let contig of contigs) this.dataSource.addContig(contig);
+            
+            // if no panels have been specified, create one from the first available contig
+            if (this.panels.size === 0) {
+                this.dataSource.getContigs().then(contigs => {
+                    if (contigs.length > 0 && this.panels.size === 0) {
+                        this.addPanel({
+                            contig: contigs[0].id,
+                            x0: contigs[0].startIndex,
+                            x1: contigs[0].startIndex + contigs[0].span
+                        });
+                    }
+                });
+            }
+        })
+
+        let defaultTrackHeight = trackClasses.trackObjectClass.defaultHeightPx != null ? trackClasses.trackObjectClass.defaultHeightPx : 100;
         let heightPx = model.heightPx != null ? model.heightPx : defaultTrackHeight;
 
         // create a track and add the header element to the grid
@@ -466,7 +487,7 @@ export class TrackViewer extends Object2D {
     }
 
     resetNothingToDisplayText() {
-        this.nothingToDisplay.string = 'Nothing to display';
+        this.nothingToDisplay.string = 'Loading';
     }
 
     refreshStyle() {

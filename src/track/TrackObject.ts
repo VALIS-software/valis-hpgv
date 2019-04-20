@@ -188,7 +188,7 @@ export class TrackObject<
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number) {
     }
 
-    protected getTileLoader(): TileLoaderType {
+    getTileLoader(): TileLoaderType {
         return this.dataSource.getTileLoader(this.model, this.contig) as any;
     }
 

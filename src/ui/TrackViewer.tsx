@@ -134,7 +134,8 @@ export class TrackViewer extends Object2D {
         let panels = state.panels || [];
 
         // hide/show add panel button
-        this.allowNewPanels = state.allowNewPanels === undefined ? false : state.allowNewPanels;
+        let clampToTracks = state.clampToTracks == null ? false : state.clampToTracks;
+        this.allowNewPanels = state.allowNewPanels == null ? false : state.allowNewPanels;
         this.grid.toggleChild(this.addPanelButton, this.allowNewPanels);
 
         // Panels
@@ -191,6 +192,11 @@ export class TrackViewer extends Object2D {
             }
         }
 
+        // apply clampToTracks
+        for (let panel of this.panels) {
+            panel.clampToTracks = clampToTracks;
+        }
+
         this.layoutTrackRows(false);
 
         this.layoutGridContainer();
@@ -199,8 +205,10 @@ export class TrackViewer extends Object2D {
     }
 
     getConfiguration(): TrackViewerConfiguration {
+        let clampToTracks = false;
         let panels: TrackViewerConfiguration['panels'] = new Array();
         for (let panel of this.panels) {
+            clampToTracks = panel.clampToTracks;
             let width = this.panelEdges[panel.column + 1] - this.panelEdges[panel.column];
             panels.push({
                 location: {
@@ -222,6 +230,7 @@ export class TrackViewer extends Object2D {
 
         return {
             allowNewPanels: this.allowNewPanels,
+            clampToTracks: clampToTracks,
             panels: panels,
             tracks: tracks,
         }
@@ -378,6 +387,7 @@ export class TrackViewer extends Object2D {
         let newWidth = newColumnIndex == 0 ? 1 : 1 / newColumnIndex;
         let newEdge = 1 + newWidth;
         edges.push(newEdge);
+    
 
         // create panel object and add header to the scene graph
         let panel = new Panel((p) => this.closePanel(p, true), this.spacing, this.panelHeaderHeight, this.xAxisHeight, this.dataSource);

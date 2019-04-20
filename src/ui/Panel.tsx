@@ -32,6 +32,7 @@ export class Panel extends Object2D {
 
     maxRange: number = 1e10;
     minRange: number = 10;
+    clampToTracks: boolean = false;
 
     readonly header: ReactObject;
     readonly xAxis: Axis;
@@ -221,6 +222,7 @@ export class Panel extends Object2D {
         x0 = Math.min(x0, x1);
         x1 = Math.max(x0, x1);
 
+
         // if range is below allowed minimum, override without changing center
         let span = x1 - x0;
         if (span < this.minRange) {
@@ -315,6 +317,10 @@ export class Panel extends Object2D {
     }
 
     private setRangeImmediate(x0: number, x1: number) {
+        let l = this.applyLimits(x0, x1);
+        x0 = l.x0;
+        x1 = l.x1;
+
         (this.x0 as any) = x0;
         (this.x1 as any) = x1;
 
@@ -336,6 +342,27 @@ export class Panel extends Object2D {
         }
 
         this.updatePanelHeader();
+    }
+
+    protected applyLimits(x0: number, x1: number) {
+        if (this.clampToTracks) {
+            x0 = Math.max(0, x0);
+            x1 = Math.max(0, x1);
+
+            let allMaxX = -Infinity;
+            for (let trackView of this.trackViews) {
+                let maxX = trackView.getTileLoader() .maximumX;
+                if (isFinite(maxX)) {
+                    allMaxX = Math.max(maxX, allMaxX);
+                }
+            }
+
+            if (allMaxX > 0) {
+                x0 = Math.min(allMaxX, x0);
+                x1 = Math.min(allMaxX, x1);
+            }
+        }
+        return { x0, x1 };
     }
 
     protected onTrackLeave = (e: InteractionEvent) => {
@@ -527,6 +554,19 @@ export class Panel extends Object2D {
                 let dxf = e.fractionX - this._dragXF0;
                 let x0 = this._dragX00 + span * (-dxf);
                 let x1 = x0 + span;
+
+                let l = this.applyLimits(x0, x1);
+                let dlx0 = Math.abs(l.x0 - x0);
+                let dlx1 = Math.abs(l.x1 - x1);
+
+                if (dlx0 > 0) {
+                    x0 = l.x0;
+                    x1 = x0 + span;
+                }
+                if (dlx1 > 0) {
+                    x1 = l.x1;
+                    x0 = x1 - span;
+                }
 
                 this.setRange(x0, x1);
                 break;

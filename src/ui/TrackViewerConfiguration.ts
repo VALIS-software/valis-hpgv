@@ -10,6 +10,7 @@ export interface TrackViewerConfiguration {
     
     // defaults to false
     allowNewPanels?: boolean,
+    clampToTracks?: boolean,
 }
 
 export default TrackViewerConfiguration;

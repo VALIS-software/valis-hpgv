@@ -8,17 +8,24 @@ export class InternalDataSource {
 
     protected tileCaches: {
         [type: string]: {
-            [key: string]: TileLoader<any, any>
+            [contig: string]: TileLoader<any, any>
         }
     } = {};
 
     protected localContigs = new Array<Contig>();
+    protected cachedContigs: Array<Contig>;
 
     constructor(protected readonly dataSource: IDataSource) {
     }
 
     getContigs() {
-        return this.dataSource.getContigs().then(contigs => contigs.concat(this.localContigs));
+        return this.dataSource.getContigs()
+            .then(contigs => this.cachedContigs = contigs)
+            .then(contigs => contigs.concat(this.localContigs));
+    }
+
+    getCachedContigs(): Array<Contig> {
+        return this.cachedContigs.concat(this.localContigs);
     }
 
     addContig(contig: Contig) {
@@ -30,6 +37,21 @@ export class InternalDataSource {
             existingContig.startIndex = Math.min(existingContig.startIndex, contig.startIndex);
             existingContig.span = Math.min(existingContig.span, contig.span);
             existingContig.name = existingContig.name || contig.name;
+        }
+
+        // tileLoaders that have already been cached might need to update their maxX
+        for (let type in this.tileCaches) {
+            for (let tileLoaderContig in this.tileCaches[type]) {
+                let tileLoader = this.tileCaches[type][tileLoaderContig];
+                if ((tileLoader as any).contig === contig.id) {
+                    let maxX = contig.startIndex + contig.span;
+                    if (isFinite(tileLoader.maximumX)) {
+                        tileLoader.maximumX = Math.max(maxX, tileLoader.maximumX);
+                    } else {
+                        tileLoader.maximumX = maxX;
+                    }
+                }
+            }
         }
     }
 
@@ -66,7 +88,12 @@ export class InternalDataSource {
             this.getContigs().then((contigInfoArray) => {
                 let matchingContigInfo = contigInfoArray.find((c) => c.id === contig);
                 if (matchingContigInfo != null) {
-                    tileLoader.maximumX = matchingContigInfo.span - 1;
+                    let maxX = matchingContigInfo.startIndex + matchingContigInfo.span;
+                    if (isFinite(tileLoader.maximumX)) {
+                        tileLoader.maximumX = Math.max(maxX, tileLoader.maximumX);
+                    } else {
+                        tileLoader.maximumX = maxX;
+                    }
                 }
             });
         }

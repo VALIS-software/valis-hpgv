@@ -48,6 +48,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         '--transcript': [107 / 0xff, 109 / 0xff, 136 / 0xff, 0.17],
         '--coding': [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4],
         '--non-coding': [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4],
+        '--coding-max-score': [26 / 0xff, 174 / 0xff, 222 / 0xff, 0.4],
+        '--non-coding-max-score': [82 / 0xff, 75 / 0xff, 165 / 0xff, 0.4],
         '--untranslated': [138 / 0xff, 136 / 0xff, 191 / 0xff, 0.38],
         'color': [1, 1, 1, 1],
         '--stroke': [1, 1, 1, 1],
@@ -302,6 +304,12 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                     let color = gene.class === GeneClass.NonProteinCoding ? this.colors['--non-coding'] : this.colors['--coding'];
 
+                    // apply shading based on score
+                    if (gene.score != null && gene.score > 0) {
+                        let maxScoreColor = gene.class === GeneClass.NonProteinCoding ? this.colors['--non-coding-max-score'] : this.colors['--coding-max-score'];
+                        color = rgbaLerp(color, maxScoreColor, Math.max(0, Math.min(1, gene.score / 1000)));
+                    }
+
                     let colorLowerAlpha = color.slice();
                     colorLowerAlpha[3] *= .689655172;
 
@@ -398,6 +406,16 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
 }
 
+function rgbaLerp(colorA: Array<number>, colorB:Array<number>, t: number) {
+    let result = new Array(4);
+
+    result[0] = (colorB[0] - colorA[0]) * t + colorA[0];
+    result[1] = (colorB[1] - colorA[1]) * t + colorA[1];
+    result[2] = (colorB[2] - colorA[2]) * t + colorA[2];
+    result[3] = (colorB[3] - colorA[3]) * t + colorA[3];
+
+    return result;
+}
 
 class GeneAnnotation extends Object2D {
 

@@ -50,9 +50,12 @@
 .hpgv_track-annotation {
     --transcript-arrow: #36456530;
     --transcript:rgba(156, 163, 175, 0.13);
-    --coding: rgba(37, 110, 195, 0.79);
-    --non-coding: rgba(91, 51, 154, 0.79);
+    --coding: rgba(0, 44, 95, 0.79);
+    --non-coding: rgba(79, 41, 140, 0.79);
     --untranslated: rgba(191, 184, 184, 0.53);
+
+    --coding-max-score: rgba(52, 218, 255, 0.79);
+    --non-coding-max-score: rgba(255, 0, 59, 0.79);;
 }
 
 .hpgv_track-sequence {

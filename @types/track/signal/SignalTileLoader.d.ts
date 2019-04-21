@@ -3,6 +3,7 @@ import { SignalTrackModel } from "./SignalTrackModel";
 import { BigWigReader, HeaderData } from "bigwig-reader";
 import { TileLoader, Tile } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
+import { Contig } from "../..";
 export declare type SignalTilePayload = {
     textureUnpackMultiplier: number;
     array: Float32Array;
@@ -33,6 +34,7 @@ export declare class SignalTileLoader extends TileLoader<SignalTilePayload, Bloc
     protected bigWigLoader: BigWigLoader;
     protected readonly nChannels: number;
     static cacheKey(model: SignalTrackModel): string;
+    static getAvailableContigs(model: SignalTrackModel): Promise<Array<Contig>>;
     static requestIndex: number;
     constructor(dataSource: IDataSource, model: SignalTrackModel, contig: string);
     mapLodLevel(l: number): number;

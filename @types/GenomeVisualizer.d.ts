@@ -7,7 +7,7 @@ import { AppCanvas } from "./ui/core/AppCanvas";
 import { TrackViewer, Track } from "./ui/TrackViewer";
 import { TileLoader } from "./track/TileLoader";
 import { TrackObject } from "./track/TrackObject";
-import { GenomicLocation } from "./model";
+import { GenomicLocation, Contig } from "./model";
 import { Panel } from "./ui";
 export interface GenomeVisualizerRenderProps {
     width: number;
@@ -18,6 +18,7 @@ export interface GenomeVisualizerRenderProps {
 interface CustomTileLoader<ModelType> {
     new (dataSource: IDataSource, model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
     cacheKey(model: ModelType): string | null;
+    getAvailableContigs(model: ModelType): Promise<Array<Contig>>;
 }
 interface CustomTrackObject {
     new (model: TrackModel): TrackObject<TrackModel, any>;

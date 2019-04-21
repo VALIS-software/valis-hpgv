@@ -27,6 +27,7 @@ export declare class Panel extends Object2D {
     column: number;
     maxRange: number;
     minRange: number;
+    clampToTracks: boolean;
     readonly header: ReactObject;
     readonly xAxis: Axis;
     readonly resizeHandle: Rect;
@@ -68,6 +69,10 @@ export declare class Panel extends Object2D {
     }): void;
     private _rangeAnimationObject;
     private setRangeImmediate;
+    protected applyLimits(x0: number, x1: number): {
+        x0: number;
+        x1: number;
+    };
     protected onTrackLeave: (e: InteractionEvent) => void;
     protected onTrackPointerMove: (e: InteractionEvent) => void;
     protected onTrackWheel: (e: WheelInteractionEvent) => void;

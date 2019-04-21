@@ -43,7 +43,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
      * Override to handle drawing
      */
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
-    protected getTileLoader(): TileLoaderType;
+    getTileLoader(): TileLoaderType;
     protected _loadingTiles: UsageCache<Tile<any>>;
     protected triggerDisplayUpdate(): void;
     /**

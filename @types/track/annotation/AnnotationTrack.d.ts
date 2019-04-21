@@ -31,6 +31,8 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
         '--transcript': number[];
         '--coding': number[];
         '--non-coding': number[];
+        '--coding-max-score': number[];
+        '--non-coding-max-score': number[];
         '--untranslated': number[];
         'color': number[];
         '--stroke': number[];
@@ -41,6 +43,8 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
             '--transcript': number[];
             '--coding': number[];
             '--non-coding': number[];
+            '--coding-max-score': number[];
+            '--non-coding-max-score': number[];
             '--untranslated': number[];
             'color': number[];
             '--stroke': number[];

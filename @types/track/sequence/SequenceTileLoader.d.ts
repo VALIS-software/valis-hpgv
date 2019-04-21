@@ -2,6 +2,7 @@ import GPUDevice, { GPUTexture } from "engine/rendering/GPUDevice";
 import TileLoader, { Tile } from "../TileLoader";
 import { SequenceTrackModel } from "./SequenceTrackModel";
 import { IDataSource } from "../../data-source/IDataSource";
+import { Contig } from "../..";
 declare type TilePayload = {
     array: Uint8Array;
     sequenceMinMax: {
@@ -21,6 +22,7 @@ export declare class SequenceTileLoader extends TileLoader<TilePayload, BlockPay
     protected readonly model: SequenceTrackModel;
     protected readonly contig: string;
     static cacheKey(model: SequenceTrackModel): string;
+    static getAvailableContigs(model: SequenceTrackModel): Promise<Array<Contig>>;
     constructor(dataSource: IDataSource, model: SequenceTrackModel, contig: string);
     mapLodLevel(l: number): number;
     protected getTilePayload(tile: Tile<TilePayload>): Promise<{

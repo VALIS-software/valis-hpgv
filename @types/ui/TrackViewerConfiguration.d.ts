@@ -7,5 +7,6 @@ export interface TrackViewerConfiguration {
     }>;
     tracks: Array<TrackModel>;
     allowNewPanels?: boolean;
+    clampToTracks?: boolean;
 }
 export default TrackViewerConfiguration;

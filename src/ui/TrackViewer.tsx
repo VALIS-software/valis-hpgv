@@ -46,6 +46,7 @@ export class TrackViewer extends Object2D {
     readonly minTrackHeight = 35;
 
     protected allowNewPanels = true;
+    protected _removableTracks = true; // use setRemovableTracks
     protected panels = new Set<Panel>();
     protected tracks = new Array<Track>();
 
@@ -136,6 +137,7 @@ export class TrackViewer extends Object2D {
         // hide/show add panel button
         let clampToTracks = state.clampToTracks == null ? false : state.clampToTracks;
         this.allowNewPanels = state.allowNewPanels == null ? false : state.allowNewPanels;
+        this.setRemovableTracks(state.removableTracks == null ? true : state.removableTracks);
         this.grid.toggleChild(this.addPanelButton, this.allowNewPanels);
 
         // Panels
@@ -230,6 +232,7 @@ export class TrackViewer extends Object2D {
 
         return {
             allowNewPanels: this.allowNewPanels,
+            removableTracks: this._removableTracks,
             clampToTracks: clampToTracks,
             panels: panels,
             tracks: tracks,
@@ -328,8 +331,11 @@ export class TrackViewer extends Object2D {
         rowObject.setResizable(true);
 
         this.grid.add(rowObject.header);
-        this.grid.add(rowObject.closeButton);
         this.grid.add(rowObject.resizeHandle);
+        
+        if (this._removableTracks) {
+            this.grid.add(rowObject.closeButton);
+        }
 
         // first instantaneously the y position of the track and override h to 0
         this.layoutTrackRows(false, rowObject);
@@ -603,6 +609,15 @@ export class TrackViewer extends Object2D {
         }
     }
 
+    protected setRemovableTracks(state: boolean) {
+        this._removableTracks = state;
+        for (let track of this.tracks) {
+            let rowObject = (track as any as TrackInternal).rowObject;
+            this.grid.toggleChild(rowObject.closeButton, this._removableTracks);
+        }
+        this.layoutGridContainer();
+    }
+
     /**
      * Removes the row from the scene and cleans up resources
      *
@@ -790,8 +805,14 @@ export class TrackViewer extends Object2D {
     }
 
     protected layoutGridContainer() {
+        let trackButtonsVisible = this.allowNewPanels || this._removableTracks;
+
         this.grid.x = this.trackHeaderWidth + this.spacing.x * 0.5;
-        this.grid.w = -this.trackHeaderWidth - this.spacing.x - this.trackButtonWidth;
+        this.grid.w = 
+            - this.trackHeaderWidth - this.spacing.x * 0.5
+            // right-side buttons 
+            - (trackButtonsVisible ? (this.trackButtonWidth + this.spacing.x * 0.5) : 0)
+        ;
         this.grid.relativeW = 1;
         this.grid.y = this.panelHeaderHeight + this.spacing.y * 0.5 + this.xAxisHeight;
 
@@ -1016,14 +1037,14 @@ export class TrackViewer extends Object2D {
         style?: React.CSSProperties
     }) {
         const iconSize = 32;
-        const iconMargin = 16;
+        const margin = 16;
 
         const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
 
         const expandArrow = (<ArrowElem
             style={{
                 marginTop: 8,
-                marginLeft: iconMargin,
+                marginLeft: margin,
                 color: 'inherit',
             }}
             viewBox={`0 0 ${iconSize} ${iconSize}`}
@@ -1048,13 +1069,14 @@ export class TrackViewer extends Object2D {
                     cursor: 'pointer',
                     userSelect: 'none',
                     width: iconSize, height: iconSize,
-                    marginRight: iconMargin,
+                    marginRight: margin,
                 }}
             >
                 {expandArrow}
             </div>
             <div style={{
-                flexGrow: 1
+                flexGrow: 1,
+                marginRight: margin,
             }}>
                 {props.model.name}
             </div>

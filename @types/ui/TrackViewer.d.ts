@@ -22,6 +22,7 @@ export declare class TrackViewer extends Object2D {
     readonly minPanelWidth: number;
     readonly minTrackHeight: number;
     protected allowNewPanels: boolean;
+    protected _removableTracks: boolean;
     protected panels: Set<Panel>;
     protected tracks: Track[];
     protected panelEdges: number[];
@@ -57,6 +58,7 @@ export declare class TrackViewer extends Object2D {
     protected refreshTrackStyle(type: string): void;
     protected refreshPanelStyle(): void;
     protected onPanelsChanged(): void;
+    protected setRemovableTracks(state: boolean): void;
     /**
      * Removes the row from the scene and cleans up resources
      *

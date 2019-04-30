@@ -1015,22 +1015,18 @@ export class TrackViewer extends Object2D {
         isExpanded: boolean,
         style?: React.CSSProperties
     }) {
-        const iconViewBoxSize = '0 0 32 32';
-        const headerContainerStyle: React.CSSProperties = {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-        };
+        const iconSize = 32;
+        const iconMargin = 16;
 
         const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
 
         const expandArrow = (<ArrowElem
             style={{
                 marginTop: 8,
-                marginLeft: 16,
+                marginLeft: iconMargin,
                 color: 'inherit',
             }}
-            viewBox={iconViewBoxSize}
+            viewBox={`0 0 ${iconSize} ${iconSize}`}
         />);
         return <div
             className="hpgv_ui-block hpgv_track-header"
@@ -1039,25 +1035,28 @@ export class TrackViewer extends Object2D {
                 width: '100%',
                 height: '100%',
                 overflow: 'hidden',
-                userSelect: 'none',
+                display: 'flex',
+                alignItems: 'center',
                 ...props.style,
             }}
         >
-            <div style={{
-                position: 'absolute',
-                width: '100%',
-                textAlign: 'center',
-                top: '50%',
-                transform: 'translate(0, -50%)',
-            }}>
-                <div onClick={() => {
+            <div
+                onClick={() => {
                     props.setExpanded(!props.isExpanded);
-                }} style={headerContainerStyle}>
-                    <IconButton color="inherit">
-                        {expandArrow}
-                    </IconButton>
-                    {props.model.name}
-                </div>
+                }}
+                style={{
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    width: iconSize, height: iconSize,
+                    marginRight: iconMargin,
+                }}
+            >
+                {expandArrow}
+            </div>
+            <div style={{
+                flexGrow: 1
+            }}>
+                {props.model.name}
             </div>
         </div>
     }

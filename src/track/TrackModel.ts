@@ -15,6 +15,9 @@ export type TrackModel = {
 
     color?: Array<number>,
 
+    // @! not yet implemented
+    styleSelector?: string,
+
     [field: string]: any,
 };
 

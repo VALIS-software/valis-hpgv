@@ -46,7 +46,9 @@ interface CustomTileLoader<ModelType> {
 interface CustomTrackObject {
     new(model: TrackModel): TrackObject<TrackModel, any>;
 
-    defaultHeightPx?: number; // optionally override the default track height
+    getDefaultHeightPx?: (model: TrackModel) => number; // optionally override the default track height
+    getExpandable?: (model: TrackModel) => boolean; // disable expandability by setting this to false
+
     styleNodes?: React.ReactNode; // occasionally it might be useful to have sub nodes within a track's style proxy node
 }
 export class GenomeVisualizer {

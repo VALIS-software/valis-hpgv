@@ -16,7 +16,9 @@ import { StyleProxy } from "../../ui";
 
 export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel> extends ShaderTrack<Model, SequenceTileLoader> {
 
-    static defaultHeightPx = 40;
+    static getDefaultHeightPx(model: any) {
+        return 40;
+    };
 
     protected densityMultiplier = 2.0;
     protected sharedState = {

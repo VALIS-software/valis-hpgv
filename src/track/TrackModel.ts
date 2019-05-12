@@ -9,6 +9,9 @@ export type TrackModel = {
     // display properties
     name: string,
     heightPx?: number,
+    expandedHeightPx?: number,
+
+    expandable?: boolean,
 
     color?: Array<number>,
 

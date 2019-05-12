@@ -267,7 +267,8 @@ export class TrackViewer extends Object2D {
             }
         })
 
-        let defaultTrackHeight = trackClasses.trackObjectClass.defaultHeightPx != null ? trackClasses.trackObjectClass.defaultHeightPx : 100;
+        let defaultTrackHeight = trackClasses.trackObjectClass.getDefaultHeightPx != null ? trackClasses.trackObjectClass.getDefaultHeightPx(model) : 100;
+        let expandable = trackClasses.trackObjectClass.getExpandable != null ? trackClasses.trackObjectClass.getExpandable(model) : true;
         let heightPx = model.heightPx != null ? model.heightPx : defaultTrackHeight;
 
         // create a track and add the header element to the grid
@@ -284,6 +285,8 @@ export class TrackViewer extends Object2D {
 
         let rowObject = new RowObject(
             model,
+            heightPx,
+            expandable,
             this.spacing,
             () => this.closeTrack(track),
             (h: number) => track.heightPx = h,
@@ -1032,6 +1035,7 @@ export class TrackViewer extends Object2D {
 
     public static TrackHeader(props: {
         model: TrackModel,
+        expandable: boolean,
         setExpanded?: (state: boolean) => void,
         isExpanded: boolean,
         style?: React.CSSProperties
@@ -1060,20 +1064,31 @@ export class TrackViewer extends Object2D {
                 alignItems: 'center',
                 ...props.style,
             }}
-        >
-            <div
-                onClick={() => {
-                    props.setExpanded(!props.isExpanded);
-                }}
-                style={{
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    width: iconSize, height: iconSize,
-                    marginRight: margin,
-                }}
-            >
-                {expandArrow}
-            </div>
+        >   
+            {
+                props.expandable ? (
+                    <div
+                        onClick={() => {
+                            props.setExpanded(!props.isExpanded);
+                        }}
+                        style={{
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            width: iconSize, height: iconSize,
+                            marginRight: margin,
+                        }}
+                    >
+                        {expandArrow}
+                    </div>
+                ) : (
+                    <div
+                        style={{
+                            width: iconSize, height: iconSize,
+                            marginRight: margin,
+                        }}
+                    ></div>
+                )
+            }
             <div style={{
                 flexGrow: 1,
                 marginRight: margin,
@@ -1198,9 +1213,12 @@ class RowObject {
     protected _headerIsExpandedState: boolean | undefined = undefined;
     protected styleProxy: StyleProxy;
     protected interactionDisabled: boolean = false;
+    protected readonly expandedTrackHeightPx: number;
 
     constructor(
         protected model: TrackModel,
+        protected readonly defaultHeightPx: number,
+        protected readonly defaultExpandable: boolean,
         protected readonly spacing: { x: number, y: number },
         protected onClose: (t: RowObject) => void,
         protected readonly setHeight: (h: number) => void,
@@ -1214,6 +1232,8 @@ class RowObject {
         this.resizeHandle.z = 1;
         this.resizeHandle.render = false;
         this.setResizable(false);
+
+        this.expandedTrackHeightPx = this.model.expandedHeightPx != null ? this.model.expandedHeightPx : (defaultHeightPx * 2);
 
         this.updateHeader();
     }
@@ -1289,11 +1309,12 @@ class RowObject {
         this._headerIsExpandedState = this.isExpanded();
         this.header.content = (<TrackViewer.TrackHeader
             model={this.model}  
+            expandable={this.model.expandable != null ? this.model.expandable : this.defaultExpandable}
             isExpanded={this._headerIsExpandedState}
             setExpanded={(toggle: boolean) => {
                 if (this.interactionDisabled) return;
 
-                this.setHeight(toggle ? RowObject.expandedTrackHeight : RowObject.collapsedTrackHeight);
+                this.setHeight(toggle ? this.expandedTrackHeightPx : this.defaultHeightPx);
             }}
             style={{
                 opacity: this._opacity,
@@ -1316,11 +1337,8 @@ class RowObject {
     }
 
     protected isExpanded = () => {
-        return this.getHeight() >= RowObject.expandedTrackHeight;
+        return this.getHeight() >= this.expandedTrackHeightPx;
     }
-
-    public static readonly expandedTrackHeight = 200;
-    public static readonly collapsedTrackHeight = 50;
 
 }
 

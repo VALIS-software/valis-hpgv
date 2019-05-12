@@ -22,7 +22,15 @@ const TRANSCRIPT_HEIGHT = 20;
 
 export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
 
-    static defaultHeightPx = 100;
+    static getDefaultHeightPx(model: any) {
+        return 100;
+    };
+
+    static getExpandable(model: AnnotationTrackModel) {
+        let defaultCompact = true;
+        let compact = model.compact != null ? model.compact : defaultCompact;
+        return compact ? false : true;        
+    }
 
     protected readonly macroLodBlendRange = 2;
     protected readonly macroLodThresholdLow = 7;
@@ -619,7 +627,7 @@ class TranscriptComponent extends Rect {
         hoverOverlay.relativeH = 1;
         hoverOverlay.opacity = 0;
         hoverOverlay.additiveBlending = 0.5;
-        this.add(hoverOverlay)
+        this.add(hoverOverlay);
 
         // highlight on mouse-over
         const springStrength = 300;

@@ -1074,7 +1074,9 @@ export class TrackViewer extends Object2D {
                         style={{
                             cursor: 'pointer',
                             userSelect: 'none',
-                            width: iconSize, height: iconSize,
+                            width: iconSize,
+                            height: iconSize,
+                            minWidth: iconSize,
                             marginRight: margin,
                         }}
                     >
@@ -1083,7 +1085,9 @@ export class TrackViewer extends Object2D {
                 ) : (
                     <div
                         style={{
-                            width: iconSize, height: iconSize,
+                            width: iconSize,
+                            height: iconSize,
+                            minWidth: iconSize,
                             marginRight: margin,
                         }}
                     ></div>

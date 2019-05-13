@@ -22,7 +22,8 @@ interface CustomTileLoader<ModelType> {
 }
 interface CustomTrackObject {
     new (model: TrackModel): TrackObject<TrackModel, any>;
-    defaultHeightPx?: number;
+    getDefaultHeightPx?: (model: TrackModel) => number;
+    getExpandable?: (model: TrackModel) => boolean;
     styleNodes?: React.ReactNode;
 }
 export declare class GenomeVisualizer {

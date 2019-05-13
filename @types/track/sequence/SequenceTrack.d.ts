@@ -9,7 +9,7 @@ import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
 import { StyleProxy } from "../../ui";
 export declare class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel> extends ShaderTrack<Model, SequenceTileLoader> {
-    static defaultHeightPx: number;
+    static getDefaultHeightPx(model: any): number;
     protected densityMultiplier: number;
     protected sharedState: {
         colors: {

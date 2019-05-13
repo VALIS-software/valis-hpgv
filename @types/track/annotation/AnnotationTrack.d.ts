@@ -11,7 +11,8 @@ import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTra
 import { GenomeFeature } from "./AnnotationTypes";
 import { StyleProxy } from "../../ui/util/StyleProxy";
 export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
-    static defaultHeightPx: number;
+    static getDefaultHeightPx(model: any): number;
+    static getExpandable(model: AnnotationTrackModel): boolean;
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;

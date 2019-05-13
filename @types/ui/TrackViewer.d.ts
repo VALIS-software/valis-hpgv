@@ -103,6 +103,7 @@ export declare class TrackViewer extends Object2D {
     }): JSX.Element;
     static TrackHeader(props: {
         model: TrackModel;
+        expandable: boolean;
         setExpanded?: (state: boolean) => void;
         isExpanded: boolean;
         style?: React.CSSProperties;
@@ -129,6 +130,8 @@ export declare class Track {
  */
 declare class RowObject {
     protected model: TrackModel;
+    protected readonly defaultHeightPx: number;
+    protected readonly defaultExpandable: boolean;
     protected readonly spacing: {
         x: number;
         y: number;
@@ -150,7 +153,8 @@ declare class RowObject {
     protected _headerIsExpandedState: boolean | undefined;
     protected styleProxy: StyleProxy;
     protected interactionDisabled: boolean;
-    constructor(model: TrackModel, spacing: {
+    protected readonly expandedTrackHeightPx: number;
+    constructor(model: TrackModel, defaultHeightPx: number, defaultExpandable: boolean, spacing: {
         x: number;
         y: number;
     }, onClose: (t: RowObject) => void, setHeight: (h: number) => void, getHeight: () => number);
@@ -167,7 +171,5 @@ declare class RowObject {
     protected layoutY(): void;
     protected updateHeader(): void;
     protected isExpanded: () => boolean;
-    static readonly expandedTrackHeight: number;
-    static readonly collapsedTrackHeight: number;
 }
 export default TrackViewer;

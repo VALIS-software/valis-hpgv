@@ -23,7 +23,7 @@ const TRANSCRIPT_HEIGHT = 20;
 export class AnnotationTrack extends TrackObject<AnnotationTrackModel, AnnotationTileLoader> {
 
     static getDefaultHeightPx(model: any) {
-        return 100;
+        return 120;
     };
 
     static getExpandable(model: AnnotationTrackModel) {

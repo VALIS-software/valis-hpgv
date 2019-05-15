@@ -358,7 +358,7 @@ export class Axis extends Object2D {
         '2': 'M', // mega
         '1': 'k', // kilo
         '-1': 'm', // milli
-        '-2': 'µ', // micro
+        '-2': 'μ', // micro
         '-3': 'n', // nano
         '-4': 'p', // pico
         '-5': 'f', // femto
@@ -392,7 +392,7 @@ export class Axis extends Object2D {
     
             str = numString + symbol;
         }
-    
+
         return str;
     }
 

@@ -85,7 +85,7 @@ function gff3Convert(inputFilePath, outputDirectory) {
                 }
             },
             // print errors and comments
-            onError: Terminal_1.Terminal.error,
+            onError: (e) => Terminal_1.Terminal.error(e),
             onComment: (c) => Terminal_1.Terminal.log(`<dim><i>${c}<//>`),
             onComplete: (gff3) => {
                 if (_lastSequenceId !== undefined) {
@@ -109,8 +109,9 @@ function gff3Convert(inputFilePath, outputDirectory) {
             completedSequences.add(sequenceId);
             // save tiles to disk
             // assume all sequences represent chromosome and prefix with chr
-            saveTiles(tileset.sequences[sequenceId], `${vgenesDirectory}/chr${sequenceId}`);
-            saveTiles(macroTileset.sequences[sequenceId], `${vgenesDirectory}/chr${sequenceId}-macro`);
+            let sequenceName = sequenceId.substr(0, 3) == 'chr' ? sequenceId : `chr${sequenceId}`;
+            saveTiles(tileset.sequences[sequenceId], `${vgenesDirectory}/${sequenceName}`);
+            saveTiles(macroTileset.sequences[sequenceId], `${vgenesDirectory}/${sequenceName}-macro`);
             // release sequence tile data to GC since we no longer need it
             delete tileset.sequences[sequenceId];
             delete macroTileset.sequences[sequenceId];

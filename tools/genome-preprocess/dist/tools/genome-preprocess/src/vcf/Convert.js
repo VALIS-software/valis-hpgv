@@ -30,7 +30,6 @@ function vcfConvert(inputFilePath, outputDirectory) {
                     let featureIndex = parseInt(feature.POS);
                     let range = rangeFromContig(feature.CHROM) || contigRange;
                     let featureAbsoluteIndex = range.startIndex + (parseInt(feature.POS) - 1);
-                    // Terminal.log(feature);
                     tileset.addFeature('main', featureAbsoluteIndex, 1, {
                         id: feature.ID,
                         baseIndex: featureAbsoluteIndex,

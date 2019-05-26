@@ -54,10 +54,10 @@ SoGeneClass.instance = new SoGeneClass();
 exports.SoGeneClass = SoGeneClass;
 class SoTranscriptClass {
     constructor() {
+        this['transcript'] = TranscriptClass.Unspecified;
         this['lnc_RNA'] = TranscriptClass.NonProteinCoding;
         this['mRNA'] = TranscriptClass.ProteinCoding;
         this['pseudogenic_transcript'] = TranscriptClass.Unspecified;
-        this['transcript'] = TranscriptClass.Unspecified;
         this['miRNA'] = TranscriptClass.NonProteinCoding;
         this['ncRNA'] = TranscriptClass.NonProteinCoding;
         this['rRNA'] = TranscriptClass.NonProteinCoding;

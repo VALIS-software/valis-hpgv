@@ -54,7 +54,9 @@ function processFile(filePath: string): Promise<Array<string> | string | null> {
 	let ext = path.extname(filePath).toLowerCase();
 
 	switch (ext) {
-		case '.gff3': {
+		case '.gff3':
+		case '.gff2':
+		case '.gtf': {
 			return gff3Convert(filePath, outputDirectory);
 		}
 		case '.fa':

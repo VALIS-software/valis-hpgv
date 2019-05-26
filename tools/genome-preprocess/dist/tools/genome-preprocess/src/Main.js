@@ -46,7 +46,9 @@ for (let filePath of filePaths) {
 function processFile(filePath) {
     let ext = path.extname(filePath).toLowerCase();
     switch (ext) {
-        case '.gff3': {
+        case '.gff3':
+        case '.gff2':
+        case '.gtf': {
             return Convert_1.gff3Convert(filePath, outputDirectory);
         }
         case '.fa':

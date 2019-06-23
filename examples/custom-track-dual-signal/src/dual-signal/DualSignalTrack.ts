@@ -28,7 +28,7 @@ class DualSignalTile extends SignalTile {
         // this function returns the signal image given signal values from the texture
         vec4 signalRGBA(vec4 textureSample) {
             // uncomment the following line to see the raw signal data
-            // return vec4(textureSample.rg, 0., 1.);
+            return vec4(textureSample.rg, 0., 1.);
 
             float signalAlpha1 = antialiasedSignalAlpha(textureSample.r);
             float signalAlpha2 = antialiasedSignalAlpha(textureSample.g);

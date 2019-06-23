@@ -246,7 +246,27 @@ export class DualSignalTileLoader extends SignalTileLoader {
 
 Once we've created a [TileLoader](src/track/TileLoader.ts), we need a [TrackObject](src/track/TrackObject.ts) to render the tiles. For this dual signal example we can use the existing signal track class and extend it to display two signals. A [TrackObject](src/track/TrackObject.ts) displays tile data via tile objects, in [SignalTrack.ts](src/track/signal/SignalTrack.ts) there's a class called [SignalTile](src/track/signal/SignalTrack.ts) which is used to draw a single tile. We extend [SignalTrack](src/track/signal/SignalTrack.ts) and change the `customTileNodeClass` field to refer to our custom tile class we'll call `DualSignalTile`.
 
-To draw two signal tracks we override the value of `colorShaderFunction` in our extension of [SignalTile](src/track/signal/SignalTrack.ts). `colorShaderFunction` contains WebGL shader code that decides the color of pixel given the corresponding tile data and pixel's coordinates. In our custom `colorShaderFunction` we use `step(1.0 - signal, uv.y)` to set the output value to 1 when the pixel's y coordinate (`uv.y`) is less than `signal`. `signal` and `uv.y` are normalised to cover the range 0 to 1. This fills in the area below the signal's curve. We set the output pixel color's red component to correspond to first bigwig signal (`textureSample.r`) and the green component to correspond to the second bigwig signal (`textureSample.g`).
+To draw two signal tracks we override the value of `signalRGBA` in our extension of [SignalTile](src/track/signal/SignalTrack.ts). `signalRGBA` contains WebGL shader code that decides the color of pixel given the corresponding tile data and pixel's coordinates. `signalRGB` takes the signal values in the texture data and turns it into an RGBA value to draw an image. The [default implementation](https://github.com/VALIS-software/valis-hpgv/blob/cd18c3bcf0f145410cd56fea633b8d0bf99b9fbe/src/track/signal/SignalTrack.ts#L349) look like this
+
+```glsl
+vec4 signalRGBA(vec4 textureSample) {
+    float signalAlpha = antialiasedSignalAlpha(textureSample.r);
+    return vec4(signalColor, signalAlpha);
+}
+```
+
+A simple alternative would be to just convert the texture input values directly into colors:
+```glsl
+vec4 signalRGBA(vec4 textureSample) {
+    return vec4(textureSample.r, textureSample.g, 0., 1.);
+}
+```
+
+This will draw red where the first signal is > 0 and green where the second signal is > 0:
+
+<img alt="Dual signal track bands" src="https://user-images.githubusercontent.com/3742992/59980911-5f9a0900-95f4-11e9-8599-c7261b4aeaf5.png">
+
+To draw the signal as a curve we need to transform the signal values so that an opaque color is return when below a threshold and clear is returned when above – a help function `antialiasedSignalAlpha(value)` exists to do this.
 
 In a file called `DualSignalTrack.ts`:
 
@@ -277,17 +297,26 @@ export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
 
 class DualSignalTile extends SignalTile {
 
-    protected colorShaderFunction = `
-        vec3 color(vec4 textureSample, vec2 uv) {
-            return
-                vec3(
-                    // use the first signal to set the red channel
-                    step(1.0 - uv.y, textureSample.r),
-                    // use the second to set the green channel
-                    step(1.0 - uv.y, textureSample.g),
-                    0.0
-                )
-            ;
+    protected signalRGBA = `
+        // this function returns the signal image given signal values from the texture
+        vec4 signalRGBA(vec4 textureSample) {
+            // uncomment the following line to see the raw signal data
+            return vec4(textureSample.rg, 0., 1.);
+
+            float signalAlpha1 = antialiasedSignalAlpha(textureSample.r);
+            float signalAlpha2 = antialiasedSignalAlpha(textureSample.g);
+
+            // red signal
+            vec4 signal1 = vec4(vec3(1., 0., 0.) * signalAlpha1, signalAlpha1);
+
+            // green signal
+            vec4 signal2 = vec4(vec3(0., 1., 0.) * signalAlpha2, signalAlpha2);
+
+            // add the two signals together
+            // we could perform more other operations here to help study the data
+            // for example, we could multiply the signals to find overlapping regions
+
+            return signal1 + signal2;
         }
     `;
 

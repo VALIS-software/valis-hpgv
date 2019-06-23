@@ -24,17 +24,26 @@ export class DualSignalTrack extends SignalTrack<DualSignalTrackModel> {
 
 class DualSignalTile extends SignalTile {
 
-    protected colorShaderFunction = `
-        vec3 color(vec4 textureSample, vec2 uv) {
-            return
-                vec3(
-                    // use the first signal to set the red channel
-                    step(1.0 - uv.y, textureSample.r),
-                    // use the second to set the green channel
-                    step(1.0 - uv.y, textureSample.g),
-                    0.0
-                )
-            ;
+    protected signalShaderFunction = `
+        // this function returns the signal image given signal values from the texture
+        vec4 signalRGBA(vec4 textureSample) {
+            // uncomment the following line to see the raw signal data
+            // return vec4(textureSample.rg, 0., 1.);
+
+            float signalAlpha1 = antialiasedSignalAlpha(textureSample.r);
+            float signalAlpha2 = antialiasedSignalAlpha(textureSample.g);
+
+            // red signal
+            vec4 signal1 = vec4(vec3(1., 0., 0.) * signalAlpha1, signalAlpha1);
+
+            // green signal
+            vec4 signal2 = vec4(vec3(0., 1., 0.) * signalAlpha2, signalAlpha2);
+
+            // add the two signals together
+            // we could perform more other operations here to help study the data
+            // for example, we could multiply the signals to find overlapping regions
+
+            return signal1 + signal2;
         }
     `;
 

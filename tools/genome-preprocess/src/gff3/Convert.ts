@@ -18,10 +18,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { AnnotationTileset, AnnotationTile } from './AnnotationTileset';
-import { Gff3Parser } from 'genomics-formats/lib/gff3/Gff3Parser';
+import { Gff3Parser, Gff3 } from 'genomics-formats/lib/gff3/Gff3Parser';
 import { Feature } from 'genomics-formats/lib/gff3/Feature';
 import { Terminal } from '../Terminal';
 import { deleteDirectory } from '../FileSystemUtils';
+import Contig from '../Contig';
 
 // settings
 
@@ -58,6 +59,9 @@ export function gff3Convert(inputFilePath: string, outputDirectory: string): Pro
 			onUnknownFeature,
 			Terminal.error,
 		);
+
+		// track contigs as they're created to use as an estimate where explicit sequence ranges are not provided 
+		let implicitContigs = new Array<Contig>();
 
 		let completedSequences = new Set<string>();
 
@@ -123,6 +127,8 @@ export function gff3Convert(inputFilePath: string, outputDirectory: string): Pro
 						onSequenceComplete(_lastSequenceId);
 					}
 
+					saveManifest(gff3, vgenesDirectory);
+
 					// post-convert info
 					if (Object.keys(unknownFeatureTypes).length > 0) {
 						Terminal.warn('Unknown features:', unknownFeatureTypes);
@@ -155,6 +161,18 @@ export function gff3Convert(inputFilePath: string, outputDirectory: string): Pro
 			saveTiles(tileset.sequences[sequenceId], `${vgenesDirectory}/${sequenceName}`);
 			saveTiles(macroTileset.sequences[sequenceId], `${vgenesDirectory}/${sequenceName}-macro`);
 
+			// add to contigs list for manifest.json
+			let tiles = tileset.sequences[sequenceId];
+			let lastTile = tiles[tiles.length - 1];
+			let totalSpan = lastTile.startIndex + lastTile.span;
+			implicitContigs.push({
+				id: sequenceId,
+				name: sequenceName,
+				startIndex: 0,
+				span: totalSpan,
+			});
+
+
 			// release sequence tile data to GC since we no longer need it
 			delete tileset.sequences[sequenceId];
 			delete macroTileset.sequences[sequenceId];
@@ -186,6 +204,39 @@ export function gff3Convert(inputFilePath: string, outputDirectory: string): Pro
 				}
 
 				Terminal.success(`Saved <b>${nSavedFiles}</b> files into <b>${directory}</b>`);
+			} catch (e) {
+				Terminal.error(e);
+				reject(e);
+			}
+		}
+
+		function saveManifest(gff3: Gff3, directory: string) {
+			try {
+				let contigs = new Array<Contig>();
+
+				for (let implicitContig of implicitContigs) {
+					let explicitSeq = gff3.sequences[implicitContig.id];
+					let explicitSpan: number | null = null;
+					if ((explicitSeq != null) && (explicitSeq.start != null) && (explicitSeq.end != null)) {
+						explicitSpan = explicitSeq.end - explicitSeq.start;
+					}
+					
+					contigs.push({
+						id: implicitContig.id,
+						name: implicitContig.name,
+						startIndex: explicitSeq != null ? ((explicitSeq.start || 0) - 1) : implicitContig.startIndex,
+						span: explicitSpan != null ? explicitSpan : implicitContig.span
+					});
+				}
+
+				let manifest = JSON.stringify({
+					contigs: implicitContigs
+				});
+
+				let path = `${directory}/manifest.json`;
+
+				fs.writeFileSync(path, manifest);
+				Terminal.success(`Saved <b>${path}</b>`);
 			} catch (e) {
 				Terminal.error(e);
 				reject(e);

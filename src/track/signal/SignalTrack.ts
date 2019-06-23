@@ -346,11 +346,10 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
 
-    protected colorShaderFunction = `
-        ${Shaders.functions.palettes.viridis}
-
-        vec3 color(vec4 textureSample, vec2 uv) {
-            return step(1.0 - textureSample.r, uv.y) * viridis(textureSample.r * uv.y);
+    protected signalShaderFunction = `
+        vec4 signalRGBA(vec4 textureSample) {
+            float signalAlpha = antialiasedSignalAlpha(textureSample.r);
+            return vec4(signalColor, signalAlpha);
         }
     `;
 
@@ -387,10 +386,11 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
 
                 varying vec2 texCoord;
                 varying vec4 rect_px; // x, y, width, height
-                
-                void main() {
-                    vec4 textureSample = texture2D(memoryBlock, texCoord) * scaleFactor;
-                    float signalHeight_uv = textureSample.r;
+
+                ${this.signalShaderFunction}
+
+                float antialiasedSignalAlpha(float signalValue) {
+                    float signalHeight_uv = signalValue;
                     float signalTop_px = signalHeight_uv * rect_px[3] + rect_px[1];
 
                     #ifdef GL_OES_standard_derivatives
@@ -405,11 +405,17 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
 
                     // cheap antialiasing by estimating pixel coverage (using rotatable pixel model)
                     float d = pixelSignalDist_px/sqrt(signalGradient * signalGradient + 1.0);
-                    float signalAlpha = clamp(0.5 + d, 0.0, 1.0);
+                    return clamp(0.5 + d, 0.0, 1.0);
+                }
+                
+                void main() {
+                    vec4 textureSample = texture2D(memoryBlock, texCoord) * scaleFactor;
+
+                    vec4 signal = signalRGBA(textureSample);
 
                     // manual premultiplied alpha blending
                     const float blendFactor = 1.0;
-                    gl_FragColor = vec4(signalColor * signalAlpha + backgroundColor * (1.0 - signalAlpha), blendFactor) * opacity;
+                    gl_FragColor = vec4(signal.rgb * signal.a + backgroundColor * (1.0 - clamp(signal.a, 0., 1.)), blendFactor) * opacity;
                 }
             `,
             SignalTile.attributeLayout

@@ -47,7 +47,7 @@ export declare class SignalTile extends ShaderTile<SignalTilePayload> {
     protected readonly sharedState: SignalTrack['sharedState'];
     protected gpuTexture: GPUTexture;
     protected memoryBlockY: number;
-    protected colorShaderFunction: string;
+    protected signalShaderFunction: string;
     constructor(sharedState: SignalTrack['sharedState']);
     setTile(tile: Tile<SignalTilePayload>): void;
     allocateGPUResources(device: GPUDevice): void;

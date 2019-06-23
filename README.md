@@ -301,7 +301,7 @@ class DualSignalTile extends SignalTile {
         // this function returns the signal image given signal values from the texture
         vec4 signalRGBA(vec4 textureSample) {
             // uncomment the following line to see the raw signal data
-            return vec4(textureSample.rg, 0., 1.);
+            // return vec4(textureSample.rg, 0., 1.);
 
             float signalAlpha1 = antialiasedSignalAlpha(textureSample.r);
             float signalAlpha2 = antialiasedSignalAlpha(textureSample.g);
@@ -349,7 +349,7 @@ After running `parcel index.html`, you should see the following when visiting [`
 
 npx parcel build index.html --public-url '.'
 
-<img alt="Dual signal track demo" src="https://user-images.githubusercontent.com/3742992/49332258-e7112380-f5a1-11e8-8ff6-786a696a1859.png">
+<img alt="Dual signal track demo" src="https://user-images.githubusercontent.com/3742992/59981120-2c0cae00-95f7-11e9-9d40-5c4785948c58.png">
 
 [Live Demo](https://valis-software.github.io/valis-hpgv/examples/custom-track-dual-signal/dist/index.html)
 

@@ -61,6 +61,8 @@ class AnnotationTileset {
             return;
         }
         if (!this.topLevelOnly) {
+            // ensure children are sorted by start index ascending
+            feature.children.sort((a, b) => a.start - b.start);
             for (let child of feature.children) {
                 this.addFeature(tile, child);
             }

@@ -387,8 +387,6 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                 varying vec2 texCoord;
                 varying vec4 rect_px; // x, y, width, height
 
-                ${this.signalShaderFunction}
-
                 float antialiasedSignalAlpha(float signalValue) {
                     float signalHeight_uv = signalValue;
                     float signalTop_px = signalHeight_uv * rect_px[3] + rect_px[1];
@@ -407,6 +405,8 @@ export class SignalTile extends ShaderTile<SignalTilePayload> {
                     float d = pixelSignalDist_px/sqrt(signalGradient * signalGradient + 1.0);
                     return clamp(0.5 + d, 0.0, 1.0);
                 }
+
+                ${this.signalShaderFunction}
                 
                 void main() {
                     vec4 textureSample = texture2D(memoryBlock, texCoord) * scaleFactor;

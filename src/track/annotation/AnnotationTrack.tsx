@@ -932,7 +932,7 @@ class TranscriptSpan extends Rect {
             void main() {
                 vec2 x = vec2(vUv.x, vUv.y - 0.5);
 
-                x.x = mix(x.x, 1.0 - x.x, direction);
+                x.x = mix(1.0 - x.x, x.x, direction);
 
                 float n = 2.0;
                 x *= n; x.x = fract(x.x);

@@ -8,6 +8,7 @@ export declare type TrackModel = {
     name: string;
     heightPx?: number;
     expandedHeightPx?: number;
+    highlightLocation?: string;
     expandable?: boolean;
     color?: Array<number>;
     styleSelector?: string;

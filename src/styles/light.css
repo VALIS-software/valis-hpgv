@@ -41,7 +41,7 @@
 }
 
 .hpgv_track {
-    background-color: #e9f0f3;
+    background-color: white;//#e9f0f3;
     --loading-indicator: #8ea1bf;
     --cursor: #3645653b;
     --secondary-cursor: #3645653b;

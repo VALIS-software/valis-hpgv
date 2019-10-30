@@ -8,21 +8,12 @@ import TextClone from "../../ui/util/TextClone";
 import TrackObject from "../TrackObject";
 import { VariantTileLoader } from "./VariantTileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
-import { StyleProxy } from "../../ui";
 export declare class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> extends TrackObject<Model, VariantTileLoader> {
     protected readonly macroLodBlendRange: number;
     protected readonly macroLodThresholdLow: number;
     protected readonly macroLodThresholdHigh: number;
     protected pointerOverTrack: boolean;
-    protected style: {
-        colors: {
-            '--addition': number[];
-            '--deletion': number[];
-            '--swap': number[];
-        };
-    };
     constructor(model: Model);
-    applyStyle(styleProxy: StyleProxy): void;
     protected _microTileCache: UsageCache<IntervalInstances>;
     protected _onStageAnnotations: UsageCache<Object2D>;
     protected _sequenceLabelCache: UsageCache<{

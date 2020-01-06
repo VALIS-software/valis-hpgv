@@ -203,7 +203,9 @@ export class GenomeVisualizer {
     }
 
     addPanel(location: GenomicLocation, animateIn: boolean) {
-        return this.trackViewer.addPanel(location, animateIn, 'chr1:12345');// FIX ME!!!
+        return this.trackViewer.addPanel(location, animateIn);
+        // Previously had --> but I think it's not necessary
+        // return this.trackViewer.addPanel(location, animateIn, 'chr1:12345');
     }
 
     closeTrack(track: Track, animateOut: boolean = true, onComplete?: () => void) {

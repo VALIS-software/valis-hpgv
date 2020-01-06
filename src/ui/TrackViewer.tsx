@@ -86,7 +86,7 @@ export class TrackViewer extends Object2D {
 
         this.addPanelButton = new ReactObject(
             <TrackViewer.AddPanelButton onClick={() => {
-                this.addPanel({ contig: 'chr1', x0: 0, x1: 249e6}, true);// FIX ME!!!
+                this.addPanel({ contig: 'chr1', x0: 0, x1: 249e6}, true);
             }} />,
             this.panelHeaderHeight,
             this.trackButtonWidth,

@@ -95,9 +95,6 @@ export class Panel extends Object2D {
         this.header.originY = -1;
         this.header.y = -this.xAxisHeight - this.spacing.y * 0.5;
         this.add(this.header);
-        
-        console.log('HERE WE ARE');
-        console.log(this);
 
         // 1/2 spacing around the x-axis
         let offset = 0.5; // offset labels by 0.5 to center on basepairs
@@ -725,8 +722,6 @@ export class Panel extends Object2D {
             this.setRangeUsingRangeSpecifier(rangeSpecifier);
         }
         this.updatePanelHeader();
-        console.log('range specifier');
-        console.log(rangeSpecifier);
         let contigString = rangeSpecifier.split(':')[0];
         for (let tile of this.trackViews) {
             tile.setHighlightPointer('0', 0.5, contigString);
@@ -739,8 +734,6 @@ export class Panel extends Object2D {
     }
 
     protected setRangeUsingRangeSpecifier(specifier: string) {
-        console.log('set range using range specifier');
-
         // @! this could be improved to be more robust (for example, omitting contig should use current contig, etc)
         try {
             let parts = specifier.split(':');

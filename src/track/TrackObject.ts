@@ -370,7 +370,6 @@ export class HighlightPointer extends Rect {
         this.originX = -0.5;
         this.relativeH = 1;
         // this is the width, in pixels, of the highlight region
-        // the highlight width should really scale on zoom
         this.w = 3;
 
         this.transparent = true;

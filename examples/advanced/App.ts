@@ -1,9 +1,5 @@
 const GV = require('../../dist/valis-hpgv.js');
 
-function handleTest() {
-    console.log('we are handling the test');
-}
-
 // pass a list of files to visualize in an array, the viewer will determine the best visualization to use
 let config = {
     allowNewPanels: true,

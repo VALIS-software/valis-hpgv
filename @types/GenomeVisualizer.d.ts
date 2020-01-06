@@ -53,7 +53,7 @@ export declare class GenomeVisualizer {
      * @param x1 right base index
      */
     setRange(x0: number, x1: number): void;
-    addTrack(model: TrackModel, animateIn?: boolean, highlightLocation: string): Track;
+    addTrack(model: TrackModel, animateIn: boolean, highlightLocation: string): Track;
     addTrackFromFilePath(path: string, name?: string, animateIn?: boolean, highlightLocation?: string): Track;
     addPanel(location: GenomicLocation, animateIn: boolean): void;
     closeTrack(track: Track, animateOut?: boolean, onComplete?: () => void): void;

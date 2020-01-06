@@ -43,7 +43,7 @@ export declare class TrackViewer extends Object2D {
     setConfiguration(state: TrackViewerConfiguration): void;
     getConfiguration(): TrackViewerConfiguration;
     setDataSource(dataSource: InternalDataSource): void;
-    addTrack(model: TrackModel, animate?: boolean, highlightLocation: string): Track;
+    addTrack(model: TrackModel, animate: boolean, highlightLocation: string): Track;
     closeTrack(track: Track, animate?: boolean, onComplete?: () => void): void;
     addPanel(location: GenomicLocation, animate?: boolean, highlightLocation?: string): void;
     closePanel(panel: Panel, animate?: boolean, onComplete?: () => void): void;

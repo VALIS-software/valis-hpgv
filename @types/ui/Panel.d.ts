@@ -84,7 +84,7 @@ export declare class Panel extends Object2D {
     protected onTrackDragStart: (e: InteractionEvent) => void;
     protected onTrackDragMove: (e: InteractionEvent) => void;
     protected onTrackDragEnd: (e: InteractionEvent) => void;
-    protected setActiveAxisPointer(e: InteractionEvent): void;
+    protected setActiveAxisPointer(e: InteractionEvent, flag?: String): void;
     protected removeActiveAxisPointer(e: InteractionEvent): void;
     protected fillX(obj: Object2D): void;
     protected availableContigAtOffset: (contig: string, offset: number) => string;

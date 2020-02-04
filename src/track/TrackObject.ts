@@ -30,10 +30,13 @@ export class TrackObject<
     protected x1: number;
     
     protected defaultCursor = 'crosshair';
+    protected highlightLocation: string;
 
     protected axisPointers: { [id: string]: AxisPointer } = {};
     protected activeAxisPointerColor = [1, 1, 1, 0.8];
     protected secondaryAxisPointerColor = [0.2, 0.2, 0.2, 1];
+    
+    protected highlightPointers: { [id: string]: HighlightPointer } = {};
 
     protected focusRegionRectLeft: Rect;
     protected focusRegionRectRight: Rect;
@@ -48,6 +51,8 @@ export class TrackObject<
         
         // set default background color
         this.color = [0.1, 0.1, 0.1, 1];
+        
+        this.highlightLocation = model["highlightLocation"];
 
         this.cursorStyle = this.defaultCursor;
     
@@ -124,6 +129,41 @@ export class TrackObject<
             axisPointer.setStyle(style);
         }
     }
+    
+    setHighlightPointer(id: string, fractionX: number, contig?: string) {
+        let withinBounds = fractionX >= 0 && fractionX <= 1;
+    
+        let highlightPointer = this.highlightPointers[id];
+    
+        if (highlightPointer === undefined) {
+            // !withinBounds means do not draw, so we don't need to create the object
+            if (!withinBounds) return;
+            // create axis pointer
+            highlightPointer = new HighlightPointer(null, [0.2, 0.2, 0.2, 0.5], [0.2, 0.2, 0.2, 0.5], 'x');
+            highlightPointer.z = 2;
+            this.add(highlightPointer);
+            this.highlightPointers[id] = highlightPointer;
+        }
+        highlightPointer.color = [0.957, 0.886, 0.478, 1]; // hex: 
+    
+        highlightPointer.render = withinBounds;
+        
+        if (!(this.highlightLocation)) {
+            highlightPointer.render = false;
+        }
+    
+        if (withinBounds && this.highlightLocation) {
+            const highlightChr = this.highlightLocation.split(':')[0];
+            const contigPosition = contig ? contig : this.contig;
+            let highlightPosition;
+            if (highlightChr !== contigPosition) {
+                highlightPosition = NaN;
+            } else {
+                highlightPosition = +this.highlightLocation.split(':')[1];
+            }
+            highlightPointer.relativeX = (highlightPosition - this.x0 - 0.5) / (this.x1 - this.x0);
+        }
+    }
 
     removeAxisPointer(id: string) {
         let axisPointer = this.axisPointers[id];
@@ -136,7 +176,7 @@ export class TrackObject<
         delete this.axisPointers[id];
     }
 
-    setFocusRegion(x0_fractional: number, x1_fractional: number) {        
+    setFocusRegion(x0_fractional: number, x1_fractional: number) {
         this.focusRegionRectLeft.relativeX = 0;
         this.focusRegionRectLeft.relativeW = Math.max(Math.min(x0_fractional, x1_fractional), 0);
         this.focusRegionRectLeft.render = true;
@@ -317,6 +357,41 @@ export class AxisPointer extends Rect {
         (this.style as any) = style;
     }
 
+}
+
+export enum HighlightStyle {
+    Active = 0,
+    Secondary = 1,
+}
+
+export class HighlightPointer extends Rect {
+
+    readonly style: HighlightStyle;
+
+    constructor(style: HighlightStyle, public activeColor: ArrayLike<number>, public secondaryColor: ArrayLike<number>, axis: 'x' | 'y') {
+        super(0, 0);
+
+        this.originX = -0.5;
+        this.relativeH = 1;
+        // this is the width, in pixels, of the highlight region
+        this.w = 3;
+
+        this.transparent = true;
+
+        this.setStyle(style);
+    }
+    
+    setStyle(style: HighlightStyle) {
+        switch (style) {
+            case HighlightStyle.Active:
+                this.color = [0.2, 0.2, 0.2, 0];
+                break;
+            case HighlightStyle.Secondary:
+                this.color = [0.2, 0.2, 0.2, 0];
+                break;
+        }
+        (this.style as any) = style;
+    }
 }
 
 class LoadingIndicator extends Text {

@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import React = require("react");
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
@@ -37,13 +38,14 @@ export declare class TrackViewer extends Object2D {
     protected trackStyleProxies: {
         [trackType: string]: StyleProxy;
     };
+    protected highlightLocation: string;
     constructor();
     setConfiguration(state: TrackViewerConfiguration): void;
     getConfiguration(): TrackViewerConfiguration;
     setDataSource(dataSource: InternalDataSource): void;
-    addTrack(model: TrackModel, animate?: boolean): Track;
+    addTrack(model: TrackModel, animate: boolean, highlightLocation: string): Track;
     closeTrack(track: Track, animate?: boolean, onComplete?: () => void): void;
-    addPanel(location: GenomicLocation, animate?: boolean): void;
+    addPanel(location: GenomicLocation, animate?: boolean, highlightLocation?: string): void;
     closePanel(panel: Panel, animate?: boolean, onComplete?: () => void): void;
     getTracks(): Track[];
     getPanels(): Set<Panel>;

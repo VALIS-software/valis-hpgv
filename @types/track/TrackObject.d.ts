@@ -16,11 +16,15 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     protected x0: number;
     protected x1: number;
     protected defaultCursor: string;
+    protected highlightLocation: string;
     protected axisPointers: {
         [id: string]: AxisPointer;
     };
     protected activeAxisPointerColor: number[];
     protected secondaryAxisPointerColor: number[];
+    protected highlightPointers: {
+        [id: string]: HighlightPointer;
+    };
     protected focusRegionRectLeft: Rect;
     protected focusRegionRectRight: Rect;
     protected loadingIndicator: LoadingIndicator;
@@ -31,6 +35,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     setContig(contig: string): void;
     setRange(x0: number, x1: number): void;
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle): void;
+    setHighlightPointer(id: string, fractionX: number, contig?: string): void;
     removeAxisPointer(id: string): void;
     setFocusRegion(x0_fractional: number, x1_fractional: number): void;
     clearFocusRegion(): void;
@@ -65,6 +70,17 @@ export declare class AxisPointer extends Rect {
     readonly style: AxisPointerStyle;
     constructor(style: AxisPointerStyle, activeColor: ArrayLike<number>, secondaryColor: ArrayLike<number>, axis: 'x' | 'y');
     setStyle(style: AxisPointerStyle): void;
+}
+export declare enum HighlightStyle {
+    Active = 0,
+    Secondary = 1
+}
+export declare class HighlightPointer extends Rect {
+    activeColor: ArrayLike<number>;
+    secondaryColor: ArrayLike<number>;
+    readonly style: HighlightStyle;
+    constructor(style: HighlightStyle, activeColor: ArrayLike<number>, secondaryColor: ArrayLike<number>, axis: 'x' | 'y');
+    setStyle(style: HighlightStyle): void;
 }
 declare class LoadingIndicator extends Text {
     constructor();

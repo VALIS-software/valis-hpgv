@@ -7,6 +7,7 @@ Dev notes:
         - Panels should be an array not a set
 */
 
+import "@babel/polyfill";
 import React = require("react");
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
@@ -64,6 +65,8 @@ export class TrackViewer extends Object2D {
 
     protected panelStyleProxy: StyleProxy;
     protected trackStyleProxies: { [trackType: string]: StyleProxy } = {};
+    
+    protected highlightLocation: string;
     
     constructor() {
         super();
@@ -190,7 +193,7 @@ export class TrackViewer extends Object2D {
         // create rows
         if (state.tracks != null) {
             for (let track of state.tracks) {
-                this.addTrack(track, false);
+                this.addTrack(track, false, state.highlightLocation);
             }
         }
 
@@ -247,8 +250,10 @@ export class TrackViewer extends Object2D {
     }
 
     // track-viewer state deltas
-    addTrack(model: TrackModel, animate: boolean = true): Track {
+    addTrack(model: TrackModel, animate: boolean = true, highlightLocation: string): Track {
         let trackClasses = GenomeVisualizer.getTrackType(model.type);
+        
+        model.highlightLocation = highlightLocation;
 
         trackClasses.tileLoaderClass.getAvailableContigs(model).then(contigs => {
             for(let contig of contigs) this.dataSource.addContig(contig);
@@ -387,7 +392,7 @@ export class TrackViewer extends Object2D {
         this.layoutTrackRows(animate);
     }
 
-    addPanel(location: GenomicLocation, animate: boolean = true) {
+    addPanel(location: GenomicLocation, animate: boolean = true, highlightLocation?: string) {
         let edges = this.panelEdges;
         let newColumnIndex = Math.max(edges.length - 1, 0);
 

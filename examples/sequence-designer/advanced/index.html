@@ -1,0 +1,65 @@
+<style>
+    body {
+        margin: 0;
+    }
+</style>
+
+<div id="container"></div>
+
+<script src="../../dist/valis-hpgv.js"></script>
+
+<script>
+    let config = {
+        allowNewPanels: false,
+        clampToTracks: true,
+        removableTracks: false,
+        panels: [
+            {
+               location: { contig: 'chr1', x0: 0, x1: 249e6 }
+            }
+        ],
+        tracks: [
+            {
+                name: 'DNA',
+                type: 'sequence',
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir',
+            },
+            {
+                name: 'Genes',
+                type: 'annotation',
+                compact: true,
+                path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.92.vgenes-dir',
+            },
+            {
+                name: 'Cerebellum, DNase',
+                type: 'signal',
+                path: "https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig",
+                heightPx: 150,
+            },
+        ],
+    };
+
+    // get state from URL
+    if (window.location.hash) {
+        config = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
+    }
+
+    let visualizer = new GenomeVisualizer(config);
+
+    let container = document.getElementById('container');
+
+    window.addEventListener('resize', update);
+
+    function update() {
+        visualizer.render({
+            width: window.innerWidth,
+            height: window.innerHeight
+        }, container);
+    }
+
+    function saveStateInURL() {
+        window.history.replaceState(null, null, '#' + JSON.stringify(visualizer.getConfiguration()));
+    }
+
+    update();
+</script>

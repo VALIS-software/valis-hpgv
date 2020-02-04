@@ -626,7 +626,6 @@ class TranscriptComponent extends Rect {
         hoverOverlay.relativeW = 1;
         hoverOverlay.relativeH = 1;
         hoverOverlay.opacity = 0;
-        hoverOverlay.additiveBlending = 0.5;
         this.add(hoverOverlay);
 
         // highlight on mouse-over

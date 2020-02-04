@@ -6,7 +6,7 @@ import { SharedResources } from "engine/SharedResources";
 import GPUDevice, { AttributeType, GPUTexture } from "engine/rendering/GPUDevice";
 import { DrawMode, DrawContext } from "engine/rendering/Renderer";
 import { Tile, TileState } from "../TileLoader";
-import { AxisPointer, AxisPointerStyle } from "../TrackObject";
+import { AxisPointer, AxisPointerStyle, HighlightPointer, HighlightStyle } from "../TrackObject";
 import { Text, Scalar } from "engine";
 import { OpenSansRegular } from "../../ui";
 import Animator from "../../Animator";
@@ -33,6 +33,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
     protected signalReading: Text;
     protected yAxisPointer: AxisPointer;
+    protected highlightPointer: HighlightPointer;
 
     readonly signalReadingSnapX = true;
     protected showSignalReading = true;
@@ -106,7 +107,15 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         // this.yAxisPointer.opacity = 0.3;
         this.yAxisPointer.mask = this;
         this.add(this.yAxisPointer);
-
+        
+        this.highlightPointer = new HighlightPointer(HighlightStyle.Secondary, [0.2, 0.2, 0.2, 0], [0.2, 0.2, 0.2, 0], 'x');
+        this.highlightPointer.render = true;
+        this.highlightPointer.x = 0.5;
+        this.highlightPointer.y = 0;
+        this.highlightPointer.z = 2;
+        this.highlightPointer.mask = this;
+        this.add(this.highlightPointer);
+        
         // begin frame loop
         this.frameLoop();
 
@@ -130,11 +139,19 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         this.yAxisPointer.activeColor = this.activeAxisPointerColor;
         this.yAxisPointer.secondaryColor = this.secondaryAxisPointerColor;
         this.yAxisPointer.setStyle(this.yAxisPointer.style);
+        
+        this.highlightPointer.activeColor = [0.2, 0.2, 0.2, 0.5];
+        this.highlightPointer.secondaryColor = [0.2, 0.2, 0.2, 0.5];
+        this.highlightPointer.setStyle(this.highlightPointer.style);
     }
 
     setAxisPointer(id: string, fractionX: number, style: AxisPointerStyle) {
         super.setAxisPointer(id, fractionX, style);
         this.updateAxisPointerSample();
+    }
+    
+    setHighlightPointer(id: string, fractionX: number, contig?: string) {
+        super.setHighlightPointer(id, fractionX);
     }
 
     removeAxisPointer(id: string) {
@@ -273,7 +290,9 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
                 
                 let tileRelativeX = (pointerTrackRelativeX - tileNode.relativeX) / tileNode.relativeW;
                 this.setSignalReading(tile.payload.getReading(tileRelativeX, 0));
-
+                
+                let highlightRelativeX = (pointerTrackRelativeX + tileNode.relativeX) / tileNode.relativeW;
+                
                 if (this.signalReadingSnapX) {
                     let signalReadingRelativeWidth = (this.signalReading.getComputedWidth() + Math.abs(this.signalReading.x) * 2) / this.getComputedWidth();
                     this.signalReading.relativeX = Math.min(pointerTrackRelativeX, 1 - signalReadingRelativeWidth);
@@ -284,6 +303,12 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         } else {
             this.setSignalReading(null);
         }
+    }
+    
+    protected setHighlightValue(value: number) {
+        this.highlightPointer.render = true;
+        this.highlightPointer.transparent = false;
+        this.highlightPointer.relativeX = value;
     }
 
     protected setSignalReading(value: number | null) {

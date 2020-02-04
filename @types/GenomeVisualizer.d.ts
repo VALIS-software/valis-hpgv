@@ -14,6 +14,7 @@ export interface GenomeVisualizerRenderProps {
     height: number;
     pixelRatio?: number;
     style?: React.CSSProperties;
+    highlightLocation?: string;
 }
 interface CustomTileLoader<ModelType> {
     new (dataSource: IDataSource, model: ModelType, contig: string, ...args: Array<any>): TileLoader<any, any>;
@@ -30,7 +31,7 @@ export declare class GenomeVisualizer {
     protected trackViewer: TrackViewer;
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
-    constructor(configuration?: GenomeVisualizerConfiguration | Array<string>, dataSource?: IDataSource | string);
+    constructor(configuration?: GenomeVisualizerConfiguration, dataSource?: IDataSource | string);
     setDataSource(dataSourceArg: IDataSource | string | undefined): void;
     setConfiguration(configuration: GenomeVisualizerConfiguration): void;
     getConfiguration(): import("./ui/TrackViewerConfiguration").TrackViewerConfiguration;
@@ -52,8 +53,8 @@ export declare class GenomeVisualizer {
      * @param x1 right base index
      */
     setRange(x0: number, x1: number): void;
-    addTrack(model: TrackModel, animateIn?: boolean): Track;
-    addTrackFromFilePath(path: string, name?: string, animateIn?: boolean): Track;
+    addTrack(model: TrackModel, animateIn: boolean, highlightLocation: string): Track;
+    addTrackFromFilePath(path: string, name?: string, animateIn?: boolean, highlightLocation?: string): Track;
     addPanel(location: GenomicLocation, animateIn: boolean): void;
     closeTrack(track: Track, animateOut?: boolean, onComplete?: () => void): void;
     closePanel(panel: Panel, animateOut: boolean, onComplete?: () => void): void;

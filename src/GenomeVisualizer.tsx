@@ -33,6 +33,7 @@ export interface GenomeVisualizerRenderProps {
 
     pixelRatio?: number,
     style?: React.CSSProperties,
+    highlightLocation?: string,
 }
 
 interface CustomTileLoader<ModelType> {
@@ -57,7 +58,7 @@ export class GenomeVisualizer {
     protected appCanvasRef: AppCanvas;
     protected internalDataSource: InternalDataSource;
 
-    constructor(configuration?: GenomeVisualizerConfiguration | Array<string>, dataSource?: IDataSource | string){
+    constructor(configuration?: GenomeVisualizerConfiguration, dataSource?: IDataSource | string){
         this.trackViewer = new TrackViewer();
 
         this.setDataSource(dataSource);
@@ -136,11 +137,11 @@ export class GenomeVisualizer {
         }
     }
 
-    addTrack(model: TrackModel, animateIn: boolean = true) {
-        return this.trackViewer.addTrack(model, animateIn);
+    addTrack(model: TrackModel, animateIn: boolean = true, highlightLocation: string) {
+        return this.trackViewer.addTrack(model, animateIn, highlightLocation);
     }
 
-    addTrackFromFilePath(path: string, name?: string, animateIn?: boolean) {
+    addTrackFromFilePath(path: string, name?: string, animateIn?: boolean, highlightLocation?: string) {
         // we don't know what contigs are available so we must read the first file for this
         let basename = path.split('/').pop().split('\\').pop();
         let parts = basename.split('.');
@@ -158,7 +159,7 @@ export class GenomeVisualizer {
                     name: trackName,
                     path: path,
                 };
-                return this.addTrack(model, animateIn);
+                return this.addTrack(model, animateIn, highlightLocation);
             }
             case GenomicFileFormat.ValisGenes:
             case GenomicFileFormat.BigBed:
@@ -168,7 +169,7 @@ export class GenomeVisualizer {
                     name: trackName,
                     path: path,
                 };
-                return this.addTrack(model, animateIn);
+                return this.addTrack(model, animateIn, highlightLocation);
             }
             case GenomicFileFormat.ValisDna: {
                 let model: SequenceTrackModel = {
@@ -176,7 +177,7 @@ export class GenomeVisualizer {
                     name: trackName,
                     path: path,
                 };
-                return this.addTrack(model, animateIn);
+                return this.addTrack(model, animateIn, highlightLocation);
             }
             case GenomicFileFormat.ValisVariants: {
                 let model: VariantTrackModel = {
@@ -184,7 +185,7 @@ export class GenomeVisualizer {
                     name: trackName,
                     path: path,
                 };
-                return this.addTrack(model, animateIn);
+                return this.addTrack(model, animateIn, highlightLocation);
             }
             /*
             case 'bam': { break; }
@@ -203,6 +204,8 @@ export class GenomeVisualizer {
 
     addPanel(location: GenomicLocation, animateIn: boolean) {
         return this.trackViewer.addPanel(location, animateIn);
+        // Previously had --> but I think it's not necessary
+        // return this.trackViewer.addPanel(location, animateIn, 'chr1:12345');
     }
 
     closeTrack(track: Track, animateOut: boolean = true, onComplete?: () => void) {

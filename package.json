@@ -31,6 +31,7 @@
     "string-split-by": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/polyfill": "^7.6.0",
     "@types/node": "10.11.7",
     "@types/react": "16.x",
     "@types/react-dom": "16.x",

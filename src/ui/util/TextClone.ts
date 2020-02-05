@@ -10,7 +10,7 @@ import { Text } from "engine/ui/Text";
  */
 export class TextClone extends Object2D {
 
-    color: ArrayLike<number>;
+    color: Array<number>;
     additiveBlending: number = 0.0;
 
     set _w(v: number) { }
@@ -22,7 +22,7 @@ export class TextClone extends Object2D {
     set render(v: boolean) { }
     get render() { return this.text.render; }
 
-    constructor(readonly text: Text, color: ArrayLike<number> = [0, 0, 0, 1]) {
+    constructor(readonly text: Text, color: Array<number> = [0, 0, 0, 1]) {
         super();
         this.color = color;
         this.transparent = true;

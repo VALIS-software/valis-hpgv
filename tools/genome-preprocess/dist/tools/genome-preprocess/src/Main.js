@@ -48,6 +48,7 @@ function processFile(filePath) {
     switch (ext) {
         case '.gff3':
         case '.gff2':
+        case '.gff':
         case '.gtf': {
             return Convert_1.gff3Convert(filePath, outputDirectory);
         }

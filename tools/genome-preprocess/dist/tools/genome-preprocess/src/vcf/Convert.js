@@ -122,6 +122,7 @@ function biobureauGenerateGenes(inputFilePath, outputDirectory, vcf) {
                 sequenceId: 'main',
                 id: biobureauGeneName,
                 name: biobureauGeneName,
+                topLevel: true,
                 type: 'gene',
                 children: [],
                 start: startBase,

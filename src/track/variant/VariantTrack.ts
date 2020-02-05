@@ -12,6 +12,7 @@ import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
 import { VariantTileLoader } from "./VariantTileLoader";
 import { VariantTrackModel } from "./VariantTrackModel";
+import { StyleProxy } from "../../ui";
 
 export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> extends TrackObject<Model, VariantTileLoader> {
 
@@ -20,6 +21,14 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
     protected readonly macroLodThresholdHigh = this.macroLodThresholdLow + this.macroLodBlendRange;
 
     protected pointerOverTrack = false;
+
+    protected style = {
+        colors: {
+            '--addition': [0.0, 1.0, 0.0, 1.],
+            '--deletion': [1.0, 0., 0., 1.],
+            '--swap': [1., 1., 1., 1.],
+        }
+    }
 
     constructor(model: Model) {
         super(model);
@@ -31,6 +40,21 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
         this.addInteractionListener('pointerleave', (e) => {
             this.pointerOverTrack = false;
         });
+    }
+
+    applyStyle(styleProxy: StyleProxy) {
+        super.applyStyle(styleProxy);
+
+        for (let propertyName in this.style.colors) {
+            let color = styleProxy.getColor(propertyName);
+            if (color != null) {
+                (this.style.colors as { [key: string]: Array<number> })[propertyName] = color;
+            }
+        }
+
+        this._microTileCache.removeAll();
+        this._onStageAnnotations.removeAll();
+        this._sequenceLabelCache.removeAll();
     }
 
     // @! this needs clearing
@@ -94,7 +118,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
                             let altIndex = 0;
                             let refSpan = variant.refSequence.length;
 
-                            let color: Array<number> = [1, 0, 0, 1.0]; // default to deletion
+                            let color: Array<number>;
 
                             for (let altSequence of variant.alts) {
                                 let altSpan = altSequence.length;
@@ -102,14 +126,15 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
                                 let lengthDelta = altSpan - refSpan;
 
                                 // generate color from lengthDelta
-                                let opacity = 1;
                                 if (lengthDelta === 0) {
-                                    color = [1.0, 1.0, 1.0, opacity];
+                                    color = this.style.colors["--swap"];
                                 } else if (lengthDelta < 0) {
-                                    color = [1.0, 0.3, 0.5, opacity];
+                                    color = this.style.colors["--deletion"];
                                 } else {
-                                    color = [0.3, 1.0, 0.5, opacity];
+                                    color = this.style.colors["--addition"];
                                 }
+
+                                color = [0,0,0,1];
 
                                 for (let i = 0; i < altSpan; i++) {
                                     let baseCharacter = altSequence[i];
@@ -180,7 +205,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
                             // multiple boxes
                             let refSpan = variant.refSequence.length;
 
-                            let color: Array<number> = [1, 0, 0, 1.0]; // default to deletion
+                            let color: Array<number>; // default to deletion
 
                             let altIndex = 0;
                             for (let altSequence of variant.alts) {
@@ -189,13 +214,12 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
                                 let lengthDelta = altSpan - refSpan;
 
                                 // generate color from lengthDelta
-                                let opacity = 0.7;
                                 if (lengthDelta === 0) {
-                                    color = [0.8, 0.8, 0.8, opacity];
+                                    color = this.style.colors["--swap"];
                                 } else if (lengthDelta < 0) {
-                                    color = [1, 0, 0, opacity];
+                                    color = this.style.colors["--deletion"];
                                 } else {
-                                    color = [0, 1, 0, opacity];
+                                    color = this.style.colors["--addition"];
                                 }
 
                                 instanceData.push({
@@ -253,7 +277,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
 
                         let instancesTile = new IntervalInstances(instanceData);
                         instancesTile.minWidth = 1.0;
-                        instancesTile.additiveBlending = 1.0; // full additive blending
+                        instancesTile.additiveBlending = 0.0; // full additive blending
                         instancesTile.y = tileY;
                         instancesTile.z = 0.75;
                         instancesTile.mask = this;
@@ -309,13 +333,14 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
         label.textParent.sx = label.textParent.sy = textSizePx;
 
         if (label.text != null) {
-            label.text.color[3] = textOpacity;
+            label.text.color = color;
+            label.text.opacity = textOpacity;
         }
     }
 
     protected createBaseLabel = (baseCharacter: string, color: ArrayLike<number>, onClick: (e: InteractionEvent) => void) => {
         let root = new Rect(0, 0, color);
-        root.additiveBlending = 1;
+        root.additiveBlending = 0;
         root.mask = this;
         root.opacity = 0;
         root.z = 0.5;
@@ -361,8 +386,8 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
                 textInstance = VariantTrack.baseTextInstances['?'];
             }
 
-            let textClone = new TextClone(textInstance, [1, 1, 1, 1]);
-            textClone.additiveBlending = 1.0;
+            textClone = new TextClone(textInstance, [0, 1, 0, 1]);
+            textClone.additiveBlending = 0.0;
             textClone.originX = -0.5;
             textClone.originY = -0.5;
             textClone.mask = this;
@@ -370,7 +395,6 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
             textParent.add(textClone);
             root.add(textParent);
         }
-
 
         this.add(root);
 

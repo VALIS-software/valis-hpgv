@@ -56,6 +56,7 @@ function processFile(filePath: string): Promise<Array<string> | string | null> {
 	switch (ext) {
 		case '.gff3':
 		case '.gff2':
+		case '.gff':
 		case '.gtf': {
 			return gff3Convert(filePath, outputDirectory);
 		}

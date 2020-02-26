@@ -282,7 +282,7 @@ export class VariantTrack<Model extends VariantTrackModel = VariantTrackModel> e
     protected displayLabel(
         variantId: string,
         baseCharacter: string,
-        color: ArrayLike<number>,
+        color: Array<number>,
         startIndex: number,
         altIndex: number,
         charIndex: number,

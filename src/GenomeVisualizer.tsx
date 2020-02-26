@@ -271,6 +271,7 @@ export class GenomeVisualizer {
                 }}
                 onWillUnmount={() => {
                     this.stopFrameLoop();
+                    this.clearCaches();
                 }}
             >
                 <div className="hpgv_style-proxies" style={{ display: 'none' }}>

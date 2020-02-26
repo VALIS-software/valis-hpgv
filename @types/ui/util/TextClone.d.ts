@@ -9,12 +9,12 @@ import { Text } from "engine/ui/Text";
  */
 export declare class TextClone extends Object2D {
     readonly text: Text;
-    color: ArrayLike<number>;
+    color: Array<number>;
     additiveBlending: number;
     _w: number;
     _h: number;
     render: boolean;
-    constructor(text: Text, color?: ArrayLike<number>);
+    constructor(text: Text, color?: Array<number>);
     onAdded(): void;
     onRemoved(): void;
     allocateGPUResources(device: GPUDevice): void;

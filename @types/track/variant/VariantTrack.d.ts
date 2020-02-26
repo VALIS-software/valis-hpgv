@@ -22,7 +22,7 @@ export declare class VariantTrack<Model extends VariantTrackModel = VariantTrack
         text: TextClone;
     }>;
     updateDisplay(samplingDensity: number, continuousLodLevel: number, span: number, widthPx: number): void;
-    protected displayLabel(variantId: string, baseCharacter: string, color: ArrayLike<number>, startIndex: number, altIndex: number, charIndex: number, relativeX: number, baseLayoutW: number, altHeightPx: number, textSizePx: number, textOpacity: number, tileY: number): void;
+    protected displayLabel(variantId: string, baseCharacter: string, color: Array<number>, startIndex: number, altIndex: number, charIndex: number, relativeX: number, baseLayoutW: number, altHeightPx: number, textSizePx: number, textOpacity: number, tileY: number): void;
     protected createBaseLabel: (baseCharacter: string, color: ArrayLike<number>, onClick: (e: InteractionEvent) => void) => {
         root: Rect;
         textParent: Object2D;

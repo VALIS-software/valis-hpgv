@@ -50,18 +50,6 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
 
         this.sharedState.track = this;
 
-        if (model.color != null) {
-            this.sharedState.signalColor = model.color;
-        }
-
-        if (model.autoScale != null) {
-            this.autoScale = model.autoScale;
-        }
-
-        if (model.scale != null) {
-            this.displayScale = model.scale;
-        }
-
         this.yAxis = new Axis({
             x0: 0,
             x1: 1.0,
@@ -116,6 +104,19 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         this.highlightPointer.mask = this;
         this.add(this.highlightPointer);
         
+
+        if (model.color != null) {
+            this.sharedState.signalColor = model.color;
+        }
+
+        if (model.autoScale != null) {
+            this.autoScale = model.autoScale;
+        }
+
+        if (model.scale != null) {
+            this.displayScale = model.scale;
+        }
+
         // begin frame loop
         this.frameLoop();
 

@@ -599,6 +599,7 @@ export class Panel extends Object2D {
 
                 let event = new SelectRegionEvent(
                     this,
+                    this.contig,
                     x0,
                     x1,
                     Math.min(this._dragXF0, e.fractionX),
@@ -779,7 +780,7 @@ export class SelectRegionEvent extends PanelEvent<'select-region'> {
 
     constructor(
         panel: Panel,
-        // base-pair range
+        readonly contig: string,
         /**
          * Selection start in base-pairs
          */

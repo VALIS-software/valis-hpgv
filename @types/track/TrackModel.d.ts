@@ -6,6 +6,7 @@
 export declare type TrackModel = {
     type: string;
     name: string;
+    longname?: string;
     heightPx?: number;
     expandedHeightPx?: number;
     highlightLocation?: string;

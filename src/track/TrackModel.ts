@@ -8,6 +8,7 @@ export type TrackModel = {
 
     // display properties
     name: string,
+    longname?: string,
     heightPx?: number,
     expandedHeightPx?: number,
     

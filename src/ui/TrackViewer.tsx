@@ -12,8 +12,6 @@ import React = require("react");
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Animator from "../Animator";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
@@ -30,6 +28,21 @@ import { DEFAULT_SPRING } from "./UIConstants";
 import { OpenSansRegular } from "./font";
 import { StyleProxy } from "./util/StyleProxy";
 import { TrackEvent } from "../track/TrackEvent";
+
+
+// Icons to collapse and expand track header.
+const ExpandLessIcon = () => (
+    <svg version="1.1" focusable="false" viewBox="0 0 12 7.4">
+        <path d="M6,0L0,6l1.4,1.4L6,2.8l4.6,4.6L12,6L6,0z"/>
+    </svg>
+);
+
+const ExpandMoreIcon = () => (
+    <svg version="1.1" focusable="false" viewBox="0 0 12 7.4">
+        <path d="M10.6,0L6,4.6L1.4,0L0,1.4l6,6l6-6L10.6,0z"/>
+    </svg>
+);
+
 
 export class TrackViewer extends Object2D {
 
@@ -1045,19 +1058,11 @@ export class TrackViewer extends Object2D {
         isExpanded: boolean,
         style?: React.CSSProperties
     }) {
-        const iconSize = 32;
-        const margin = 16;
+        const iconSize = 16;
+        const margin = 8;
 
         const ArrowElem = props.isExpanded ? ExpandLessIcon : ExpandMoreIcon;
 
-        const expandArrow = (<ArrowElem
-            style={{
-                marginTop: 8,
-                marginLeft: margin,
-                color: 'inherit',
-            }}
-            viewBox={`0 0 ${iconSize} ${iconSize}`}
-        />);
         return <div
             className="hpgv_ui-block hpgv_track-header"
             style={{
@@ -1065,45 +1070,31 @@ export class TrackViewer extends Object2D {
                 width: '100%',
                 height: '100%',
                 overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
                 ...props.style,
             }}
         >   
+            <div>{props.isExpanded && props.model.longname ? props.model.longname : props.model.name}</div>
             {
                 props.expandable ? (
                     <div
+                        role="button"
+                        tabIndex={0} 
+                        aria-expanded={props.isExpanded}
                         onClick={() => {
                             props.setExpanded(!props.isExpanded);
                         }}
-                        style={{
-                            cursor: 'pointer',
-                            userSelect: 'none',
-                            width: iconSize,
-                            height: iconSize,
-                            // minWidth: iconSize,
-                            marginRight: margin,
+                        onKeyDown={(e) => {
+                            if (e.keyCode === 13 || e.keyCode === 32) {
+                                props.setExpanded(!props.isExpanded);
+                                e.preventDefault();
+                            }
                         }}
+                        className="hpgv_track-expander"
                     >
-                        {expandArrow}
+                        <ArrowElem />
                     </div>
-                ) : (
-                    <div
-                        style={{
-                            width: iconSize,
-                            height: iconSize,
-                            // minWidth: iconSize,
-                            marginRight: margin,
-                        }}
-                    ></div>
-                )
+                ) : null
             }
-            <div style={{
-                flexGrow: 1,
-                marginRight: margin,
-            }}>
-                {props.model.name}
-            </div>
         </div>
     }
 

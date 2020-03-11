@@ -26,6 +26,23 @@
     border-bottom-right-radius: 0;
 }
 
+.hpgv_track-expander {
+    position: absolute;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    width: 16px;
+    height: 16px;
+    padding: 4px;
+    cursor: pointer;
+    line-height: 0;
+}
+
+.hpgv_track-expander > svg {
+    display: block;
+}
+
 /* The following are draw via WebGL, so only the properties CSS used here can be changed */
 .hpgv_panel {
     --axis: black;

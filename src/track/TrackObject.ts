@@ -179,7 +179,6 @@ export class TrackObject<
 
     emitTrackEvent(eventData: TrackEvent) {
         this.emit('track-event', eventData);
-        this.emit(eventData.type, eventData);
     }
 
     /**

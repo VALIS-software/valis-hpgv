@@ -6,7 +6,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import CloseIcon from "@material-ui/icons/Close";
 import EditIcon from "@material-ui/icons/Edit";
 import Animator from "../Animator";
-import { InteractionEvent, WheelDeltaMode, WheelInteractionEvent } from "engine/ui/InteractionEvent";
+import { InteractionEvent, WheelDeltaMode, WheelInteractionEvent, InteractionEventInternal } from "engine/ui/InteractionEvent";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import * as React from "react";
@@ -592,13 +592,26 @@ export class Panel extends Object2D {
 
                 let x0 = Math.min(selectedRegionX0, selectedRegionX1);
                 let x1 = Math.max(selectedRegionX0, selectedRegionX1);
-
+                
                 // clamp to existing range (so it must be a zoom in)
                 x0 = Math.max(x0, this.x0);
                 x1 = Math.min(x1, this.x1);
+
+                let event = new SelectRegionEvent(
+                    this,
+                    x0,
+                    x1,
+                    Math.min(this._dragXF0, e.fractionX),
+                    Math.max(this._dragXF0, e.fractionX),
+                );
+
+                this.emit('panel-event', event);
+
+                if (!event.defaultPrevented) {
+                    // zoom into region
+                    this.setRange(x0, x1, true);
+                }
                 
-                // zoom into region
-                this.setRange(x0, x1, true);
                 break;
             }
             case DragMode.Move: {
@@ -740,6 +753,51 @@ export class Panel extends Object2D {
         } catch (e) {
             console.error(`Could not parse specifier "${specifier}"`);
         }
+    }
+
+}
+
+export class PanelEvent<Type extends string> {
+
+    get defaultPrevented () {
+        return this._defaultPrevented;
+    }
+
+    constructor(
+        readonly type: Type,
+        readonly panel: Panel
+    ) { }
+
+    preventDefault = () => {
+        this._defaultPrevented = true;
+    }
+    
+    protected _defaultPrevented = false
+}
+
+export class SelectRegionEvent extends PanelEvent<'select-region'> {
+
+    constructor(
+        panel: Panel,
+        // base-pair range
+        /**
+         * Selection start in base-pairs
+         */
+        readonly x0: number,
+        /**
+         * Selection end in base-pairs
+         */
+        readonly x1: number,
+        /**
+         * Location of selection start relative to the panel view, where 0 left most edge and 1 is rightmost
+         */
+        readonly x0ViewFraction: number, 
+        /**
+         * Location of selection end relative to the panel view, where 0 left most edge and 1 is rightmost
+         */
+        readonly x1ViewFraction: number, 
+    ) {
+        super('select-region', panel);
     }
 
 }

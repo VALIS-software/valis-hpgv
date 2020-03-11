@@ -23,7 +23,7 @@ import { GenomicLocation } from "../model/GenomicLocation";
 import TrackModel from "../track/TrackModel";
 import TrackObject from "../track/TrackObject";
 import ReactObject from "./core/ReactObject";
-import Panel, { PanelInternal } from "./Panel";
+import Panel, { PanelInternal, PanelEvent } from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
 import { DEFAULT_SPRING } from "./UIConstants";
 import { OpenSansRegular } from "./font";
@@ -402,6 +402,9 @@ export class TrackViewer extends Object2D {
         let panel = new Panel((p) => this.closePanel(p, true), this.spacing, this.panelHeaderHeight, this.xAxisHeight, this.dataSource);
         panel.setContig(location.contig);
         panel.setRange(location.x0, location.x1);
+        panel.addEventListener('panel-event', (event: PanelEvent<any>) => {
+            this.emit(event.type, event);
+        });
         panel.column = newColumnIndex; // @! should use array of panels instead of column field
         panel.relativeH = 1; // fill the full grid height
         this.grid.add(panel);
@@ -556,7 +559,6 @@ export class TrackViewer extends Object2D {
         
         // unwrap and forward track events, so you can do, trackViewer.addEventListener(<track-event>, ...)
         trackObject.addEventListener('track-event', (eventData: TrackEvent) => {
-            this.emit('track-event', eventData);
             this.emit(eventData.type, eventData);
         });
     }

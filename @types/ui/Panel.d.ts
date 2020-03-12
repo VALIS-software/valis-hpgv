@@ -93,4 +93,48 @@ export declare class Panel extends Object2D {
     protected startEditing(): void;
     protected setRangeUsingRangeSpecifier(specifier: string): void;
 }
+export declare class PanelEvent<Type extends string> {
+    readonly type: Type;
+    readonly panel: Panel;
+    readonly defaultPrevented: boolean;
+    constructor(type: Type, panel: Panel);
+    preventDefault: () => void;
+    protected _defaultPrevented: boolean;
+}
+export declare class SelectRegionEvent extends PanelEvent<'select-region'> {
+    readonly contig: string;
+    /**
+     * Selection start in base-pairs
+     */
+    readonly x0: number;
+    /**
+     * Selection end in base-pairs
+     */
+    readonly x1: number;
+    /**
+     * Location of selection start relative to the panel view, where 0 left most edge and 1 is rightmost
+     */
+    readonly x0ViewFraction: number;
+    /**
+     * Location of selection end relative to the panel view, where 0 left most edge and 1 is rightmost
+     */
+    readonly x1ViewFraction: number;
+    constructor(panel: Panel, contig: string, 
+    /**
+     * Selection start in base-pairs
+     */
+    x0: number, 
+    /**
+     * Selection end in base-pairs
+     */
+    x1: number, 
+    /**
+     * Location of selection start relative to the panel view, where 0 left most edge and 1 is rightmost
+     */
+    x0ViewFraction: number, 
+    /**
+     * Location of selection end relative to the panel view, where 0 left most edge and 1 is rightmost
+     */
+    x1ViewFraction: number);
+}
 export default Panel;

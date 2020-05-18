@@ -29,7 +29,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     static getExpandable(model: AnnotationTrackModel) {
         let defaultCompact = true;
         let compact = model.compact != null ? model.compact : defaultCompact;
-        return compact ? false : true;        
+        return compact ? false : true;
     }
 
     protected readonly macroLodBlendRange = 2;
@@ -50,6 +50,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
     protected macroModel: MacroAnnotationTrackModel;
 
     readonly compact: boolean;
+
+    readonly displayLabels: boolean;
 
     protected colors = {
         '--transcript-arrow': [138 / 0xff, 136 /0xff, 191 /0xff, 0.38],
@@ -80,6 +82,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         super(model);
 
         this.compact = this.model.compact !== false;
+        this.displayLabels = this.model.displayLabels;
 
         this.macroModel = {
             ...model,
@@ -147,6 +150,9 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         this._annotationCache.markAllUnused();
 
         let namesOpacity = 1.0 - Scalar.linstep(this.namesLodThresholdLow, this.namesLodThresholdHigh, continuousLodLevel);
+        if (!this.displayLabels) {
+            namesOpacity = 0;
+        }
 
         let microSamplingDensity = 1;
 
@@ -179,7 +185,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create gene object
-                    let geneAnnotation = new GeneAnnotation(this.compact, gene, this.sharedState, this.onAnnotationClicked);
+                    let geneAnnotation = new GeneAnnotation(this.compact, this.displayLabels, gene, this.sharedState, this.onAnnotationClicked);
                     geneAnnotation.z = 1 / 4;
                     geneAnnotation.relativeH = 0;
 
@@ -248,7 +254,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
         annotations.sort((a, b) => {
             return a.gene.relativeX - b.gene.relativeX;
         });
-    
+
         let trackWidth = this.getComputedWidth();
 
         let cursorPositiveX = 0;
@@ -442,6 +448,7 @@ class GeneAnnotation extends Object2D {
 
     constructor(
         readonly compact: boolean,
+        readonly displayLabels: boolean,
         readonly gene: Gene,
         sharedState: AnnotationTrack['sharedState'],
         onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void
@@ -483,7 +490,7 @@ class GeneAnnotation extends Object2D {
             transcriptAnnotation.h = TRANSCRIPT_HEIGHT;
             transcriptAnnotation.y = 0;
             transcriptAnnotation.relativeW = 1;
-            this.add(transcriptAnnotation);        
+            this.add(transcriptAnnotation);
         }
     }
 
@@ -945,7 +952,7 @@ class TranscriptSpan extends Rect {
                         1.0,
                         step(direction, 0.75) * step(0.25, direction)
                     ) *
-                    
+
                     // middle line
                     lineSegment(x, vec2(0), vec2(1.0, 0.), 0.1, pixelSize)
                 );

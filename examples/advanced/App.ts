@@ -14,6 +14,7 @@ let config = {
             name: 'Valis Genes',
             type: 'annotation',
             path: 'https://encoded-build.s3.amazonaws.com/browser/GRCh38/GRCh38.vgenes-dir',
+            displayLabels: false,
         },
         {
             name: 'bigBed',

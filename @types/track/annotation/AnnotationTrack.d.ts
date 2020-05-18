@@ -27,6 +27,7 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
     };
     protected macroModel: MacroAnnotationTrackModel;
     readonly compact: boolean;
+    readonly displayLabels: boolean;
     protected colors: {
         '--transcript-arrow': number[];
         '--transcript': number[];
@@ -85,9 +86,10 @@ export declare class AnnotationTrack extends TrackObject<AnnotationTrackModel, A
 }
 declare class GeneAnnotation extends Object2D {
     readonly compact: boolean;
+    readonly displayLabels: boolean;
     readonly gene: Gene;
     opacity: number;
     protected _opacity: number;
-    constructor(compact: boolean, gene: Gene, sharedState: AnnotationTrack['sharedState'], onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void);
+    constructor(compact: boolean, displayLabels: boolean, gene: Gene, sharedState: AnnotationTrack['sharedState'], onAnnotationClicked: (e: InteractionEvent, feature: GenomeFeature, gene: Gene) => void);
 }
 export default AnnotationTrack;

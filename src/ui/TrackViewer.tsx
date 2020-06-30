@@ -13,6 +13,8 @@ import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Animator from "../Animator";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
@@ -47,6 +49,7 @@ export class TrackViewer extends Object2D {
 
     protected allowNewPanels = true;
     protected _removableTracks = true; // use setRemovableTracks
+    protected reorderTracks = false;
     protected panels = new Set<Panel>();
     protected tracks = new Array<Track>();
 
@@ -137,6 +140,7 @@ export class TrackViewer extends Object2D {
         // hide/show add panel button
         let clampToTracks = state.clampToTracks == null ? false : state.clampToTracks;
         this.allowNewPanels = state.allowNewPanels == null ? false : state.allowNewPanels;
+        this.reorderTracks = state.reorderTracks == null ? false : state.reorderTracks;
         this.setRemovableTracks(state.removableTracks == null ? true : state.removableTracks);
         this.grid.toggleChild(this.addPanelButton, this.allowNewPanels);
 
@@ -233,6 +237,7 @@ export class TrackViewer extends Object2D {
         return {
             allowNewPanels: this.allowNewPanels,
             removableTracks: this._removableTracks,
+            reorderTracks: this.reorderTracks,
             clampToTracks: clampToTracks,
             panels: panels,
             tracks: tracks,
@@ -289,8 +294,11 @@ export class TrackViewer extends Object2D {
             expandable,
             this.spacing,
             () => this.closeTrack(track),
+            () => this.moveTrackUp(track),
+            () => this.moveTrackDown(track),
             (h: number) => track.heightPx = h,
-            (): number => track.heightPx
+            (): number => track.heightPx,
+            this.reorderTracks
         );
 
         (track as any as TrackInternal).rowObject = rowObject;
@@ -1070,7 +1078,10 @@ export class TrackViewer extends Object2D {
     public static TrackHeader(props: {
         model: TrackModel,
         expandable: boolean,
+        reorder: boolean,
         setExpanded?: (state: boolean) => void,
+        moveUp: () => void,
+        moveDown: () => void,
         isExpanded: boolean,
         style?: React.CSSProperties
     }) {
@@ -1098,7 +1109,47 @@ export class TrackViewer extends Object2D {
                 alignItems: 'center',
                 ...props.style,
             }}
-        >   
+        >
+            {props.reorder ? 
+                <div
+                    style={{
+                        position: 'absolute',
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                >
+                    <div 
+                        className="hpgv_track-reorder-button"
+                        onClick={() => props.moveUp()}
+                        style={{
+                            position:'absolute',
+                            top: 0,
+                            width: '100%',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                        }}
+                    >
+                        {<ArrowDropUpIcon ></ArrowDropUpIcon>}
+                    </div>
+                    <div
+                        className="hpgv_track-reorder-button"
+                        onClick={() => props.moveDown()}
+                        style={{
+                            position:'absolute',
+                            bottom: 0,
+                            width: '100%',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                        }
+                    }>
+                        {<ArrowDropDownIcon></ArrowDropDownIcon>}
+                    </div>
+                </div>
+            : ''
+            }
             {
                 props.expandable ? (
                     <div
@@ -1259,8 +1310,11 @@ class RowObject {
         protected readonly defaultExpandable: boolean,
         protected readonly spacing: { x: number, y: number },
         protected onClose: (t: RowObject) => void,
+        protected onMoveUp: (t: RowObject) => void,
+        protected onMoveDown: (t: RowObject) => void,
         protected readonly setHeight: (h: number) => void,
-        protected readonly getHeight: () => number
+        protected readonly getHeight: () => number,
+        public reorder: boolean,
     ) {
         this.header = new ReactObject();
         this.closeButton = new ReactObject();
@@ -1346,6 +1400,7 @@ class RowObject {
     protected updateHeader() {
         this._headerIsExpandedState = this.isExpanded();
         this.header.content = (<TrackViewer.TrackHeader
+            reorder={this.reorder}
             model={this.model}  
             expandable={this.model.expandable != null ? this.model.expandable : this.defaultExpandable}
             isExpanded={this._headerIsExpandedState}
@@ -1354,6 +1409,8 @@ class RowObject {
 
                 this.setHeight(toggle ? this.expandedTrackHeightPx : this.defaultHeightPx);
             }}
+            moveUp={() => this.onMoveUp(this)}
+            moveDown={() => this.onMoveDown(this)}
             style={{
                 opacity: this._opacity,
                 pointerEvents: this.interactionDisabled ? 'none' : null

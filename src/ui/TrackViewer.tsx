@@ -387,6 +387,38 @@ export class TrackViewer extends Object2D {
         this.layoutTrackRows(animate);
     }
 
+    setTrackIndex(track: Track, index: number, animate = true) {
+        // re-orders tracks in this.tracks[] and then calls this.layoutTrackRows(animate);
+
+        // apply array bounds check
+        index = Math.min(Math.max(index, 0), this.tracks.length - 1);
+
+        let currentIndex = this.tracks.indexOf(track);
+
+        // remove from tracks[] array (index -1 is fine and does nothing)
+        this.tracks.splice(currentIndex, 1);
+
+        // insert at index
+        this.tracks.splice(index, 0, track);
+
+        // now this.tracks[] has been changed, let's re-layout the tracks
+        this.layoutTrackRows(animate);
+    }
+
+    moveTrackUp(track: Track, animate = true) {
+        let currentIndex = this.tracks.indexOf(track);
+        if (currentIndex !== -1) {
+            this.setTrackIndex(track, currentIndex - 1, animate);
+        }
+    }
+
+    moveTrackDown(track: Track, animate = true) {
+        let currentIndex = this.tracks.indexOf(track);
+        if (currentIndex !== -1) {
+            this.setTrackIndex(track, currentIndex + 1, animate);
+        }
+    }
+
     addPanel(location: GenomicLocation, animate: boolean = true) {
         let edges = this.panelEdges;
         let newColumnIndex = Math.max(edges.length - 1, 0);

@@ -213,6 +213,18 @@ export class GenomeVisualizer {
         return this.trackViewer.closePanel(panel, animateOut, onComplete);
     }
 
+    setTrackIndex(track: Track, index: number, animate = true) {
+        return this.trackViewer.setTrackIndex(track, index, animate);
+    }
+
+    moveTrackUp(track: Track, animate = true) {
+        return this.trackViewer.moveTrackUp(track, animate);
+    }
+
+    moveTrackDown(track: Track, animate = true) {
+        return this.trackViewer.moveTrackDown(track, animate);
+    }
+
     getTracks() {
         return this.trackViewer.getTracks();
     }

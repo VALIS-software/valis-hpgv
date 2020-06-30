@@ -1,0 +1,67 @@
+<style>
+    body {
+        margin: 0;
+    }
+</style>
+
+<div id="container"></div>
+
+<script src="../../dist/valis-hpgv.js"></script>
+
+<script>
+    let config = {
+        allowNewPanels: false,
+        clampToTracks: true,
+        removableTracks: true,
+        reorderTracks: true,
+        panels: [
+            {
+               location: { contig: 'chr1', x0: 0, x1: 249e6 }
+            }
+        ],
+        tracks: [
+            {
+                name: 'Cerebellum, DNase',
+                type: 'signal',
+                path: "https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig",
+                heightPx: 150,
+            },
+            {
+                name: 'Unknown Signal',
+                type: 'signal',
+                path: "https://www.encodeproject.org/files/ENCFF677VKI/@@download/ENCFF677VKI.bigWig",
+                heightPx: 150,
+            },
+            {
+                name: 'Third Signal',
+                type: 'signal',
+                path: "https://www.encodeproject.org/files/ENCFF677VKI/@@download/ENCFF677VKI.bigWig",
+                heightPx: 150,
+            },
+        ],
+    };
+
+    // get state from URL
+    if (window.location.hash) {
+        config = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
+    }
+
+    let visualizer = new GenomeVisualizer(config);
+
+    let container = document.getElementById('container');
+
+    window.addEventListener('resize', update);
+
+    function update() {
+        visualizer.render({
+            width: window.innerWidth,
+            height: window.innerHeight
+        }, container);
+    }
+
+    function saveStateInURL() {
+        window.history.replaceState(null, null, '#' + JSON.stringify(visualizer.getConfiguration()));
+    }
+
+    update();
+</script>

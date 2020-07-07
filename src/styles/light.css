@@ -58,7 +58,7 @@
 }
 
 .hpgv_track {
-    background-color: white;//#e9f0f3;
+    background-color: white; /* #e9f0f3; */
     --loading-indicator: #8ea1bf;
     --cursor: #3645653b;
     --secondary-cursor: #3645653b;
@@ -67,7 +67,7 @@
 .hpgv_track-annotation {
     --transcript-arrow: #36456530;
     --transcript:rgba(156, 163, 175, 0.13);
-    --coding: rgba(0, 44, 95, 0.79);
+    --coding: black; /* Annotation like bigBed */
     --non-coding: rgba(79, 41, 140, 0.79);
     --untranslated: rgba(191, 184, 184, 0.53);
 
@@ -92,7 +92,7 @@
 }
 
 .hpgv_track-signal {
-    --signal-color: #49a7f5;
+    --signal-color: red; /* Signal like bigwig color */
 }
 
 .hpgv_track-variant {

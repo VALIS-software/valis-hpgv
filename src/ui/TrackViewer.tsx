@@ -1080,11 +1080,20 @@ export class TrackViewer extends Object2D {
                         role="button"
                         tabIndex={0} 
                         aria-expanded={props.isExpanded}
-                        onClick={() => {
-                            props.setExpanded(!props.isExpanded);
+                        onClick={(e) => {
+                            if (e.altKey) {
+                                const ariaExpanded = (e.currentTarget as HTMLElement).getAttribute('aria-expanded');
+                                const elements = Array.from(document.querySelectorAll('.hpgv_track-expander'))
+                                    .filter(element => element.getAttribute('aria-expanded') === ariaExpanded) as HTMLElement[];
+                                elements.forEach(element => {
+                                    element.click();
+                                });
+                            } else {
+                                props.setExpanded(!props.isExpanded);
+                            }
                         }}
                         onKeyDown={(e) => {
-                            if (e.keyCode === 13 || e.keyCode === 32) {
+                        if (e.keyCode === 13 || e.keyCode === 32) {
                                 props.setExpanded(!props.isExpanded);
                                 e.preventDefault();
                             }

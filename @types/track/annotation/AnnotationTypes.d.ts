@@ -28,6 +28,7 @@ export interface GeneInfo extends GenomeFeature {
     soClass: keyof SoGeneClass;
     transcriptCount: number;
     score?: number;
+    color?: string;
 }
 export declare enum TranscriptClass {
     Unspecified = 0,

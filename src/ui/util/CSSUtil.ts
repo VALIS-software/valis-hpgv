@@ -14,6 +14,28 @@ export class CSSUtil {
         ];
     }
 
+    static getBedFileRGBA(color: string, score: number) {
+        const alpha : number = (score || 1000) / 1000;
+        let rgba0 : number = 107;
+        let rgba1 : number = 109;
+        let rgba2 : number = 136;
+
+        if (color && color.includes('rgb')) {
+            const rgba = color
+                .replace('rgba', '')
+                .replace('rgb', '')
+                .replace('(', '')
+                .replace(')', '')
+                .split(',').map(Number);
+
+            rgba0 = isNaN(rgba[0]) ? rgba0 : rgba[0];
+            rgba1 = isNaN(rgba[1]) ? rgba1 : rgba[1];
+            rgba2 = isNaN(rgba[2]) ? rgba2 : rgba[2];
+        }
+
+        return [rgba0 / 0xff, rgba1 / 0xff, rgba2 / 0xff, alpha];  
+    }
+
     private static _1pxCtx: CanvasRenderingContext2D;
     private static get1pxCtx() {
         if (this._1pxCtx == null) {

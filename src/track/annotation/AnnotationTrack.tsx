@@ -17,6 +17,7 @@ import { AnnotationTileLoader, Gene, Transcript } from "./AnnotationTileLoader";
 import { AnnotationTrackModel, MacroAnnotationTrackModel } from './AnnotationTrackModel';
 import { GeneClass, GenomeFeature, TranscriptClass, GenomeFeatureType, TranscriptComponentInfo } from "./AnnotationTypes";
 import { StyleProxy } from "../../ui/util/StyleProxy";
+import { CSSUtil } from "../../ui/util/CSSUtil";
 
 const TRANSCRIPT_HEIGHT = 20;
 
@@ -182,6 +183,8 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                 if (this.model.strand != null && gene.strand !== this.model.strand) continue;
 
                 let annotationKey = this.contig + ':' + this.annotationKey(gene);
+
+                this.colors['--transcript'] =  CSSUtil.getBedFileRGBA(gene.color, gene.score);
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create gene object

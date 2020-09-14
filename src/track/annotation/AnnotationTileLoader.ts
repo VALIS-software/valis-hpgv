@@ -246,7 +246,8 @@ function transformAnnotationsBigBed(dataset: Array<BigBedData>): TilePayload {
                 utr: [],
                 other: [],
             }],
-            score: data.score
+            score: data.score,
+            color: String(data.color) // prevent error just in case of non-string
         };
         return gene;
     });

@@ -124,7 +124,7 @@ export class GenomeVisualizer {
             this.getPanels()[0].setContig(contig);
         }
     }
-    
+
     /**
      * Sets the current displayed region of the first open panel
      * Spanned length = x1 - x0
@@ -214,6 +214,18 @@ export class GenomeVisualizer {
 
     closePanel(panel: Panel, animateOut: boolean, onComplete?: () => void) {
         return this.trackViewer.closePanel(panel, animateOut, onComplete);
+    }
+
+    setTrackIndex(track: Track, index: number, animate = true) {
+        return this.trackViewer.setTrackIndex(track, index, animate);
+    }
+
+    moveTrackUp(track: Track, animate = true) {
+        return this.trackViewer.moveTrackUp(track, animate);
+    }
+
+    moveTrackDown(track: Track, animate = true) {
+        return this.trackViewer.moveTrackDown(track, animate);
     }
 
     getTracks() {

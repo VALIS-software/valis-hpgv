@@ -21,6 +21,11 @@ export interface TrackViewerConfiguration {
      * Default `false`
      */
     clampToTracks?: boolean;
+    /**
+    * When true buttons to reorder the tracks are visible
+    * Default `false`
+    */
+    reorderTracks?: boolean;
     highlightLocation?: string;
 }
 export default TrackViewerConfiguration;

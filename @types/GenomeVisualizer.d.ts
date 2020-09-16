@@ -58,6 +58,9 @@ export declare class GenomeVisualizer {
     addPanel(location: GenomicLocation, animateIn: boolean): void;
     closeTrack(track: Track, animateOut?: boolean, onComplete?: () => void): void;
     closePanel(panel: Panel, animateOut: boolean, onComplete?: () => void): void;
+    setTrackIndex(track: Track, index: number, animate?: boolean): void;
+    moveTrackUp(track: Track, animate?: boolean): void;
+    moveTrackDown(track: Track, animate?: boolean): void;
     getTracks(): Track[];
     getPanels(): Panel[];
     clearCaches(): void;

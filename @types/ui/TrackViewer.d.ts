@@ -24,6 +24,7 @@ export declare class TrackViewer extends Object2D {
     readonly minTrackHeight: number;
     protected allowNewPanels: boolean;
     protected _removableTracks: boolean;
+    protected reorderTracks: boolean;
     protected panels: Set<Panel>;
     protected tracks: Track[];
     protected panelEdges: number[];
@@ -45,6 +46,9 @@ export declare class TrackViewer extends Object2D {
     setDataSource(dataSource: InternalDataSource): void;
     addTrack(model: TrackModel, animate: boolean, highlightLocation: string): Track;
     closeTrack(track: Track, animate?: boolean, onComplete?: () => void): void;
+    setTrackIndex(track: Track, indexParam: number, animate?: boolean): void;
+    moveTrackUp(track: Track, animate?: boolean): void;
+    moveTrackDown(track: Track, animate?: boolean): void;
     addPanel(location: GenomicLocation, animate?: boolean, highlightLocation?: string): void;
     closePanel(panel: Panel, animate?: boolean, onComplete?: () => void): void;
     getTracks(): Track[];
@@ -106,7 +110,10 @@ export declare class TrackViewer extends Object2D {
     static TrackHeader(props: {
         model: TrackModel;
         expandable: boolean;
+        reorder: boolean;
         setExpanded?: (state: boolean) => void;
+        moveUp: () => void;
+        moveDown: () => void;
         isExpanded: boolean;
         style?: React.CSSProperties;
     }): JSX.Element;
@@ -139,8 +146,11 @@ declare class RowObject {
         y: number;
     };
     protected onClose: (t: RowObject) => void;
+    protected onMoveUp: (t: RowObject) => void;
+    protected onMoveDown: (t: RowObject) => void;
     protected readonly setHeight: (h: number) => void;
     protected readonly getHeight: () => number;
+    reorder: boolean;
     readonly header: ReactObject;
     readonly closeButton: ReactObject;
     readonly resizeHandle: Rect;
@@ -159,7 +169,7 @@ declare class RowObject {
     constructor(model: TrackModel, defaultHeightPx: number, defaultExpandable: boolean, spacing: {
         x: number;
         y: number;
-    }, onClose: (t: RowObject) => void, setHeight: (h: number) => void, getHeight: () => number);
+    }, onClose: (t: RowObject) => void, onMoveUp: (t: RowObject) => void, onMoveDown: (t: RowObject) => void, setHeight: (h: number) => void, getHeight: () => number, reorder: boolean);
     setResizable(v: boolean): void;
     addTrackView(trackView: TrackObject): void;
     removeTrackView(trackView: TrackObject): void;

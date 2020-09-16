@@ -12,6 +12,8 @@ import React = require("react");
 import IconButton from "@material-ui/core/IconButton";
 import AddIcon from "@material-ui/icons/Add";
 import CloseIcon from "@material-ui/icons/Close";
+import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import Animator from "../Animator";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
@@ -61,6 +63,7 @@ export class TrackViewer extends Object2D {
 
     protected allowNewPanels = true;
     protected _removableTracks = true; // use setRemovableTracks
+    protected reorderTracks = false;
     protected panels = new Set<Panel>();
     protected tracks = new Array<Track>();
 
@@ -78,9 +81,9 @@ export class TrackViewer extends Object2D {
 
     protected panelStyleProxy: StyleProxy;
     protected trackStyleProxies: { [trackType: string]: StyleProxy } = {};
-    
+
     protected highlightLocation: string;
-    
+
     constructor() {
         super();
 
@@ -151,9 +154,10 @@ export class TrackViewer extends Object2D {
         let panels = state.panels || [];
 
         // hide/show add panel button
-        let clampToTracks = state.clampToTracks == null ? false : state.clampToTracks;
-        this.allowNewPanels = state.allowNewPanels == null ? false : state.allowNewPanels;
-        this.setRemovableTracks(state.removableTracks == null ? true : state.removableTracks);
+        let clampToTracks = state.clampToTracks = !!state.clampToTracks;
+        this.allowNewPanels = state.allowNewPanels = !!state.allowNewPanels;
+        this.reorderTracks = state.reorderTracks = !!state.reorderTracks;
+        this.setRemovableTracks(state.removableTracks = !!state.removableTracks);
         this.grid.toggleChild(this.addPanelButton, this.allowNewPanels);
 
         // Panels
@@ -249,6 +253,7 @@ export class TrackViewer extends Object2D {
         return {
             allowNewPanels: this.allowNewPanels,
             removableTracks: this._removableTracks,
+            reorderTracks: this.reorderTracks,
             clampToTracks: clampToTracks,
             panels: panels,
             tracks: tracks,
@@ -265,12 +270,12 @@ export class TrackViewer extends Object2D {
     // track-viewer state deltas
     addTrack(model: TrackModel, animate: boolean = true, highlightLocation: string): Track {
         let trackClasses = GenomeVisualizer.getTrackType(model.type);
-        
+
         model.highlightLocation = highlightLocation;
 
         trackClasses.tileLoaderClass.getAvailableContigs(model).then(contigs => {
             for(let contig of contigs) this.dataSource.addContig(contig);
-            
+
             // if no panels have been specified, create one from the first available contig
             if (this.panels.size === 0) {
                 this.dataSource.getContigs().then(contigs => {
@@ -296,7 +301,7 @@ export class TrackViewer extends Object2D {
             (name) => {
                 if (name === 'heightPx') {
                     this.emit('track-resize', track);
-                } 
+                }
                 this.layoutTrackRows(true);
             }
         );
@@ -307,8 +312,11 @@ export class TrackViewer extends Object2D {
             expandable,
             this.spacing,
             () => this.closeTrack(track),
+            () => this.moveTrackUp(track),
+            () => this.moveTrackDown(track),
             (h: number) => track.heightPx = h,
-            (): number => track.heightPx
+            (): number => track.heightPx,
+            this.reorderTracks
         );
 
         (track as any as TrackInternal).rowObject = rowObject;
@@ -331,7 +339,7 @@ export class TrackViewer extends Object2D {
         rowObject.header.x = -this.trackHeaderWidth + this.spacing.x * 0.5;
         rowObject.header.w = this.trackHeaderWidth;
 
-        // position the resize handle to span the full width of the viewer 
+        // position the resize handle to span the full width of the viewer
         rowObject.resizeHandle.relativeW = 1;
         rowObject.resizeHandle.x = -this.trackHeaderWidth;
         rowObject.resizeHandle.w = this.trackHeaderWidth;
@@ -353,7 +361,7 @@ export class TrackViewer extends Object2D {
 
         this.grid.add(rowObject.header);
         this.grid.add(rowObject.resizeHandle);
-        
+
         if (this._removableTracks) {
             this.grid.add(rowObject.closeButton);
         }
@@ -405,6 +413,38 @@ export class TrackViewer extends Object2D {
         this.layoutTrackRows(animate);
     }
 
+    setTrackIndex(track: Track, indexParam: number, animate = true) {
+        // re-orders tracks in this.tracks[] and then calls this.layoutTrackRows(animate);
+
+        // apply array bounds check
+        const index: number = Math.min(Math.max(indexParam, 0), this.tracks.length - 1);
+
+        let currentIndex = this.tracks.indexOf(track);
+
+        // remove from tracks[] array (index -1 is fine and does nothing)
+        this.tracks.splice(currentIndex, 1);
+
+        // insert at index
+        this.tracks.splice(index, 0, track);
+
+        // now this.tracks[] has been changed, let's re-layout the tracks
+        this.layoutTrackRows(animate);
+    }
+
+    moveTrackUp(track: Track, animate = true) {
+        let currentIndex = this.tracks.indexOf(track);
+        if (currentIndex !== -1) {
+            this.setTrackIndex(track, currentIndex - 1, animate);
+        }
+    }
+
+    moveTrackDown(track: Track, animate = true) {
+        let currentIndex = this.tracks.indexOf(track);
+        if (currentIndex !== -1) {
+            this.setTrackIndex(track, currentIndex + 1, animate);
+        }
+    }
+
     addPanel(location: GenomicLocation, animate: boolean = true, highlightLocation?: string) {
         let edges = this.panelEdges;
         let newColumnIndex = Math.max(edges.length - 1, 0);
@@ -414,7 +454,7 @@ export class TrackViewer extends Object2D {
         let newWidth = newColumnIndex == 0 ? 1 : 1 / newColumnIndex;
         let newEdge = 1 + newWidth;
         edges.push(newEdge);
-    
+
 
         // create panel object and add header to the scene graph
         let panel = new Panel((p) => this.closePanel(p, true), this.spacing, this.panelHeaderHeight, this.xAxisHeight, this.dataSource);
@@ -571,7 +611,7 @@ export class TrackViewer extends Object2D {
         let trackObject = new trackObjectClass(model);
         panel.addTrackView(trackObject);
         rowObject.addTrackView(trackObject);
-        
+
         // unwrap and forward track events, so you can do, trackViewer.addEventListener(<track-event>, ...)
         trackObject.addEventListener('track-event', (eventData: TrackEvent) => {
             this.emit('track-event', eventData);
@@ -829,9 +869,9 @@ export class TrackViewer extends Object2D {
         let trackButtonsVisible = this.allowNewPanels || this._removableTracks;
 
         this.grid.x = this.trackHeaderWidth + this.spacing.x * 0.5;
-        this.grid.w = 
+        this.grid.w =
             - this.trackHeaderWidth - this.spacing.x * 0.5
-            // right-side buttons 
+            // right-side buttons
             - (trackButtonsVisible ? (this.trackButtonWidth + this.spacing.x * 0.5) : 0)
         ;
         this.grid.relativeW = 1;
@@ -857,7 +897,7 @@ export class TrackViewer extends Object2D {
         // assumes grid.h is up to date (requires calling layoutTrackRows(false))
         let trackViewerHeight = this.getComputedHeight();
         let gridViewportHeight = trackViewerHeight - this.grid.y;
-        
+
         let totoalRowHeight = this.getTotalRowHeight();
 
         const padding = this.spacing.y;
@@ -1054,7 +1094,10 @@ export class TrackViewer extends Object2D {
     public static TrackHeader(props: {
         model: TrackModel,
         expandable: boolean,
+        reorder: boolean,
         setExpanded?: (state: boolean) => void,
+        moveUp: () => void,
+        moveDown: () => void,
         isExpanded: boolean,
         style?: React.CSSProperties
     }) {
@@ -1072,13 +1115,54 @@ export class TrackViewer extends Object2D {
                 overflow: 'hidden',
                 ...props.style,
             }}
-        >   
+        >
+            {props.reorder ?
+                <div
+                    className="hpgv_track-reorder-container"
+                    style={{
+                        position: 'absolute',
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                >
+                    <div
+                        className="hpgv_track-reorder-button move-up"
+                        onClick={() => props.moveUp()}
+                        style={{
+                            position:'absolute',
+                            top: 0,
+                            width: '100%',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                        }}
+                    >
+                        {<ArrowDropUpIcon ></ArrowDropUpIcon>}
+                    </div>
+                    <div
+                        className="hpgv_track-reorder-button move-down"
+                        onClick={() => props.moveDown()}
+                        style={{
+                            position:'absolute',
+                            bottom: 0,
+                            width: '100%',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                        }
+                    }>
+                        {<ArrowDropDownIcon></ArrowDropDownIcon>}
+                    </div>
+                </div>
+                : ''
+            }
             <div>{props.isExpanded && props.model.longname ? props.model.longname : props.model.name}</div>
             {
                 props.expandable ? (
                     <div
                         role="button"
-                        tabIndex={0} 
+                        tabIndex={0}
                         aria-expanded={props.isExpanded}
                         onClick={(e) => {
                             if (e.altKey) {
@@ -1230,8 +1314,11 @@ class RowObject {
         protected readonly defaultExpandable: boolean,
         protected readonly spacing: { x: number, y: number },
         protected onClose: (t: RowObject) => void,
+        protected onMoveUp: (t: RowObject) => void,
+        protected onMoveDown: (t: RowObject) => void,
         protected readonly setHeight: (h: number) => void,
-        protected readonly getHeight: () => number
+        protected readonly getHeight: () => number,
+        public reorder: boolean,
     ) {
         this.header = new ReactObject();
         this.closeButton = new ReactObject();
@@ -1251,7 +1338,7 @@ class RowObject {
         this.resizeHandle.cursorStyle = v ? 'row-resize' : null;
         this.resizeHandle.color = (v ? [0, 1, 0, 1] : [0.3, 0.3, 0.3, 1]);
     }
-    
+
     addTrackView(trackView: TrackObject) {
         this.trackViews.add(trackView);
         this.syncTrackView(trackView);
@@ -1317,7 +1404,8 @@ class RowObject {
     protected updateHeader() {
         this._headerIsExpandedState = this.isExpanded();
         this.header.content = (<TrackViewer.TrackHeader
-            model={this.model}  
+            reorder={this.reorder}
+            model={this.model}
             expandable={this.model.expandable != null ? this.model.expandable : this.defaultExpandable}
             isExpanded={this._headerIsExpandedState}
             setExpanded={(toggle: boolean) => {
@@ -1325,6 +1413,8 @@ class RowObject {
 
                 this.setHeight(toggle ? this.expandedTrackHeightPx : this.defaultHeightPx);
             }}
+            moveUp={() => this.onMoveUp(this)}
+            moveDown={() => this.onMoveDown(this)}
             style={{
                 opacity: this._opacity,
                 pointerEvents: this.interactionDisabled ? 'none' : null

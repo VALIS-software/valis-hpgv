@@ -7,7 +7,7 @@ export interface TrackViewerConfiguration {
         width?: number
     }>,
     tracks: Array<TrackModel>,
-    
+
     /**
      * When true a button to create a new panel will be visible
      * Default `false`
@@ -23,6 +23,11 @@ export interface TrackViewerConfiguration {
      * Default `false`
      */
     clampToTracks?: boolean,
+    /**
+    * When true buttons to reorder the tracks are visible
+    * Default `false`
+    */
+    reorderTracks?: boolean,
     highlightLocation?: string,
 }
 

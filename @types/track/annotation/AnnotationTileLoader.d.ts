@@ -1,11 +1,11 @@
 import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader } from "../TileLoader";
-import { GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
+import { GeneInfo, ENCODEBigBedColumns, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 import { BigLoader } from "../../formats";
 import { Contig, AnnotationTrackModel } from "../..";
 export declare type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
-};
+} & ENCODEBigBedColumns;
 export declare type Transcript = TranscriptInfo & {
     exon: Array<TranscriptComponentInfo>;
     cds: Array<TranscriptComponentInfo>;
@@ -15,7 +15,14 @@ export declare type Transcript = TranscriptInfo & {
 declare type TilePayload = Array<Gene>;
 declare enum AnnotationFormat {
     ValisGenes = 0,
-    BigBed = 1
+    BigBed = 1,
+    BigBedDataBroadPeak = 2,
+    BigBedDataNarrowPeak = 3,
+    BigBedDataRNAElement = 4,
+    BigBedDataMethyl = 5,
+    BigBedDataTssPeak = 6,
+    BigBedDataIdrPeak = 7,
+    BigBedDataIdrRankedPeak = 8
 }
 export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly dataSource: IDataSource;

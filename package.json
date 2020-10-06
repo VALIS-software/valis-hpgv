@@ -6,10 +6,10 @@
   "types": "./@types/index.d.ts",
   "scripts": {
     "clean": "rimraf ./@types ./dist",
-    "prod": "npm run clean && cti src && webpack --mode=production && webpack --mode=production --env.includeReact",
+    "prod": "npm run clean && cti src && webpack --mode=development && webpack --mode=development --env.includeReact",
     "dev": "webpack-dev-server --mode=development",
     "dev-react": "webpack-dev-server --mode=development --env.includeReact",
-    "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
+    "analyze": "npm run clean && cti src && webpack --mode=development --env.analyze",
     "build": "npm run prod"
   },
   "bin": {
@@ -21,13 +21,13 @@
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
     "axios": "^0.18.0",
-    "bigwig-reader": "^1.0.9",
+    "bigwig-reader": "git+https://github.com/ENCODE-DCC/bigwig-reader.git#encode-bigbed-type-addition",
     "engine": "github:VALIS-software/Engine",
+    "fast-deep-equal": "^2.0.1",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",
+    "mkdirp": "^0.5.1",
     "react": "16.x",
     "react-dom": "16.x",
-    "fast-deep-equal": "^2.0.1",
-    "mkdirp": "^0.5.1",
     "string-split-by": "^1.0.0"
   },
   "devDependencies": {

@@ -1,9 +1,9 @@
 import IDataSource from "../../data-source/IDataSource";
 import { Tile, TileLoader, TileState } from "../TileLoader";
-import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass, TranscriptClass } from "./AnnotationTypes";
+import { GeneInfo, GenomeFeature, ENCODEBigBedColumns, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass, TranscriptClass } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
-import { BigBedData, BigZoomData } from "bigwig-reader";
+import { BigBedData, BigZoomData, BigBedDataNarrowPeak, BigBedDataBroadPeak, BigBedDataRNAElement, BigBedDataMethyl, BigBedDataTssPeak, BigBedDataIdrPeak, BigBedDataIdrRankedPeak } from "bigwig-reader";
 import { Formats, GenomicFileFormat } from "../../formats/Formats";
 import { Contig, AnnotationTrackModel } from "../..";
 import Axios from "axios";
@@ -11,7 +11,7 @@ import Axios from "axios";
 // Tile payload is a list of genes extended with nesting
 export type Gene = GeneInfo & {
     transcripts: Array<Transcript>;
-};
+} & ENCODEBigBedColumns;
 
 export type Transcript = TranscriptInfo & {
     exon: Array<TranscriptComponentInfo>,
@@ -25,6 +25,13 @@ type TilePayload = Array<Gene>;
 enum AnnotationFormat {
     ValisGenes,
     BigBed,
+    BigBedDataBroadPeak,
+    BigBedDataNarrowPeak,
+    BigBedDataRNAElement,
+    BigBedDataMethyl,
+    BigBedDataTssPeak,
+    BigBedDataIdrPeak,
+    BigBedDataIdrRankedPeak,
 }
 
 export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
@@ -44,13 +51,27 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     static getAnnotationFormat(model: AnnotationTrackModel) {
         // determine annotation file format
         if (model.path != null) {
-            let format = Formats.determineFormat(model.path);
+            let format = Formats.determineFormat(model.path, model.fileFormatType);
 
             switch (format) {
                 case GenomicFileFormat.ValisGenes:
                     return AnnotationFormat.ValisGenes;
                 case GenomicFileFormat.BigBed:
                     return AnnotationFormat.BigBed;
+                case GenomicFileFormat.BigBedNarrowPeak:
+                    return AnnotationFormat.BigBedDataNarrowPeak;
+                case GenomicFileFormat.BigBedBroadPeak:
+                    return AnnotationFormat.BigBedDataBroadPeak;
+                case GenomicFileFormat.BigBedDataRNAElement:
+                    return AnnotationFormat.BigBedDataRNAElement;
+                case GenomicFileFormat.BigBedDataMethyl:
+                    return AnnotationFormat.BigBedDataMethyl;
+                case GenomicFileFormat.BigBedDataTssPeak:
+                    return AnnotationFormat.BigBedDataTssPeak;    
+                case GenomicFileFormat.BigBedDataIdrPeak:
+                    return AnnotationFormat.BigBedDataIdrPeak;
+                case GenomicFileFormat.BigBedDataIdrRankedPeak:
+                    return AnnotationFormat.BigBedDataIdrRankedPeak;
                 default:
                     // we have to guess
                     if (/bigbed/ig.test(model.path)) {
@@ -85,6 +106,13 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                     }
                     break;
                 case AnnotationFormat.BigBed:
+                case AnnotationFormat.BigBedDataNarrowPeak:
+                case AnnotationFormat.BigBedDataBroadPeak:
+                case AnnotationFormat.BigBedDataRNAElement:
+                case AnnotationFormat.BigBedDataMethyl:
+                case AnnotationFormat.BigBedDataTssPeak:
+                case AnnotationFormat.BigBedDataIdrPeak:
+                case AnnotationFormat.BigBedDataIdrRankedPeak:
                     if (model.path != null) {
                         return UCSCBig.getBigLoader(model.path).then(b => UCSCBig.getContigs(b.header));
                     }
@@ -151,6 +179,7 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                             return loader.reader.readBigBedData(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBed);
                         }
 
+
                         /*
                         let zoomIndex: number | null  = loader.lodZoomIndexMap[tile.lodLevel];
 
@@ -170,6 +199,146 @@ export class AnnotationTileLoader extends TileLoader<TilePayload, void> {
                             ).then(transformAnnotationsBigZoom);
                         }
                         */
+                    });
+                }
+                case AnnotationFormat.BigBedDataNarrowPeak: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataNarrowPeak(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataNarrowPeak);
+                        }
+                    });
+                }
+                case AnnotationFormat.BigBedDataBroadPeak: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataBroadPeak(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataBroadPeak);
+                        }
+                    });
+                }
+                case AnnotationFormat.BigBedDataRNAElement: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataRNAElement(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataRNAElement);
+                        }
+                    });
+                }
+                case AnnotationFormat.BigBedDataMethyl: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataMethyl(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataMethyl);
+                        }
+                    });
+                }
+                case AnnotationFormat.BigBedDataTssPeak: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataTssPeak(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataTssPeak);
+                        }
+                    });
+                }
+                case AnnotationFormat.BigBedDataIdrPeak: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataIdrPeak(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataIdrPeak);
+                        }
+                    });
+                }
+                case AnnotationFormat.BigBedDataIdrRankedPeak: {
+                    return this.getBigLoader().then(loader => {
+                        let macroTile = this.getTileAtLod(tile.x + tile.span * 0.5, this.macroLod, false);
+
+                        if (macroTile.state === TileState.Complete) {
+                            // extract intersecting genes
+                            let intersectingGenes = new Array<Gene>();
+                            for (let gene of macroTile.payload) {
+                                let notOverlapping = ((gene.startIndex + gene.length) < tile.x) || (gene.startIndex > (tile.x + tile.span));
+                                if (!notOverlapping) {
+                                    intersectingGenes.push(gene);
+                                }
+                            }
+
+                            return intersectingGenes;
+                        } else {
+                            return loader.reader.readBigBedDataIdrRankedPeak(this.contig, tile.x, this.contig, tile.x + tile.span).then(transformAnnotationsBigBedDataIdrRankedPeak);
+                        }
                     });
                 }
                 default: {
@@ -248,6 +417,285 @@ function transformAnnotationsBigBed(dataset: Array<BigBedData>): TilePayload {
             }],
             score: data.score,
             color: String(data.color) // prevent error just in case of non-string
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataNarrowPeak(dataset: Array<BigBedDataNarrowPeak>): TilePayload {
+    return dataset.map((data: BigBedDataNarrowPeak) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            signalValue: data.signalValue,
+            pValue: data.pValue,
+            qValue: data.qValue,
+            peak: data.peak,
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataBroadPeak(dataset: Array<BigBedDataBroadPeak>): TilePayload {
+    return dataset.map((data: BigBedDataBroadPeak) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            signalValue: data.signalValue,
+            pValue: data.pValue,
+            qValue: data.qValue,
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataIdrPeak(dataset: Array<BigBedDataIdrPeak>): TilePayload {
+    return dataset.map((data: BigBedDataIdrPeak) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            localIDR: data.localIDR,
+            globalIDR: data.globalIDR,
+            rep1_chromStart: data.rep1_chromStart,
+            rep1_chromEnd: data.rep1_chromEnd,
+            rep1_count: data.rep1_count,
+            rep2_chromStart: data.rep2_chromStart,
+            rep2_chromEnd: data.rep2_chromEnd,
+            rep2_count: data.rep2_count,
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataIdrRankedPeak(dataset: Array<BigBedDataIdrRankedPeak>): TilePayload {
+    return dataset.map((data: BigBedDataIdrRankedPeak) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            pValue: data.pValue,
+            qValue: data.qValue,
+            summit: data.summit,
+            localIDR: data.localIDR,
+            globalIDR: data.globalIDR,
+            chromStart1: data.chromStart1,
+            chromEnd1: data.chromEnd1,
+            signalValue1: data.signalValue1,
+            summit1: data.summit1,
+            chromStart2: data.chromStart2,
+            chromEnd2: data.chromEnd2,
+            signalValue2: data.signalValue2,
+            summit2: data.summit2,
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataMethyl(dataset: Array<BigBedDataMethyl>): TilePayload {
+    return dataset.map((data: BigBedDataMethyl) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            thickStart: data.thickStart,
+            thickEnd: data.thickEnd,
+            reserved: data.reserved,
+            readCount: data.readCount,
+            percentMeth: data.percentMeth,
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataTssPeak(dataset: Array<BigBedDataTssPeak>): TilePayload {
+    return dataset.map((data: BigBedDataTssPeak) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            count: data.count,
+            gene_id: String(data.gene_id),
+            gene_name: String(data.gene_name),
+            tss_id: String(data.tss_id),
+            peak_cov: String(data.peak_cov),
+        };
+        return gene;
+    });
+}
+
+function transformAnnotationsBigBedDataRNAElement(dataset: Array<BigBedDataRNAElement>): TilePayload {
+    return dataset.map((data: BigBedDataRNAElement) => {
+        let gene: Gene = {
+            type: GenomeFeatureType.Gene,
+
+            name: data.name === '.' ? undefined : data.name,
+
+            startIndex: data.start,
+            length: data.end - data.start,
+
+            strand: data.strand as Strand,
+            class: GeneClass.Unspecified,
+            soClass: 'gene',
+            
+            transcriptCount: 0,
+            transcripts: [{
+                type: GenomeFeatureType.Transcript,
+
+                startIndex: data.start,
+                length: data.end - data.start,
+                
+                class: TranscriptClass.Unspecified,
+                soClass: 'transcript',
+                exon: [],
+                cds: [],
+                utr: [],
+                other: [],
+            }],
+            score: data.score,
+            level: data.level, 
+            signif: data.signif,
+            score2: data.score2,
         };
         return gene;
     });

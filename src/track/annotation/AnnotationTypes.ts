@@ -10,6 +10,7 @@ export enum GenomeFeatureType {
 	Gene,
 	Transcript,
 	TranscriptComponent,
+	ENCODEBigBedColumns,
 }
 
 export interface GenomeFeature {
@@ -35,6 +36,43 @@ export interface GeneInfo extends GenomeFeature {
 	transcriptCount: number,
 	score?: number,
 	color?: string,
+}
+
+export interface ENCODEBigBedColumns {
+	signalValue?: number,
+	pValue?: number,
+	qValue?: number,
+	peak?: number,
+	level?: number,
+	signif?: number,
+	score2?: number,
+	thickStart?: number,
+	thickEnd?: number,
+	reserved?: number,
+	readCount?: number,
+	percentMeth?: number,
+	count?: number,
+	gene_id?: string,
+	gene_name?: string,
+	tss_id?: string,
+	peak_cov?: string,
+	localIDR?: number,
+	globalIDR?: number,
+	rep1_chromStart?: number,
+	rep1_chromEnd?: number,
+	rep1_count?: number,
+	rep2_chromStart?: number,
+	rep2_chromEnd?: number,
+	rep2_count?: number,
+	chromStart1?: number,
+	chromEnd1?: number,
+	signalValue1?: number,
+	summit1?: number,
+	chromStart2?: number,
+	chromEnd2?: number,
+	signalValue2?: number,
+	summit2?: number,
+	summit?: number,
 }
 
 export enum TranscriptClass {

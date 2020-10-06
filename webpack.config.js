@@ -10,6 +10,8 @@ module.exports = (env, argv) => {
     let releaseMode = argv.mode === 'production';
 
     const config = {
+        node: { fs: 'empty' },
+
         mode: releaseMode ? "production" : "development",
 
         context: path.resolve(__dirname, "src"),

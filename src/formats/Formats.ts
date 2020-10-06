@@ -4,6 +4,13 @@ export enum GenomicFileFormat {
     ValisGenes,
     ValisDna,
     ValisVariants,
+    BigBedNarrowPeak,
+    BigBedBroadPeak,
+    BigBedDataRNAElement,
+    BigBedDataMethyl,
+    BigBedDataTssPeak,
+    BigBedDataIdrPeak,
+    BigBedDataIdrRankedPeak,
 }
 
 export class Formats {
@@ -22,12 +29,26 @@ export class Formats {
         'vgenes-dir': GenomicFileFormat.ValisGenes,
         'vdna-dir': GenomicFileFormat.ValisDna,
         'vvariants-dir': GenomicFileFormat.ValisVariants,
-        
     }
 
-    static determineFormat(path: string): GenomicFileFormat | undefined {
+    static ENCODEBigBedMap: { [key: string]: GenomicFileFormat } = {
+        'narrowPeak': GenomicFileFormat.BigBedNarrowPeak,
+        'broadPeak': GenomicFileFormat.BigBedBroadPeak,
+        'bedRnaElements': GenomicFileFormat.BigBedDataRNAElement,
+        'bedMethyl': GenomicFileFormat.BigBedDataMethyl,
+        'tss_peak': GenomicFileFormat.BigBedDataTssPeak,
+        'idr_peak': GenomicFileFormat.BigBedDataIdrPeak,
+        'idr_ranked_peak,': GenomicFileFormat.BigBedDataIdrRankedPeak,
+        'bed': GenomicFileFormat.BigBed,
+    }
+
+    static determineFormat(path: string, fileFormatType?: string): GenomicFileFormat | undefined {
         let fileExtension = path.substr(path.lastIndexOf('.') + 1).toLowerCase();
-        return this.extensionMap[fileExtension];
-    }
 
+        if (!fileFormatType) {
+            return this.extensionMap[fileExtension];
+        } 
+
+        return this.ENCODEBigBedMap[fileFormatType || 'bed'];
+    }
 }

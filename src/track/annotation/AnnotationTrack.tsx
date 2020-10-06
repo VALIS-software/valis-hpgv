@@ -193,7 +193,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.relativeH = 0;
 
                     if (this.compact) {
-                        geneAnnotation.y = this.annotationY[gene.strand];
+                        geneAnnotation.y = this.annotationY[gene.strand || Strand.Unknown];
                         geneAnnotation.relativeY = 0.5;
                         geneAnnotation.originY = -0.5;
                     } else {
@@ -333,7 +333,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     if (this.compact) {
                         instanceData.push({
                             x: 0,
-                            y: (this.annotationY[gene.strand]) - TRANSCRIPT_HEIGHT * 0.5,
+                            y: (this.annotationY[gene.strand || Strand.Unknown]) - TRANSCRIPT_HEIGHT * 0.5,
                             z: 0,
                             w: 1,
                             h: TRANSCRIPT_HEIGHT,

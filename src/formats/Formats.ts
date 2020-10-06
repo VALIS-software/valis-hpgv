@@ -47,7 +47,7 @@ export class Formats {
 
         if (!fileFormatType) {
             return this.extensionMap[fileExtension];
-        } 
+        }
 
         return this.ENCODEBigBedMap[fileFormatType || 'bed'];
     }

@@ -18,11 +18,9 @@ declare enum AnnotationFormat {
     BigBed = 1,
     BigBedDataBroadPeak = 2,
     BigBedDataNarrowPeak = 3,
-    BigBedDataRNAElement = 4,
-    BigBedDataMethyl = 5,
-    BigBedDataTssPeak = 6,
-    BigBedDataIdrPeak = 7,
-    BigBedDataIdrRankedPeak = 8
+    BigBedDataMethyl = 4,
+    BigBedDataTssPeak = 5,
+    BigBedDataIdrPeak = 6
 }
 export declare class AnnotationTileLoader extends TileLoader<TilePayload, void> {
     protected readonly dataSource: IDataSource;

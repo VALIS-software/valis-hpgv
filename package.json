@@ -21,7 +21,7 @@
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
     "axios": "^0.18.0",
-    "bigwig-reader": "git+https://github.com/ENCODE-DCC/bigwig-reader.git#encode-bigbed-type-addition",
+    "bigwig-reader": "git+https://github.com/ENCODE-DCC/bigwig-reader.git",
     "engine": "github:VALIS-software/Engine",
     "fast-deep-equal": "^2.0.1",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",

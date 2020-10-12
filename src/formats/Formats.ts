@@ -6,11 +6,9 @@ export enum GenomicFileFormat {
     ValisVariants,
     BigBedNarrowPeak,
     BigBedBroadPeak,
-    BigBedDataRNAElement,
     BigBedDataMethyl,
     BigBedDataTssPeak,
     BigBedDataIdrPeak,
-    BigBedDataIdrRankedPeak,
 }
 
 export class Formats {
@@ -34,11 +32,9 @@ export class Formats {
     static ENCODEBigBedMap: { [key: string]: GenomicFileFormat } = {
         'narrowPeak': GenomicFileFormat.BigBedNarrowPeak,
         'broadPeak': GenomicFileFormat.BigBedBroadPeak,
-        'bedRnaElements': GenomicFileFormat.BigBedDataRNAElement,
         'bedMethyl': GenomicFileFormat.BigBedDataMethyl,
         'tss_peak': GenomicFileFormat.BigBedDataTssPeak,
         'idr_peak': GenomicFileFormat.BigBedDataIdrPeak,
-        'idr_ranked_peak,': GenomicFileFormat.BigBedDataIdrRankedPeak,
         'bed': GenomicFileFormat.BigBed,
     }
 

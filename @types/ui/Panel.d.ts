@@ -55,6 +55,7 @@ export declare class Panel extends Object2D {
         y: number;
     }, panelHeaderHeight: number, xAxisHeight: number, dataSource: InternalDataSource);
     applyStyle(styleProxy: StyleProxy): void;
+    readMaxX(): number;
     setResizable(v: boolean): void;
     addTrackView(trackView: TrackObject): void;
     removeTrackView(trackView: TrackObject): void;
@@ -86,6 +87,7 @@ export declare class Panel extends Object2D {
     protected onTrackDragEnd: (e: InteractionEvent) => void;
     protected setActiveAxisPointer(e: InteractionEvent, flag?: String): void;
     protected removeActiveAxisPointer(e: InteractionEvent): void;
+    static showCoordinateError(visible: boolean, message?: string): void;
     protected fillX(obj: Object2D): void;
     protected availableContigAtOffset: (contig: string, offset: number) => string;
     protected updatePanelHeader(): void;

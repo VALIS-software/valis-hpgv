@@ -3,7 +3,7 @@ import { Tile, TileLoader, TileState } from "../TileLoader";
 import { GeneInfo, GenomeFeature, GenomeFeatureType, Strand, TranscriptComponentClass, TranscriptComponentInfo, TranscriptInfo, GeneClass, SoGeneClass, TranscriptClass } from "./AnnotationTypes";
 import TrackModel from "../TrackModel";
 import { UCSCBig, BigLoader } from "../../formats";
-import { BigBedData, BigZoomData } from "bigwig-reader";
+import { BigBedData, BigZoomData } from "genomic-reader";
 import { Formats, GenomicFileFormat } from "../../formats/Formats";
 import { Contig, AnnotationTrackModel } from "../..";
 import Axios from "axios";

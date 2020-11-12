@@ -304,6 +304,8 @@ export class TrackObject<
     // when we're waiting on data from a tile we add a complete listener to update the annotation when the data arrives
     protected createTileLoadingDependency = (tile: Tile<any>) => {
         tile.addEventListener('complete', this.onDependentTileComplete);
+        tile.addEventListener('load-failed', this.onLoadFailed);            
+
         return tile;
     }
 
@@ -315,6 +317,10 @@ export class TrackObject<
         this.triggerDisplayUpdate();
     }
 
+    protected onLoadFailed = () => {
+        this.loadingIndicator.string = 'Track could not be loaded';
+        this.loadingIndicator.color = [1, 0, 0, 1];
+    }
 }
 
 export enum AxisPointerStyle {

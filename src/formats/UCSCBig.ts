@@ -1,4 +1,4 @@
-import { BigWigReader, HeaderData } from "bigwig-reader";
+import { BigWigReader, HeaderData } from "genomic-reader";
 import { Tile } from "../track";
 
 export type BigLoader = {

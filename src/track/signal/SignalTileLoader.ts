@@ -1,7 +1,7 @@
 import GPUDevice, { ColorSpaceConversion, GPUTexture, TextureDataType, TextureFormat, TextureMagFilter, TextureMinFilter, TextureWrapMode } from "engine/rendering/GPUDevice";
 import { SignalTrackModel } from "./SignalTrackModel";
 
-import { BigWigReader, HeaderData } from  "bigwig-reader";
+import { BigWigReader, HeaderData } from  "genomic-reader";
 import { TileLoader, Tile, TileState } from "../TileLoader";
 import { IDataSource } from "../../data-source/IDataSource";
 import { Contig, UCSCBig } from "../..";

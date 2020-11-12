@@ -139,11 +139,25 @@ export class Panel extends Object2D {
         this.setResizable(false);
 
         this.setDataSource(dataSource);
+        Panel.showCoordinateError(false);
     }
 
     applyStyle(styleProxy: StyleProxy) {
         this.xAxis.color = styleProxy.getColor('color') || this.xAxis.color;
         this.xAxis.fontSizePx = styleProxy.getNumber('font-size') || this.xAxis.fontSizePx;
+    }
+
+    readMaxX() {
+        let allMaxX = -Infinity;
+
+        for (let trackView of this.trackViews) {
+            let maxX = trackView.getTileLoader().maximumX;
+            if (isFinite(maxX)) {
+                allMaxX = Math.max(maxX, allMaxX);
+            }
+        }
+
+        return allMaxX;
     }
 
     setResizable(v: boolean) {
@@ -171,6 +185,7 @@ export class Panel extends Object2D {
         this.add(trackView);
 
         this.trackViews.add(trackView);
+        Panel.showCoordinateError(false);
     }
 
     removeTrackView(trackView: TrackObject) {
@@ -185,6 +200,7 @@ export class Panel extends Object2D {
         this.remove(trackView);
 
         this.trackViews.delete(trackView);
+        Panel.showCoordinateError(false);
     }
 
     private _dataSourceId = 0;
@@ -222,7 +238,6 @@ export class Panel extends Object2D {
 
         x0 = Math.min(x0, x1);
         x1 = Math.max(x0, x1);
-
 
         // if range is below allowed minimum, override without changing center
         let span = x1 - x0;
@@ -356,13 +371,7 @@ export class Panel extends Object2D {
             x0 = Math.max(0, x0);
             x1 = Math.max(0, x1);
 
-            let allMaxX = -Infinity;
-            for (let trackView of this.trackViews) {
-                let maxX = trackView.getTileLoader() .maximumX;
-                if (isFinite(maxX)) {
-                    allMaxX = Math.max(maxX, allMaxX);
-                }
-            }
+            let allMaxX = this.readMaxX();
 
             if (allMaxX > 0) {
                 x0 = Math.min(allMaxX, x0);
@@ -664,6 +673,19 @@ export class Panel extends Object2D {
         this.eventEmitter.emit('axisPointerUpdate', this.activeAxisPointers);
     }
 
+    static showCoordinateError(visible: boolean, message : string = null) {
+        let element = document.querySelector<HTMLElement>('.valis-error-message'); 
+
+        if (!element) {
+            return;
+        }
+
+        const textContent : string = message ? message : element.textContent;
+
+        element.textContent = visible ? textContent : '';
+        element.style.display = visible ? 'inline' : 'none';
+    }
+
     protected fillX(obj: Object2D) {
         obj.x = this.spacing.x * 0.5;
         obj.originX = 0;
@@ -703,6 +725,7 @@ export class Panel extends Object2D {
             onEditSave = { (rangeSpecifier: string) => this.finishEditing(rangeSpecifier) }
             onEditStart = { () => this.startEditing() }
             onNextContig = { () => {
+                Panel.showCoordinateError(false);
                 let contig = this.availableContigAtOffset(this.contig, 1);
                 this.setContig(contig);
                 const idx = this.availableContigs.findIndex(c => c.id === contig);
@@ -711,6 +734,7 @@ export class Panel extends Object2D {
                 }
             }}
             onPreviousContig={() => {
+                Panel.showCoordinateError(false);
                 let contig = this.availableContigAtOffset(this.contig, -1);
                 this.setContig(contig);
                 const idx = this.availableContigs.findIndex(c => c.id === contig);
@@ -734,6 +758,7 @@ export class Panel extends Object2D {
     }
 
     protected startEditing() {
+        Panel.showCoordinateError(false);
         this.isEditing = true;
         this.updatePanelHeader();
     }
@@ -750,14 +775,40 @@ export class Panel extends Object2D {
                 contig = 'chr' + chromosomeContigMatch[1].toUpperCase();
             }
 
-            const ranges = parts[1].split('-');
+            const coordinates = parts[1].split('-');
             this.setContig(contig);
-            this.setRange(parseFloat(ranges[0].replace(/,/g, '')), parseFloat(ranges[1].replace(/,/g, '')));
+
+            let rawCoordinate0 = coordinates[0].replace(/,/g, '').trim();
+            let rawCoordinate1 = coordinates[1].replace(/,/g, '').trim();
+
+            if (rawCoordinate0 === '' || rawCoordinate1 === '') {
+                throw new Error('One of the coordinates is empty or not a valid number');
+            }
+
+            // Number vs parseFloat- https://stackoverflow.com/a/13676265/178550
+            let coordinate0 = Number(rawCoordinate0);
+            let coordinate1 = Number(rawCoordinate1);
+            let allMaxX = this.readMaxX();
+
+            if (allMaxX > 0 && coordinate1 > allMaxX) {
+                throw new Error(`Second coordinate ${coordinate1} must be less than max coordinate ${allMaxX}`);
+            }
+
+            if (isNaN(coordinate0) || isNaN(coordinate1)) {
+                throw new Error(`Coordinates ${isNaN(coordinate0) ? rawCoordinate0 : coordinate0} and/or ${isNaN(coordinate1) ? rawCoordinate1 : coordinate1} are invalid`);
+            }
+
+            if (coordinate1 < coordinate0) {
+                throw new Error(`The second coordinate ${coordinate1} must be greater than the first ${coordinate0}`);
+            }
+
+            this.setRange(coordinate0, coordinate1);
         } catch (e) {
             console.error(`Could not parse specifier "${specifier}"`);
+            const message = e.message || 'Error reading chromosome';
+            Panel.showCoordinateError(true, message);
         }
     }
-
 }
 
 interface PanelProps {
@@ -892,6 +943,18 @@ class PanelHeader extends React.Component<PanelProps,{}> {
                 cursor: 'pointer',
             }}>
                 {headerContents}
+                <span
+                    className="valis-error-message"
+                    style={{ 
+                        display: 'none',
+                        color: 'red',
+                        position: 'relative',
+                        top: '-5px',
+                        fontSize: '0.9em',
+                        fontWeight: 400,
+                }}>
+                        The chromosome coordinate is not valid
+                </span>
             </div>
         </div>
     }

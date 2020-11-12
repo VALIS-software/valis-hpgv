@@ -59,6 +59,7 @@ export declare class TrackObject<ModelType extends TrackModel = TrackModel, Tile
     protected createTileLoadingDependency: (tile: Tile<any>) => Tile<any>;
     protected removeTileLoadingDependency: (tile: Tile<any>) => void;
     protected onDependentTileComplete: () => void;
+    protected onLoadFailed: () => void;
 }
 export declare enum AxisPointerStyle {
     Active = 0,

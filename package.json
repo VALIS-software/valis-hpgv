@@ -21,13 +21,13 @@
     "@material-ui/core": "^3.1.0",
     "@material-ui/icons": "^3.0.1",
     "axios": "^0.18.0",
-    "bigwig-reader": "^1.0.9",
     "engine": "github:VALIS-software/Engine",
+    "fast-deep-equal": "^2.0.1",
+    "genomic-reader": "^1.4.7",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",
+    "mkdirp": "^0.5.1",
     "react": "16.x",
     "react-dom": "16.x",
-    "fast-deep-equal": "^2.0.1",
-    "mkdirp": "^0.5.1",
     "string-split-by": "^1.0.0"
   },
   "devDependencies": {

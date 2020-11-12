@@ -20,7 +20,7 @@ import { VariantTrack } from "./track/variant/VariantTrack";
 import { TrackObject } from "./track/TrackObject";
 import { SignalTileLoader } from "./track/signal/SignalTileLoader";
 import { SignalTrack } from "./track/signal/SignalTrack";
-import { BigWigReader, AxiosDataLoader } from "bigwig-reader";
+import { BigWigReader, AxiosDataLoader } from "genomic-reader";
 import { SignalTrackModel, AnnotationTrackModel, SequenceTrackModel, VariantTrackModel } from "./track";
 import { GenomicLocation, Contig } from "./model";
 import { Panel } from "./ui";
@@ -112,6 +112,7 @@ export class GenomeVisualizer {
     setLocation(genomicLocation: GenomicLocation) {
         this.setContig(genomicLocation.contig);
         this.setRange(genomicLocation.x0, genomicLocation.x1);
+        Panel.showCoordinateError(false);
     }
 
     /**

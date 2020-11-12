@@ -14,6 +14,8 @@ export type TrackModel = {
     
     highlightLocation?: string,
 
+    fileFormatType?: string,
+    
     expandable?: boolean,
 
     color?: Array<number>,

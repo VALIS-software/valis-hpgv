@@ -37,6 +37,73 @@ export interface GeneInfo extends GenomeFeature {
 	color?: string,
 }
 
+// columns in Broad Peak but not in UCSC bed
+export interface BigBedBroadPeakColumns {
+	signalValue?: number,
+	pValue?: number,
+	qValue?: number,
+}
+
+// columns in Narrow Peak but not in UCSC bed
+export interface BigBedNarrowPeakColumns {
+	signalValue?: number,
+	pValue?: number,
+	qValue?: number,
+	peak?: number,
+}
+
+// columns in TSS but not in UCSC bed
+export interface BigBedTssPeakColumns {
+	count?: number,
+	gene_id?: string,
+	gene_name?: string,
+	tss_id?: string,
+	peak_cov?: string,
+}
+
+// columns in IDR Peak but not in UCSC bed
+export interface BigBedIdrPeakColumns {
+	localIDR?: number,
+	globalIDR?: number,
+	rep1_chromStart?: number,
+	rep1_chromEnd?: number,
+	rep1_count?: number,
+	rep2_chromStart?: number,
+	rep2_chromEnd?: number,
+	rep2_count?: number,
+}
+
+// Definition of BigBed3+. Only columns that are not unambigious are used and the rest ignored
+export interface BigBedData3Plus {
+    chr: string,
+    start: number,
+    end: number,
+}
+
+// Definition of BigBed6+. Only columns that are not unambigious are used and the rest ignored
+export interface BigBedData6Plus {
+    chr: string,
+    start: number,
+    end: number,
+    name?: string,
+    score?: number,
+    strand?: string,
+}
+
+// Definition of BigBed9+. Only columns that are not unambigious are used and the rest ignored
+export interface BigBedData9Plus {
+    chr: string;
+    start: number;
+    end: number;
+    name?: string;
+    score?: number;
+    strand?: string;
+    cdStart?: number;
+    cdEnd?: number;
+    color?: string;
+}
+
+
 export enum TranscriptClass {
 	Unspecified,
 	// aka protein coding RNA

@@ -279,7 +279,7 @@ export class GenomeVisualizer {
                 pixelRatio={props.pixelRatio || window.devicePixelRatio || 1}
                 style={{
                     // default style
-                    fontFamily: 'sans-serif',
+                    fontFamily: 'Mada, sans-serif',
                     ...props.style
                 }}
                 onWillUnmount={() => {

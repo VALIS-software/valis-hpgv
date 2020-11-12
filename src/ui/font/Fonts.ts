@@ -1,1 +1,1 @@
-export const OpenSansRegular = require('./OpenSans-Regular.msdf.bin');
+export const MadaRegular = require('./Mada-Regular.msdf.bin');

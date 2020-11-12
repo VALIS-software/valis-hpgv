@@ -8,7 +8,7 @@ import { DrawMode, DrawContext } from "engine/rendering/Renderer";
 import { Tile, TileState } from "../TileLoader";
 import { AxisPointer, AxisPointerStyle, HighlightPointer, HighlightStyle } from "../TrackObject";
 import { Text, Scalar } from "engine";
-import { OpenSansRegular } from "../../ui";
+import { MadaRegular } from "../../ui";
 import Animator from "../../Animator";
 import { Shaders } from "../../Shaders";
 import TrackModel from "../TrackModel";
@@ -68,7 +68,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
         this.yAxis.mask = this;
         this.add(this.yAxis);
 
-        this.signalReading = new Text(OpenSansRegular, '', 13, [1, 1, 1, 1]);
+        this.signalReading = new Text(MadaRegular, '', 13, [1, 1, 1, 1]);
         this.signalReading.render = false;
         this.signalReading.x = -20;
         this.signalReading.y = -5;

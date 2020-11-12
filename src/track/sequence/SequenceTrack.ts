@@ -7,7 +7,7 @@ import { DrawContext, DrawMode } from "engine/rendering/Renderer";
 import Object2D from "engine/ui/Object2D";
 import SharedResources from "engine/SharedResources";
 import { Text } from "engine/ui/Text";
-import { OpenSansRegular } from "../../ui/font/Fonts";
+import { MadaRegular } from "../../ui/font/Fonts";
 import { ShaderTrack, ShaderTile } from "../ShaderTrack";
 import { TextClone } from "../../ui/util/TextClone";
 import { SequenceTrackModel } from './SequenceTrackModel';
@@ -38,11 +38,11 @@ export class SequenceTrack<Model extends SequenceTrackModel = SequenceTrackModel
         // we only need 1 text instance of each letter which we can render multiple times
         // this saves reallocating new vertex buffers for each letter
         baseTextInstances: ({
-            'A': new Text(OpenSansRegular, 'A', 1),
-            'C': new Text(OpenSansRegular, 'C', 1),
-            'G': new Text(OpenSansRegular, 'G', 1),
-            'T': new Text(OpenSansRegular, 'T', 1),
-            'N': new Text(OpenSansRegular, 'N', 1),
+            'A': new Text(MadaRegular, 'A', 1),
+            'C': new Text(MadaRegular, 'C', 1),
+            'G': new Text(MadaRegular, 'G', 1),
+            'T': new Text(MadaRegular, 'T', 1),
+            'N': new Text(MadaRegular, 'N', 1),
         } as { [letter: string]: Text }),
 
         backgroundColor: this.color,

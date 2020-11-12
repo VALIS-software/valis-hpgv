@@ -3,7 +3,7 @@ import UsageCache from "engine/ds/UsageCache";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
-import { OpenSansRegular } from "../ui/font/Fonts";
+import { MadaRegular } from "../ui/font/Fonts";
 import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { Scalar } from "engine/math/Scalar";
@@ -403,7 +403,7 @@ export class HighlightPointer extends Rect {
 class LoadingIndicator extends Text {
 
     constructor() {
-        super(OpenSansRegular, 'Loading', 12, [1, 1, 1, 1]);
+        super(MadaRegular, 'Loading', 12, [1, 1, 1, 1]);
     }
 
 }

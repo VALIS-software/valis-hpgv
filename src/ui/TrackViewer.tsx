@@ -27,7 +27,7 @@ import ReactObject from "./core/ReactObject";
 import Panel, { PanelInternal } from "./Panel";
 import TrackViewerConfiguration from "./TrackViewerConfiguration";
 import { DEFAULT_SPRING } from "./UIConstants";
-import { OpenSansRegular } from "./font";
+import { MadaRegular } from "./font";
 import { StyleProxy } from "./util/StyleProxy";
 import { TrackEvent } from "../track/TrackEvent";
 
@@ -132,7 +132,7 @@ export class TrackViewer extends Object2D {
         this.masks = [leftTrackMask, rightTrackMask];
 
         // nothing to display text
-        this.nothingToDisplay = new Text(OpenSansRegular, '', 20, [0.6, 0.6, 0.6, 1.0]);
+        this.nothingToDisplay = new Text(MadaRegular, '', 20, [0.6, 0.6, 0.6, 1.0]);
         this.nothingToDisplay.z = 10;
         // center
         this.nothingToDisplay.originX = -0.5;

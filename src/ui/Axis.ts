@@ -4,7 +4,7 @@ import { Renderable } from "engine/rendering/Renderable";
 import Object2D from "engine/ui/Object2D";
 import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
-import { OpenSansRegular } from "./font";
+import { MadaRegular } from "./font";
 
 export type AxisAlign = 'top' | 'bottom' | 'left' | 'right';
 
@@ -119,7 +119,7 @@ export class Axis extends Object2D {
             clip: false,
             color: [0, 0, 0],
             fontSizePx: 16,
-            fontPath: OpenSansRegular,
+            fontPath: MadaRegular,
             tickSpacingPx: 30,
             maxTextLength: 4,
             tickSizePx: 5,

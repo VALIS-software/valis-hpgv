@@ -1,1 +1,1 @@
-export declare const OpenSansRegular: any;
+export declare const MadaRegular: any;

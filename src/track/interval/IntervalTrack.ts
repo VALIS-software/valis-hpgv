@@ -8,7 +8,7 @@ import TrackObject from "../TrackObject";
 import IntervalTileLoader, { IntervalTilePayload } from "./IntervalTileLoader";
 import { IntervalTrackModel } from "./IntervalTrackModel";
 import { Rect } from "engine/ui/Rect";
-import { OpenSansRegular } from "../../ui/font/Fonts";
+import { MadaRegular } from "../../ui/font/Fonts";
 import { Renderable } from "engine/rendering/Renderable";
 
 export class IntervalTrack<Model extends IntervalTrackModel = IntervalTrackModel> extends TrackObject<Model, IntervalTileLoader> {
@@ -203,7 +203,7 @@ export class IntervalTrackLabel extends Rect {
         this.additiveBlending = 1; // full additive blending
 
         // add text
-        this.text = new Text(OpenSansRegular, string + '', 1, [1, 1, 1, 1]);
+        this.text = new Text(MadaRegular, string + '', 1, [1, 1, 1, 1]);
         this.text.additiveBlending = 1.0;
         this.text.originX = -0.5;
         this.text.originY = -0.5;

@@ -9,7 +9,7 @@ import Object2D from "engine/ui/Object2D";
 import { Rect } from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { Strand } from "genomics-formats/lib/gff3/Strand";
-import { OpenSansRegular } from "../../ui/font/Fonts";
+import { MadaRegular } from "../../ui/font/Fonts";
 import IntervalInstances, { IntervalInstance } from "../../ui/util/IntervalInstances";
 import { TileState } from "../TileLoader";
 import TrackObject from "../TrackObject";
@@ -204,7 +204,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.forEachSubNode((sub) => sub.mask = this);
 
                     // create name text
-                    let name = new Text(OpenSansRegular, gene.name == null ? '' : gene.name, this.compact ? 11 : 16, this.colors['color']);
+                    let name = new Text(MadaRegular, gene.name == null ? '' : gene.name, this.compact ? 11 : 16, this.colors['color']);
                     // name.fontSizePx = this.sharedState.style['font-size'];
                     name.strokeEnabled = (this.colors['--stroke'][3] > 0) && (this.sharedState.style['--stroke-width'] > 9);
                     name.strokeColor = this.colors['--stroke'];

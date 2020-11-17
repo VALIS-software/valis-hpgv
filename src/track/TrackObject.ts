@@ -4,6 +4,7 @@ import Rect from "engine/ui/Rect";
 import Text from "engine/ui/Text";
 import { InternalDataSource } from "../data-source/InternalDataSource";
 import { MadaRegular } from "../ui/font/Fonts";
+import { CSSUtil } from "../ui/util/CSSUtil";
 import { Tile, TileLoader, TileState } from "./TileLoader";
 import { TrackModel } from "./TrackModel";
 import { Scalar } from "engine/math/Scalar";
@@ -403,7 +404,8 @@ export class HighlightPointer extends Rect {
 class LoadingIndicator extends Text {
 
     constructor() {
-        super(MadaRegular, 'Loading', 12, [1, 1, 1, 1]);
+        const fontSize: number = CSSUtil.baseFontSize;
+        super(MadaRegular, 'Loading', fontSize, [1, 1, 1, 1]);
     }
 
 }

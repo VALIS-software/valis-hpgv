@@ -54,11 +54,11 @@
 /* The following are draw via WebGL, so only the properties CSS used here can be changed */
 .hpgv_panel {
     color: #737d94;
-    font-size: 11px;
+    font-size: 16px;
 }
 
 .hpgv_track {
-    background-color: white;//#e9f0f3;
+    background-color: white;
     --loading-indicator: #8ea1bf;
     --cursor: #3645653b;
     --secondary-cursor: #3645653b;

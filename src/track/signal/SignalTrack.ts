@@ -56,7 +56,7 @@ export class SignalTrack<Model extends TrackModel = SignalTrackModel> extends Sh
             align: 'left',
             invert: true,
             clip: false,
-            fontSizePx: 10,
+            fontSizePx: 14,
             tickSpacingPx: 15,
             color: [1, 1, 1, 1],
         });

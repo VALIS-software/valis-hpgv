@@ -1,4 +1,5 @@
 export class CSSUtil {
+    static baseFontSize = 16;
 
     static parseColor(color: string) {
         // use canvas 2d api to write a pixel given a CSS color, then read the written pixel RGBA

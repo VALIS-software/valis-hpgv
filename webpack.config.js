@@ -7,7 +7,7 @@ const buildName = 'valis-hpgv';
 module.exports = (env, argv) => {
     env = env || {};
 
-    let releaseMode = argv.mode === 'production';
+    let releaseMode = argv.mode === 'development';
 
     const config = {
         node: { fs: 'empty' },

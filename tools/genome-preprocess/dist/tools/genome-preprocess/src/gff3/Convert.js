@@ -16,6 +16,7 @@
  *  - A 'gene' by default is a protein-coding gene
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.gff3Convert = void 0;
 const fs = require("fs");
 const path = require("path");
 const AnnotationTileset_1 = require("./AnnotationTileset");

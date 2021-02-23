@@ -43,12 +43,11 @@ export function vcfConvert(inputFilePath: string, outputDirectory: string): Prom
                     });
                 }
 
-                // @! temporary for demo
-                let species = 'l_fortunei';
-                saveSequence(tileset.sequences['main'] || [], `${outputDirectory}/${species.toLowerCase()}.vvariants-dir/${species.toLowerCase()}`);
+                let inputFilename = path.basename(inputFilePath);
+                saveSequence(tileset.sequences['main'] || [], `${outputDirectory}/${inputFilename.toLowerCase()}.vvariants-dir/${inputFilename.toLowerCase()}`);
 
                 // @! temporary, save out genes for biobureau demo
-                filesWritten = filesWritten.concat(biobureauGenerateGenes(inputFilePath, outputDirectory, vcf));
+                // filesWritten = filesWritten.concat(biobureauGenerateGenes(inputFilePath, outputDirectory, vcf));
 
                 resolve(filesWritten);
             }
@@ -130,7 +129,7 @@ function biobureauGenerateGenes(inputFilePath: string, outputDirectory: string, 
         throw `Biobureau demo: filename does not match (@! remove this)`;
     }
 
-    let filesWritten = new Set();
+    let filesWritten = new Set<string>();
 
     let biobureauGeneTileset = new AnnotationTileset(
         lodLevel0TileSize, // ~1 million,

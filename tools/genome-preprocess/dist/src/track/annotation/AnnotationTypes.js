@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SoTranscriptComponentClass = exports.SoTranscriptClass = exports.SoGeneClass = exports.TranscriptComponentClass = exports.TranscriptClass = exports.GeneClass = exports.GenomeFeatureType = exports.Strand = void 0;
 var Strand;
 (function (Strand) {
     Strand["None"] = ".";
@@ -50,8 +51,8 @@ class SoGeneClass {
         this['pseudogene'] = GeneClass.Pseudo;
     }
 }
-SoGeneClass.instance = new SoGeneClass();
 exports.SoGeneClass = SoGeneClass;
+SoGeneClass.instance = new SoGeneClass();
 class SoTranscriptClass {
     constructor() {
         this['transcript'] = TranscriptClass.Unspecified;
@@ -66,8 +67,8 @@ class SoTranscriptClass {
         this['snRNA'] = TranscriptClass.NonProteinCoding;
     }
 }
-SoTranscriptClass.instance = new SoTranscriptClass();
 exports.SoTranscriptClass = SoTranscriptClass;
+SoTranscriptClass.instance = new SoTranscriptClass();
 class SoTranscriptComponentClass {
     constructor() {
         this['CDS'] = TranscriptComponentClass.ProteinCodingSequence;
@@ -76,5 +77,5 @@ class SoTranscriptComponentClass {
         this['three_prime_UTR'] = TranscriptComponentClass.Untranslated;
     }
 }
-SoTranscriptComponentClass.instance = new SoTranscriptComponentClass();
 exports.SoTranscriptComponentClass = SoTranscriptComponentClass;
+SoTranscriptComponentClass.instance = new SoTranscriptComponentClass();

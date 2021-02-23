@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getBranches = exports.printSummary = void 0;
 const Terminal_1 = require("../Terminal");
 function printSummary(features) {
     Terminal_1.default.log('Parsing complete\n');

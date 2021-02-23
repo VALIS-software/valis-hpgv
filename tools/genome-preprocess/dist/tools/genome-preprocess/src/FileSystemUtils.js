@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteDirectory = void 0;
 const Terminal_1 = require("./Terminal");
 const fs = require("fs");
 function deleteDirectory(directory) {

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnnotationTileset = void 0;
 const AnnotationTypes_1 = require("../../../../src/track/annotation/AnnotationTypes");
 class AnnotationTileset {
     constructor(tileSize, topLevelOnly, onUnknownFeature, onError) {
@@ -40,17 +41,17 @@ class AnnotationTileset {
                 let isTranscript = AnnotationTypes_1.SoTranscriptClass.instance[c.type] !== undefined;
                 return isTranscript ? (p + 1) : p;
             }, 0);
-            let gene = Object.assign({}, featureCommon, { type: AnnotationTypes_1.GenomeFeatureType.Gene, class: AnnotationTypes_1.SoGeneClass.instance[feature.type], strand: feature.strand, transcriptCount: transcriptCount });
+            let gene = Object.assign(Object.assign({}, featureCommon), { type: AnnotationTypes_1.GenomeFeatureType.Gene, class: AnnotationTypes_1.SoGeneClass.instance[feature.type], strand: feature.strand, transcriptCount: transcriptCount });
             tile.content.push(gene);
         }
         else if (AnnotationTypes_1.SoTranscriptClass.instance[feature.type] !== undefined) {
             // is transcript	
-            let transcript = Object.assign({}, featureCommon, { type: AnnotationTypes_1.GenomeFeatureType.Transcript, class: AnnotationTypes_1.SoTranscriptClass.instance[feature.type] });
+            let transcript = Object.assign(Object.assign({}, featureCommon), { type: AnnotationTypes_1.GenomeFeatureType.Transcript, class: AnnotationTypes_1.SoTranscriptClass.instance[feature.type] });
             tile.content.push(transcript);
         }
         else if (AnnotationTypes_1.SoTranscriptComponentClass.instance[feature.type] !== undefined) {
             // is transcript component	
-            let info = Object.assign({}, featureCommon, { type: AnnotationTypes_1.GenomeFeatureType.TranscriptComponent, class: AnnotationTypes_1.SoTranscriptComponentClass.instance[feature.type] });
+            let info = Object.assign(Object.assign({}, featureCommon), { type: AnnotationTypes_1.GenomeFeatureType.TranscriptComponent, class: AnnotationTypes_1.SoTranscriptComponentClass.instance[feature.type] });
             if (feature.phase != null) {
                 info.phase = feature.phase;
             }

@@ -6,10 +6,10 @@
   "types": "./@types/index.d.ts",
   "scripts": {
     "clean": "rimraf ./@types ./dist",
-    "prod": "npm run clean && cti src && webpack --mode=production && webpack --mode=production --env.includeReact",
+    "prod": "npm run clean && cti src && webpack --mode=development && webpack --mode=development --env.includeReact",
     "dev": "webpack-dev-server --mode=development",
     "dev-react": "webpack-dev-server --mode=development --env.includeReact",
-    "analyze": "npm run clean && cti src && webpack --mode=production --env.analyze",
+    "analyze": "npm run clean && cti src && webpack --mode=development --env.analyze",
     "build": "npm run prod"
   },
   "bin": {

@@ -46607,6 +46607,7 @@ var AnnotationTrack = /** @class */ (function (_super) {
                     // create name text
                     var name = new Text_1.default(Fonts_1.MadaRegular, gene.name == null ? '' : gene.name, _this.compact ? 11 : 16, _this.colors['color']);
                     // name.fontSizePx = this.sharedState.style['font-size'];
+                    name.fontSizePx = 400;
                     name.strokeEnabled = (_this.colors['--stroke'][3] > 0) && (_this.sharedState.style['--stroke-width'] > 9);
                     name.strokeColor = _this.colors['--stroke'];
                     name.strokeWidthPx = _this.sharedState.style['--stroke-width'];

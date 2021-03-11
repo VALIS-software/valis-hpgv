@@ -1,7 +1,7 @@
 {
   "name": "genome-visualizer",
   "version": "1.0.3",
-  "description": "",
+  "description": "## [Live Demo](https://valis-software.github.io/valis-hpgv/examples/minimal/index.html)",
   "main": "./dist/valis-hpgv.react-peer.js",
   "types": "./@types/index.d.ts",
   "scripts": {
@@ -13,7 +13,7 @@
     "build": "npm run prod"
   },
   "bin": {
-    "hpgv": "./cli.js"
+    "hpgv": "cli.js"
   },
   "author": "George Corney (haxiomic)",
   "license": "ISC",
@@ -26,6 +26,7 @@
     "genomic-reader": "^1.4.7",
     "genomics-formats": "github:VALIS-software/Genomics-Formats",
     "mkdirp": "^0.5.1",
+    "parcel": "^1.12.3",
     "react": "16.x",
     "react-dom": "16.x",
     "string-split-by": "^1.0.0"
@@ -50,5 +51,17 @@
   "peerDependencies": {
     "react": "16.x",
     "react-dom": "16.x"
-  }
+  },
+  "directories": {
+    "example": "examples"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ENCODE-DCC/valis-hpgv.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/ENCODE-DCC/valis-hpgv/issues"
+  },
+  "homepage": "https://github.com/ENCODE-DCC/valis-hpgv#readme"
 }

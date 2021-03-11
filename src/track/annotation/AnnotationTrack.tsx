@@ -204,7 +204,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
                     geneAnnotation.forEachSubNode((sub) => sub.mask = this);
 
                     // create name text
-                    let name = new Text(MadaRegular, gene.name == null ? '' : gene.name, this.compact ? 11 : 16, this.colors['color']);
+                    let name = new Text(MadaRegular, gene.name == null ? '' : gene.name, this.compact ? 14 : 16, this.colors['color']);
                     // name.fontSizePx = this.sharedState.style['font-size'];
                     name.strokeEnabled = (this.colors['--stroke'][3] > 0) && (this.sharedState.style['--stroke-width'] > 9);
                     name.strokeColor = this.colors['--stroke'];

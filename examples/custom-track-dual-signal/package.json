@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "genome-visualizer": "github:VALIS-software/valis-hpgv",
-    "parcel": "^1.10.3"
+    "parcel": "^1.10.3",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   }
 }

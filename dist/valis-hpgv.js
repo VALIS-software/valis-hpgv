@@ -80899,15 +80899,33 @@ var Panel = /** @class */ (function (_super) {
     Panel.prototype.setRangeUsingRangeSpecifier = function (specifier) {
         // @! this could be improved to be more robust (for example, omitting contig should use current contig, etc)
         try {
+            if (!specifier) {
+                throw new Error('Specificer (chromosome and coordinates) is missing');
+            }
             var parts = specifier.split(':');
             var contig = parts[0];
+            if (!contig) {
+                throw new Error('Chromosome is missing');
+            }
             // make chrx to chrX
             var chromosomeContigMatch = /chr(.*)$/.exec(contig);
             if (chromosomeContigMatch) {
                 contig = 'chr' + chromosomeContigMatch[1].toUpperCase();
             }
+            if (!parts[1]) {
+                throw new Error('Coordinates are missing');
+            }
             var coordinates = parts[1].split('-');
             this.setContig(contig);
+            if (!coordinates) {
+                throw new Error('Coordinates are missing');
+            }
+            if (!coordinates[0]) {
+                throw new Error('First coordinate is missing');
+            }
+            if (!coordinates[1]) {
+                throw new Error('Second coordinate is missing');
+            }
             var rawCoordinate0 = coordinates[0].replace(/,/g, '').trim();
             var rawCoordinate1 = coordinates[1].replace(/,/g, '').trim();
             if (rawCoordinate0 === '' || rawCoordinate1 === '') {

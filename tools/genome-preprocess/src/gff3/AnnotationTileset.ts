@@ -1,5 +1,5 @@
 import { Feature } from "genomics-formats/lib/gff3/Feature";
-import { SoGeneClass, SoTranscriptClass, GenomeFeature, GenomeFeatureType, SoTranscriptComponentClass, GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "../../../../src/track/annotation/AnnotationTypes";
+import { SoGeneClass, SoTranscriptClass, GenomeFeature, GenomeFeatureType, SoTranscriptComponentClass, GeneInfo, TranscriptComponentInfo, TranscriptInfo } from "./AnnotationTypes";
 
 export type AnnotationTile = {
     startIndex: number,

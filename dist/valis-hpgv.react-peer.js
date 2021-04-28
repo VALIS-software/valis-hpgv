@@ -51220,7 +51220,7 @@ var VariantTrack = /** @class */ (function (_super) {
                                 var startIndex = variant.baseIndex;
                                 var altIndex = 0;
                                 var refSpan = variant.refSequence.length;
-                                var color = [1, 0, 0, 1.0]; // default to deletion
+                                var color = [0, 1.0, 0, 1.0]; // default to deletion
                                 try {
                                     for (var _e = __values(variant.alts), _f = _e.next(); !_f.done; _f = _e.next()) {
                                         var altSequence = _f.value;
@@ -51229,13 +51229,14 @@ var VariantTrack = /** @class */ (function (_super) {
                                         // generate color from lengthDelta
                                         var opacity = 1;
                                         if (lengthDelta === 0) {
-                                            color = [1.0, 1.0, 1.0, opacity];
+                                            color = [0.1, 0.30, 0.30, opacity];
+                                            //94, 130, 130
                                         }
                                         else if (lengthDelta < 0) {
-                                            color = [1.0, 0.3, 0.5, opacity];
+                                            color = [0.66, 0.07, 0.09, opacity];
                                         }
                                         else {
-                                            color = [0.3, 1.0, 0.5, opacity];
+                                            color = [0.3, 0.3, 0.3, opacity];
                                         }
                                         for (var i = 0; i < altSpan; i++) {
                                             var baseCharacter = altSequence[i];
@@ -51298,10 +51299,10 @@ var VariantTrack = /** @class */ (function (_super) {
                                         // generate color from lengthDelta
                                         var opacity = 0.7;
                                         if (lengthDelta === 0) {
-                                            color = [0.8, 0.8, 0.8, opacity];
+                                            color = [0.1, 0.30, 0.30, opacity];
                                         }
                                         else if (lengthDelta < 0) {
-                                            color = [1, 0, 0, opacity];
+                                            color = [0.66, 0.07, 0.09, opacity];
                                         }
                                         else {
                                             color = [0, 1, 0, opacity];
@@ -51367,7 +51368,7 @@ var VariantTrack = /** @class */ (function (_super) {
                         }
                         var instancesTile = new IntervalInstances_1.default(instanceData);
                         instancesTile.minWidth = 1.0;
-                        instancesTile.additiveBlending = 1.0; // full additive blending
+                        instancesTile.additiveBlending = 0.0; // full additive blending
                         instancesTile.y = tileY;
                         instancesTile.z = 0.75;
                         instancesTile.mask = _this;

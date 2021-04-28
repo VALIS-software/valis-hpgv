@@ -13,10 +13,32 @@ let hpgv = new GenomeVisualizer({
     ],
     tracks: [
         {
-            name: 'DNA',
+            name: 'GRCh37',
             type: 'sequence',
-            path: 'https://s3-us-west-1.amazonaws.com/valis-file-storage/genome-data/GRCh38.vdna-dir',
+            path: 'https://encoded-build.s3.amazonaws.com/browser/GRCh38/GRCh38.vdna-dir',
         },
+        {
+            name: 'Valis Genes',
+            type: 'annotation',
+            path: 'https://encoded-build.s3.amazonaws.com/browser/GRCh38/GRCh38.vgenes-dir',
+            displayLabels: false,
+        },
+        {
+            name: 'test VCF',
+            type: 'variant',
+            path: 'https://encoded-build.s3.amazonaws.com/browser/GRCh38/test.vcf.vvariants-dir',
+            displayLabels: false,
+        },
+        {
+            name: 'bigBed',
+            type: 'annotation',
+            path: 'https://www.encodeproject.org/files/ENCFF609BMS/@@download/ENCFF609BMS.bigBed',
+        },
+        {
+            name: 'bigWig',
+            type: 'signal',
+            path: 'https://www.encodeproject.org/files/ENCFF833POA/@@download/ENCFF833POA.bigWig',
+        },        
         {
             name: 'Dual Signal',
             type: 'dual-signal',

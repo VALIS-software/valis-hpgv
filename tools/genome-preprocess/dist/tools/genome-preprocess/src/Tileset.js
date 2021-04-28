@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Tileset = void 0;
 class Tileset {
     constructor(tileSize) {
         this.tileSize = tileSize;

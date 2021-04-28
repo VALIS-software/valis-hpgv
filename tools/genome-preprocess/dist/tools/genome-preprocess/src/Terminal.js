@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Terminal = void 0;
 const util = require("util");
 const process = require("process");
 class Terminal {
@@ -56,8 +57,8 @@ class Terminal {
         }
     }
 }
-Terminal.currentRewriteId = undefined;
 exports.Terminal = Terminal;
+Terminal.currentRewriteId = undefined;
 exports.default = Terminal;
 var FormatFlag;
 (function (FormatFlag) {

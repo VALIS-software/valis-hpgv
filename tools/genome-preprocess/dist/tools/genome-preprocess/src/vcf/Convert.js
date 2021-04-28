@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.vcfConvert = void 0;
 const fs = require("fs");
 const path = require("path");
 const Terminal_1 = require("../Terminal");
@@ -37,11 +38,10 @@ function vcfConvert(inputFilePath, outputDirectory) {
                         alts: feature.ALT.split('')
                     });
                 }
-                // @! temporary for demo
-                let species = 'l_fortunei';
-                saveSequence(tileset.sequences['main'] || [], `${outputDirectory}/${species.toLowerCase()}.vvariants-dir/${species.toLowerCase()}`);
+                let inputFilename = path.basename(inputFilePath);
+                saveSequence(tileset.sequences['main'] || [], `${outputDirectory}/${inputFilename.toLowerCase()}.vvariants-dir/${inputFilename.toLowerCase()}`);
                 // @! temporary, save out genes for biobureau demo
-                filesWritten = filesWritten.concat(biobureauGenerateGenes(inputFilePath, outputDirectory, vcf));
+                // filesWritten = filesWritten.concat(biobureauGenerateGenes(inputFilePath, outputDirectory, vcf));
                 resolve(filesWritten);
             }
         });
@@ -255,7 +255,7 @@ class VCFParser {
             }
             this.callbacks.onComplete(this.output);
         };
-        this.callbacks = Object.assign({}, this.callbacks, callbacks);
+        this.callbacks = Object.assign(Object.assign({}, this.callbacks), callbacks);
     }
     onMetaLine(line) {
         if (line.trim() === '')

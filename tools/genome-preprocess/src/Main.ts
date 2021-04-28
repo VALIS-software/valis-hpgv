@@ -86,6 +86,7 @@ Generates files optimized for viewing with VALIS Genome Visualizer
 Supports the following file types
 - <b>FASTA</> <i,dim>.fa, .fna, .fasta</>
 - <b>GFF3</> <i,dim>.gff3</>
+- <b>VCF</4> <i,dim>.vcf</>
 `
 	);
 }

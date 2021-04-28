@@ -55,7 +55,7 @@ export class TrackViewer extends Object2D {
 
     readonly spacing = {
         x: 5,
-        y: 5
+        y: 0
     };
     readonly xAxisHeight = 40; // height excluding spacing
     readonly minPanelWidth = 35;
@@ -291,7 +291,11 @@ export class TrackViewer extends Object2D {
         })
 
         let defaultTrackHeight = trackClasses.trackObjectClass.getDefaultHeightPx != null ? trackClasses.trackObjectClass.getDefaultHeightPx(model) : 100;
-        let expandable = trackClasses.trackObjectClass.getExpandable != null ? trackClasses.trackObjectClass.getExpandable(model) : true;
+
+        let expandable =
+            (trackClasses.trackObjectClass.getExpandable != null ? trackClasses.trackObjectClass.getExpandable(model) : true)
+            && (model.expandable != null ? model.expandable : true);
+
         let heightPx = model.heightPx != null ? model.heightPx : defaultTrackHeight;
 
         // create a track and add the header element to the grid
@@ -357,10 +361,12 @@ export class TrackViewer extends Object2D {
             }
         });
 
-        rowObject.setResizable(true);
-
         this.grid.add(rowObject.header);
-        this.grid.add(rowObject.resizeHandle);
+
+        rowObject.setResizable(expandable);
+        if (expandable) {
+            this.grid.add(rowObject.resizeHandle);
+        }
 
         if (this._removableTracks) {
             this.grid.add(rowObject.closeButton);

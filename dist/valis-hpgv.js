@@ -81137,7 +81137,7 @@ var TrackViewer = /** @class */ (function (_super) {
         _this.trackButtonWidth = 50;
         _this.spacing = {
             x: 5,
-            y: 5
+            y: 0
         };
         _this.xAxisHeight = 40; // height excluding spacing
         _this.minPanelWidth = 35;
@@ -81552,7 +81552,8 @@ var TrackViewer = /** @class */ (function (_super) {
             }
         });
         var defaultTrackHeight = trackClasses.trackObjectClass.getDefaultHeightPx != null ? trackClasses.trackObjectClass.getDefaultHeightPx(model) : 100;
-        var expandable = trackClasses.trackObjectClass.getExpandable != null ? trackClasses.trackObjectClass.getExpandable(model) : true;
+        var expandable = (trackClasses.trackObjectClass.getExpandable != null ? trackClasses.trackObjectClass.getExpandable(model) : true)
+            && (model.expandable != null ? model.expandable : true);
         var heightPx = model.heightPx != null ? model.heightPx : defaultTrackHeight;
         // create a track and add the header element to the grid
         var track = new Track(model, heightPx, function (name) {
@@ -81603,9 +81604,11 @@ var TrackViewer = /** @class */ (function (_super) {
                 _this.endResizingTrack(track);
             }
         });
-        rowObject.setResizable(true);
         this.grid.add(rowObject.header);
-        this.grid.add(rowObject.resizeHandle);
+        rowObject.setResizable(expandable);
+        if (expandable) {
+            this.grid.add(rowObject.resizeHandle);
+        }
         if (this._removableTracks) {
             this.grid.add(rowObject.closeButton);
         }

@@ -109,8 +109,10 @@ class Main {
 		var chromosomeFilter = args[1] != null ? args[1] : '\\w+';
 		var filter = '^(${chromosomeFilter}) dna:chromosome chromosome';
 
-		Console.log('Filter is "$filter"');
-		sequenceNameFilter = new EReg(filter, '');
+		if (args[1] != null) {
+			Console.log('Filter is "$filter"');
+			sequenceNameFilter = new EReg(filter, '');
+		}
 
 		var generatedFilePaths = convertFastaFile(fastaFilePath, Path.join(['_output', fastaFilename + '.vdna-dir']));
 
@@ -420,7 +422,7 @@ class Main {
 	) {
 		Console.log('<cyan>Reading "<b>$path</b>"</cyan>');
 
-		var currentOutputBuffer: haxe.io.Output;
+		var currentOutputBuffer: haxe.io.Output = null;
 		var generatedFilePaths = new Array<String>();
 		var skipSequence = false;
 		var returnSequence = true;

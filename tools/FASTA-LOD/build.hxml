@@ -1,10 +1,8 @@
 -main Main
 
--lib console.hx
-
 -dce full
 
--lib hxnodejs:git:https://github.com/HaxeFoundation/hxnodejs#877a80e7f1f96218f7f3fbf8f37ffc2a7f42e1bd
+-lib hxnodejs
 -js bin/main.js
 
 # C++ build requires a modified version of haxe-4.0.0-2018-05-10

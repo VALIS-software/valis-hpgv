@@ -184,7 +184,7 @@ export class AnnotationTrack extends TrackObject<AnnotationTrackModel, Annotatio
 
                 let annotationKey = this.contig + ':' + this.annotationKey(gene);
 
-                this.colors['--transcript'] =  CSSUtil.getBedFileRGBA(gene.color, gene.score);
+                this.colors['--transcript'] = gene.color ? CSSUtil.getBedFileRGBA(gene.color, gene.score) : this.sharedState.colors['--transcript'].slice();
 
                 let annotation = this._annotationCache.get(annotationKey, () => {
                     // create gene object

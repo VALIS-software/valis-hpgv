@@ -48540,7 +48540,7 @@ var AnnotationTrack = /** @class */ (function (_super) {
                 if (_this.model.strand != null && gene.strand !== _this.model.strand)
                     return "continue";
                 var annotationKey = _this.contig + ':' + _this.annotationKey(gene);
-                _this.colors['--transcript'] = CSSUtil_1.CSSUtil.getBedFileRGBA(gene.color, gene.score);
+                _this.colors['--transcript'] = gene.color ? CSSUtil_1.CSSUtil.getBedFileRGBA(gene.color, gene.score) : _this.sharedState.colors['--transcript'].slice();
                 var annotation = _this._annotationCache.get(annotationKey, function () {
                     // create gene object
                     var geneAnnotation = new GeneAnnotation(_this.compact, _this.displayLabels, gene, _this.sharedState, _this.onAnnotationClicked);
